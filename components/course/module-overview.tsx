@@ -1,0 +1,106 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getModuleBySlug } from "@/lib/content/queries";
+import { getServerLocale } from "@/lib/i18n/get-locale";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { prisma } from "@/lib/db";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+
+export async function ModuleOverview({
+  courseSlug,
+  moduleSlug,
+  userId,
+}: {
+  courseSlug: "anatomy" | "physiology";
+  moduleSlug: string;
+  userId: string;
+}) {
+  const locale = await getServerLocale();
+  const dict = getDictionary(locale);
+  const mod = await getModuleBySlug(moduleSlug);
+
+  if (!mod || mod.course.slug !== courseSlug) notFound();
+
+  const title = locale === "ar" ? mod.titleAr : mod.titleEn;
+  const description = locale === "ar" ? mod.descriptionAr : mod.descriptionEn;
+
+  if (mod.lessons.length === 0) {
+    return (
+      <div>
+        <Link href={`/${courseSlug}`} className="text-sm text-primary-700 hover:underline">
+          ← {locale === "ar" ? mod.course.titleAr : mod.course.titleEn}
+        </Link>
+        <h1 className="mt-3 text-2xl font-bold">{title}</h1>
+        <Card className="mt-6">
+          <p className="text-sm text-muted">
+            {locale === "ar"
+              ? "محتوى هذا الموديل قيد الإعداد حاليًا من قبل فريق المحتوى الطبي، وسيتوفر قريبًا."
+              : "This module's content is currently being developed by the medical content team and will be available soon."}
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
+  const progress = await prisma.progressRecord.findUnique({
+    where: { userId_moduleId: { userId, moduleId: mod.id } },
+  });
+
+  const lastAttempt = await prisma.quizAttempt.findFirst({
+    where: { userId, moduleId: mod.id, completedAt: { not: null } },
+    orderBy: { completedAt: "desc" },
+  });
+
+  return (
+    <div>
+      <Link href={`/${courseSlug}`} className="text-sm text-primary-700 hover:underline">
+        ← {locale === "ar" ? mod.course.titleAr : mod.course.titleEn}
+      </Link>
+
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">{title}</h1>
+        <Badge tone={progress?.status === "COMPLETED" ? "success" : "primary"}>
+          {progress?.status === "COMPLETED"
+            ? dict.course.completed
+            : progress?.status === "IN_PROGRESS"
+              ? dict.course.inProgress
+              : dict.course.notStarted}
+        </Badge>
+      </div>
+      <p className="mt-2 max-w-2xl text-sm text-muted">{description}</p>
+
+      <h2 className="mt-8 text-lg font-bold">{dict.course.lessons}</h2>
+      <ol className="mt-4 space-y-3">
+        {mod.lessons.map((lesson, i) => (
+          <li key={lesson.id}>
+            <Link href={`/${courseSlug}/${mod.slug}/${lesson.slug}`}>
+              <Card className="flex items-center gap-4 transition-colors hover:border-primary-300">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-800">
+                  {i + 1}
+                </span>
+                <span className="font-medium">
+                  {locale === "ar" ? lesson.titleAr : lesson.titleEn}
+                </span>
+              </Card>
+            </Link>
+          </li>
+        ))}
+      </ol>
+
+      <Card className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="font-semibold">{dict.course.takeQuiz}</p>
+          {lastAttempt && (
+            <p className="mt-1 text-sm text-muted">
+              {dict.dashboard.averageScore}: {lastAttempt.scorePercent}% —{" "}
+              {lastAttempt.passed ? dict.quiz.passed : dict.quiz.failed}
+            </p>
+          )}
+        </div>
+        <ButtonLink href={`/${courseSlug}/${mod.slug}/quiz`}>{dict.course.takeQuiz}</ButtonLink>
+      </Card>
+    </div>
+  );
+}
