@@ -1,17 +1,14 @@
 // E-nursing platform data model.
-// Using SQLite for local/dev so the platform runs with zero external
-// credentials. Swapping to Postgres later only needs:
-//   1. datasource.provider = "postgresql"
-//   2. DATABASE_URL pointed at the real instance
-//   3. `Json` fields already work as-is on Postgres; enums are supported
-//      on both, so no field types need to change.
+// Postgres-backed so it can be deployed (e.g. to Vercel + Neon) as well as
+// run locally — point DATABASE_URL at any Postgres instance, local or
+// hosted, and this schema works unchanged.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

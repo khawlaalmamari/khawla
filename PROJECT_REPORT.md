@@ -119,8 +119,9 @@ Not currently used. If you want to switch from the local auth system to Clerk:
   set).
 - **An email provider** (e.g. Resend, SMTP) — to send real password-reset emails instead
   of the current dev-only console log.
-- **A production Postgres database** — swap `prisma/schema.prisma`'s datasource and
-  `DATABASE_URL` when ready to move off local SQLite.
+- **A hosted Postgres database** for a live deployment (e.g. Neon, Supabase) — the app
+  already runs on Postgres (schema and local dev were switched over from the initial
+  SQLite setup), so this is just provisioning, not a code change.
 - **A licensed 3D anatomy model** — needed before the 3D Explorer can be built for real.
 
 ## 7. Content/assets needing further work
@@ -135,8 +136,11 @@ Not currently used. If you want to switch from the local auth system to Clerk:
 
 ## 8. How to run the project
 
+Requires a PostgreSQL database (local install or a free hosted one like Neon).
+
 ```bash
 npm install
+cp .env.example .env   # edit DATABASE_URL and SESSION_SECRET
 npx prisma db push
 node prisma/seed.js
 npm run dev
@@ -145,13 +149,14 @@ Then open http://localhost:3000 and create an account through the sign-up page.
 
 ## 9. How to deploy
 
-Not deployed as part of this phase. For a real deployment:
-1. Provision a Postgres database and update `DATABASE_URL` + `prisma/schema.prisma`'s
-   provider.
-2. Set a strong random `SESSION_SECRET`.
-3. Set `AI_PROVIDER_API_KEY` and an email provider's credentials if those features are
-   needed at launch.
-4. Run `npx prisma migrate deploy` (after switching from `db push` to a real migration
-   history) and `node prisma/seed.js` against the production database.
-5. Deploy the Next.js app to your platform of choice (Vercel, or any Node host that
-   supports Next.js's standalone output).
+Not deployed as part of this phase (no hosting account was available to deploy to),
+but the app is deployment-ready. See the README's "Deploying a live version" section
+for the exact Vercel + Neon steps. Summary:
+1. Provision a Postgres database (e.g. Neon's free tier) and copy its connection string.
+2. Create a Vercel project from the GitHub repo (branch `claude/graphify-qkx15c`).
+3. Set `DATABASE_URL`, `SESSION_SECRET`, and optionally `AI_PROVIDER_API_KEY` as Vercel
+   environment variables.
+4. Run `npx prisma db push` and `node prisma/seed.js` once against that database from
+   your own machine (pointing `DATABASE_URL` at it via the command line).
+5. Deploy — Vercel builds automatically on every push and gives a live
+   `https://your-project.vercel.app` URL.

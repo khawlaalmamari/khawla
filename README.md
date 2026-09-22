@@ -3,31 +3,57 @@
 **From Knowledge to Clinical Thinking / من المعرفة إلى التفكير السريري**
 
 A bilingual (Arabic/English) medical learning platform for first-year nursing students in
-Oman, built with Next.js (App Router), TypeScript, Tailwind CSS, and Prisma.
+Oman, built with Next.js (App Router), TypeScript, Tailwind CSS, and Prisma + PostgreSQL.
 
 This is a first build phase: a complete, working vertical slice (landing page → real
-auth → one fully-content Anatomy module with lessons and a graded quiz → progress
+auth → two fully-content Anatomy modules with lessons and graded quizzes → progress
 tracking → dashboard → Ask Novia widget), rather than a shallow scaffold of every
 screen described in the original brief. See `PROJECT_REPORT.md` for exactly what is
 implemented vs. still pending.
 
-## Getting started
+## Getting started (local development)
+
+You need a PostgreSQL database — either installed locally or a free hosted one (e.g.
+[Neon](https://neon.tech) or [Supabase](https://supabase.com)).
 
 ```bash
 npm install
-npx prisma db push      # creates the local SQLite database
-node prisma/seed.js     # seeds courses, modules, and the Skeletal System lessons/quiz
+cp .env.example .env     # then edit DATABASE_URL and SESSION_SECRET in .env
+npx prisma db push       # creates the tables
+node prisma/seed.js      # seeds courses, modules, and the two full lesson/quiz modules
 npm run dev
 ```
 
 Open http://localhost:3000. Create an account via "إنشاء حساب" / "Sign Up" — there is no
 seeded demo user, since real accounts should go through the actual signup flow.
 
+## Deploying a live version (Vercel + Neon)
+
+1. **Create a Postgres database** at https://neon.tech (free tier) — click "Create
+   Project," then copy the connection string it gives you (starts with `postgresql://`).
+2. **Create a Vercel account** at https://vercel.com (free tier), sign in with GitHub.
+3. **Import the project**: on Vercel's dashboard, "Add New… → Project," select the
+   `khawla` GitHub repo, and pick the `claude/graphify-qkx15c` branch.
+4. **Set environment variables** in the Vercel project's Settings → Environment
+   Variables, before the first deploy:
+   - `DATABASE_URL` → the Neon connection string from step 1
+   - `SESSION_SECRET` → any long random string (e.g. generate one with
+     `openssl rand -hex 32` in a terminal)
+   - `AI_PROVIDER_API_KEY` → optional, leave blank for now
+5. **Push the schema to that database once**, from your own machine, before or right
+   after the first deploy:
+   ```bash
+   DATABASE_URL="<the Neon connection string>" npx prisma db push
+   DATABASE_URL="<the Neon connection string>" node prisma/seed.js
+   ```
+6. **Deploy** — Vercel builds and gives you a live `https://your-project.vercel.app`
+   link automatically on every push to that branch.
+
 ## Stack
 
 - **Next.js 16** (App Router, Turbopack) + **TypeScript** + **Tailwind CSS v4**
-- **Prisma 6** + **SQLite** for local/dev persistence (swap to Postgres by changing
-  `prisma/schema.prisma`'s datasource and `DATABASE_URL` — no field types need to change)
+- **Prisma 6** + **PostgreSQL** (works the same locally or hosted — just point
+  `DATABASE_URL` at whichever instance you're using)
 - Custom auth (bcrypt password hashing, signed HTTP-only session cookies via `jose`,
   account lockout after 3 failed attempts) — see `PROJECT_REPORT.md` for why this is a
   placeholder for Clerk rather than Clerk itself
@@ -35,9 +61,9 @@ seeded demo user, since real accounts should go through the actual signup flow.
 
 ## Environment variables
 
-See `.env.example`. Copy it to `.env` and fill in real values before deploying:
+See `.env.example`. Copy it to `.env` and fill in real values:
 
-- `DATABASE_URL` — SQLite by default; point at Postgres for production.
+- `DATABASE_URL` — a PostgreSQL connection string (local or hosted).
 - `SESSION_SECRET` — must be a long random value in production.
 - `AI_PROVIDER_API_KEY` — optional; without it, the "Ask Novia" widget honestly tells
   students the AI tutor isn't configured yet instead of fabricating answers.
