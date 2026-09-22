@@ -32,7 +32,7 @@ export async function CourseOverview({
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {course.modules.map((mod) => {
           const record = progress.get(mod.id);
-          const available = mod.slug === "anatomy-skeletal-system"; // only fully built module for now
+          const available = mod.lessons.length > 0;
           const title = locale === "ar" ? mod.titleAr : mod.titleEn;
           const description = locale === "ar" ? mod.descriptionAr : mod.descriptionEn;
 

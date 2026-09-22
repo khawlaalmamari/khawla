@@ -4,7 +4,12 @@ import type { Subject } from "@prisma/client";
 export async function getCourseBySlug(slug: string) {
   return prisma.course.findUnique({
     where: { slug },
-    include: { modules: { orderBy: { order: "asc" } } },
+    include: {
+      modules: {
+        orderBy: { order: "asc" },
+        include: { lessons: { select: { id: true } } },
+      },
+    },
   });
 }
 

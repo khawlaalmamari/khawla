@@ -13,8 +13,8 @@ needed to extend it:
 
 - Landing page (bilingual, matches the provided copy)
 - Real signup/login/logout, account lockout, forgot/reset password
-- One fully content-complete Anatomy module (Skeletal System): 5 lessons + a 15-question
-  graded quiz
+- Two fully content-complete Anatomy modules (Introduction to Human Anatomy, Skeletal
+  System): 5 lessons + a 15-question graded quiz each (10 lessons / 30 questions total)
 - Progress tracking wired to a real database, feeding a real dashboard
 - A basic but functional Study Planner (create a plan per course)
 - The Ask Novia chat widget UI, wired to a stubbed-but-real backend
@@ -79,10 +79,10 @@ is listed as remaining work below.
 
 ## 4. Remaining work
 
-- **24 of 26 course modules** (13 Anatomy + 13 Physiology, minus Skeletal System) have
-  titles/descriptions only — no lessons or quiz content yet. The structure is real and
-  extensible (same schema, same seed pattern), but the content itself needs to be
-  written module by module.
+- **23 of 26 course modules** (13 Anatomy + 13 Physiology, minus Introduction to Human
+  Anatomy and Skeletal System) have titles/descriptions only — no lessons or quiz
+  content yet. The structure is real and extensible (same schema, same seed pattern in
+  `prisma/content/`), but the content itself needs to be written module by module.
 - **3D Anatomy Explorer** — not built. This needs a real, licensed 3D anatomy model
   (e.g. a GLTF skeleton/organ model) plus a Three.js viewer; building a fake placeholder
   and presenting it as a real interactive model would violate the brief's own
