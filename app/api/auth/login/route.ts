@@ -4,6 +4,8 @@ import { verifyPassword } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
 import { loginSchema } from "@/lib/auth/schemas";
 import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
+import { sendEmail } from "@/lib/email/send";
+import { sendPasswordResetEmail } from "@/lib/auth/send-reset-email";
 import {
   isCurrentlyLocked,
   minutesUntilUnlock,
@@ -45,7 +47,28 @@ export async function POST(req: NextRequest) {
 
   const validPassword = await verifyPassword(password, user.passwordHash);
   if (!validPassword) {
-    await recordFailedAttempt(user.id, ip);
+    const { lockedNow, email, fullName } = await recordFailedAttempt(user.id, ip);
+
+    if (lockedNow) {
+      await sendPasswordResetEmail({ id: user.id, email, fullName }, req.nextUrl.origin);
+    } else {
+      try {
+        await sendEmail({
+          to: email,
+          subject: "Failed login attempt / محاولة تسجيل دخول فاشلة",
+          html: `
+            <p>Hi ${fullName},</p>
+            <p>Someone just tried to log into your E-nursing account with an incorrect password. If this wasn't you, consider changing your password.</p>
+            <hr />
+            <p dir="rtl">مرحبًا ${fullName}،</p>
+            <p dir="rtl">حاول أحدهم للتو تسجيل الدخول إلى حسابك في E-nursing بكلمة مرور غير صحيحة. إذا لم تكن أنت، ننصحك بتغيير كلمة المرور.</p>
+          `,
+        });
+      } catch (err) {
+        console.error("[email] Failed to send failed-login alert:", err);
+      }
+    }
+
     return NextResponse.json({ error: "invalidCredentials" }, { status: 401 });
   }
 

@@ -12,7 +12,10 @@ export function minutesUntilUnlock(user: { lockedUntil: Date | null }): number {
   return Math.max(0, Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000));
 }
 
-export async function recordFailedAttempt(userId: string, ipAddress: string) {
+export async function recordFailedAttempt(
+  userId: string,
+  ipAddress: string,
+): Promise<{ lockedNow: boolean; email: string; fullName: string }> {
   const user = await prisma.user.update({
     where: { id: userId },
     data: { failedLoginCount: { increment: 1 } },
@@ -22,7 +25,9 @@ export async function recordFailedAttempt(userId: string, ipAddress: string) {
     data: { userId, success: false, ipAddress },
   });
 
-  if (user.failedLoginCount >= MAX_FAILED_ATTEMPTS) {
+  const lockedNow = user.failedLoginCount >= MAX_FAILED_ATTEMPTS;
+
+  if (lockedNow) {
     const lockedUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000);
     await prisma.user.update({
       where: { id: userId },
@@ -38,7 +43,19 @@ export async function recordFailedAttempt(userId: string, ipAddress: string) {
         bodyAr: `تم تعليق حسابك مؤقتًا لمدة ${LOCKOUT_MINUTES} دقيقة بعد ${MAX_FAILED_ATTEMPTS} محاولات دخول فاشلة. إذا لم تكن أنت من قام بذلك، ننصحك بإعادة تعيين كلمة المرور بعد انتهاء مدة التعليق.`,
       },
     });
+  } else {
+    await prisma.notification.create({
+      data: {
+        userId,
+        titleEn: "Failed login attempt",
+        titleAr: "محاولة تسجيل دخول فاشلة",
+        bodyEn: "Someone tried to log into your account with an incorrect password. If this wasn't you, consider changing your password.",
+        bodyAr: "حاول أحدهم تسجيل الدخول إلى حسابك بكلمة مرور غير صحيحة. إذا لم تكن أنت، ننصحك بتغيير كلمة المرور.",
+      },
+    });
   }
+
+  return { lockedNow, email: user.email, fullName: user.fullName };
 }
 
 export async function recordSuccessfulLogin(userId: string, ipAddress: string) {
