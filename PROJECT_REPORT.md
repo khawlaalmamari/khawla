@@ -95,9 +95,12 @@ is listed as remaining work below.
   against. The code path exists (`lib/novia/reply.ts`) but is unexercised.
 - **Notifications page / Help & Support / Profile & Settings pages** — not built yet;
   notifications currently surface on the dashboard only.
-- **Email delivery** — forgot-password currently logs the reset link to the server
-  console (and returns it in the API response) in development, since no email provider
-  is configured. This must be replaced with real email sending before production use.
+- **Email delivery** — signup verification, password reset, and resend-verification
+  emails send for real via SendGrid (`lib/email/send.ts`, Single Sender Verification, no
+  domain required) when `SENDGRID_API_KEY` is set. Signup no longer auto-logs the user
+  in: they must click the verification link before they can log in. Without the key,
+  everything falls back to logging the link to the server console (and returning it in
+  the API response) in development only.
 - **Automated test suite** — none yet; all verification so far is manual/scripted
   against a running instance.
 - **Rate limiting** is in-memory (per server instance) — fine for one dev/demo instance,
@@ -117,8 +120,8 @@ Not currently used. If you want to switch from the local auth system to Clerk:
 - **`AI_PROVIDER_API_KEY`** — an Anthropic API key, to make "Ask Novia" actually answer
   questions (`lib/novia/reply.ts` already calls the Anthropic Messages API when this is
   set).
-- **An email provider** (e.g. Resend, SMTP) — to send real password-reset emails instead
-  of the current dev-only console log.
+- **`SENDGRID_API_KEY`** — a SendGrid API key with a verified Single Sender, to send real
+  verification/password-reset emails instead of the dev-only console log.
 - **A hosted Postgres database** for a live deployment (e.g. Neon, Supabase) — the app
   already runs on Postgres (schema and local dev were switched over from the initial
   SQLite setup), so this is just provisioning, not a code change.
