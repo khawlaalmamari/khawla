@@ -96,11 +96,11 @@ is listed as remaining work below.
 - **Notifications page / Help & Support / Profile & Settings pages** — not built yet;
   notifications currently surface on the dashboard only.
 - **Email delivery** — signup verification, password reset, and resend-verification
-  emails send for real via SendGrid (`lib/email/send.ts`, Single Sender Verification, no
-  domain required) when `SENDGRID_API_KEY` is set. Signup no longer auto-logs the user
-  in: they must click the verification link before they can log in. Without the key,
-  everything falls back to logging the link to the server console (and returning it in
-  the API response) in development only.
+  emails send for real via Gmail SMTP (`lib/email/send.ts`, nodemailer + a Google
+  Account App Password, no domain required) when `GMAIL_USER`/`GMAIL_APP_PASSWORD` are
+  set. Signup no longer auto-logs the user in: they must click the verification link
+  before they can log in. Without those env vars, everything falls back to logging the
+  link to the server console (and returning it in the API response) in development only.
 - **Automated test suite** — none yet; all verification so far is manual/scripted
   against a running instance.
 - **Rate limiting** is in-memory (per server instance) — fine for one dev/demo instance,

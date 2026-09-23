@@ -1,11 +1,27 @@
+import nodemailer from "nodemailer";
+
 /**
- * Minimal SendGrid integration (plain fetch, no SDK dependency).
- * Returns { sent: false } when SENDGRID_API_KEY isn't set, so callers can
- * fall back to the dev-mode console link/notification instead of failing.
- *
- * Uses SendGrid's Single Sender Verification, which lets EMAIL_FROM send to
- * any recipient without owning/verifying a whole domain.
+ * Sends real email via Gmail SMTP using a Google Account App Password
+ * (requires 2-Step Verification on that account). Returns { sent: false }
+ * when GMAIL_USER/GMAIL_APP_PASSWORD aren't set, so callers can fall back
+ * to the dev-mode console link/notification instead of failing.
  */
+let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
+
+function getTransporter() {
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!user || !pass) return null;
+
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
+  }
+  return transporter;
+}
+
 export async function sendEmail({
   to,
   subject,
@@ -15,32 +31,11 @@ export async function sendEmail({
   subject: string;
   html: string;
 }): Promise<{ sent: boolean }> {
-  const apiKey = process.env.SENDGRID_API_KEY;
-  if (!apiKey) return { sent: false };
+  const transport = getTransporter();
+  if (!transport) return { sent: false };
 
-  const fromRaw = process.env.EMAIL_FROM || "E-nursing <no-reply@example.com>";
-  const match = fromRaw.match(/^(.*)<(.+)>$/);
-  const fromEmail = (match ? match[2] : fromRaw).trim();
-  const fromName = match?.[1]?.trim();
-
-  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      personalizations: [{ to: [{ email: to }] }],
-      from: fromName ? { email: fromEmail, name: fromName } : { email: fromEmail },
-      subject,
-      content: [{ type: "text/html", value: html }],
-    }),
-  });
-
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`SendGrid request failed: ${res.status} ${body}`);
-  }
+  const from = process.env.EMAIL_FROM || process.env.GMAIL_USER;
+  await transport.sendMail({ from, to, subject, html });
 
   return { sent: true };
 }
