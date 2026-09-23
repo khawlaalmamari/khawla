@@ -11,6 +11,9 @@ let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
 function getTransporter() {
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD;
+  console.log(
+    `[email] GMAIL_USER=${user ? JSON.stringify(user) : "MISSING"} GMAIL_APP_PASSWORD=${pass ? `set (${pass.length} chars)` : "MISSING"}`,
+  );
   if (!user || !pass) return null;
 
   if (!transporter) {
