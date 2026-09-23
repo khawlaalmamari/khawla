@@ -20,18 +20,36 @@ function ProgressBar({ percent }: { percent: number }) {
   );
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ verified?: string }>;
+}) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
   const data = await getDashboardData(user.id);
+  const { verified } = await searchParams;
 
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-4 py-10 sm:px-6">
+        {verified === "success" && (
+          <div className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800">
+            {locale === "ar" ? "تم تفعيل بريدك الإلكتروني بنجاح!" : "Your email has been verified!"}
+          </div>
+        )}
+        {verified === "invalid" && (
+          <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
+            {locale === "ar"
+              ? "رابط التفعيل غير صالح أو منتهي الصلاحية."
+              : "That verification link is invalid or expired."}
+          </div>
+        )}
+
         <h1 className="text-2xl font-bold">
           {dict.dashboard.welcome.replace("{name}", user.fullName)}
         </h1>

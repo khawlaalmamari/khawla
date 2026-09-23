@@ -53,12 +53,6 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
-      {error && (
-        <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
-          {error}
-        </div>
-      )}
-
       <Field label={dict.auth.identifierLabel} htmlFor="identifier">
         <input
           id="identifier"
@@ -91,6 +85,7 @@ export function LoginForm() {
             {showPassword ? dict.auth.hidePassword : dict.auth.showPassword}
           </button>
         </div>
+        {error && <p className="text-sm text-danger">{error}</p>}
       </Field>
 
       <div className="flex justify-end text-sm">
