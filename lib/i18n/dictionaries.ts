@@ -144,6 +144,7 @@ export const ar = {
     references: "المراجع العلمية",
     takeQuiz: "ابدأ الاختبار القصير",
     backToModule: "الرجوع إلى الموديل",
+    diagram: "رسم توضيحي",
   },
   quiz: {
     question: "السؤال",
@@ -345,6 +346,7 @@ export const en: Dictionary = {
     references: "Scientific References",
     takeQuiz: "Take the Quiz",
     backToModule: "Back to Module",
+    diagram: "Illustration",
   },
   quiz: {
     question: "Question",
