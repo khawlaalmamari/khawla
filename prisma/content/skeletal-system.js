@@ -589,6 +589,171 @@ const questions = [
     explanationAr:
       "تُقلّل هشاشة العظام من كثافة العظم وتزيد من خطر الكسور الناتجة عن إصابات بسيطة، وهي شائعة بشكل خاص لدى النساء بعد انقطاع الطمث بسبب انخفاض الإستروجين، وتصيب غالبًا الورك والعمود الفقري والرسغ.",
   },
+  {
+    lessonSlug: "skeletal-introduction",
+    type: "MCQ",
+    textEn: "Which of the following is a function of red bone marrow?",
+    textAr: "أي مما يلي وظيفة لنخاع العظم الأحمر؟",
+    choices: [
+      { id: "a", en: "Producing blood cells", ar: "إنتاج خلايا الدم" },
+      { id: "b", en: "Storing fat as an energy reserve", ar: "تخزين الدهون كمخزون للطاقة" },
+      { id: "c", en: "Producing muscle fibers", ar: "إنتاج الألياف العضلية" },
+      { id: "d", en: "Conducting nerve impulses", ar: "نقل النبضات العصبية" },
+    ],
+    correct: "a",
+    explanationEn:
+      "Red bone marrow, found within spongy bone, is responsible for hematopoiesis — the production of red blood cells, white blood cells, and platelets.",
+    explanationAr:
+      "يقع نخاع العظم الأحمر داخل العظم الإسفنجي، وهو مسؤول عن تكوين الدم — إنتاج خلايا الدم الحمراء والبيضاء والصفائح الدموية.",
+  },
+  {
+    lessonSlug: "skeletal-introduction",
+    type: "MCQ",
+    textEn: "Approximately how many bones make up the appendicular skeleton?",
+    textAr: "كم عدد العظام التي يتكوّن منها الهيكل الطرفي تقريبًا؟",
+    choices: [
+      { id: "a", en: "80", ar: "80" },
+      { id: "b", en: "106", ar: "106" },
+      { id: "c", en: "126", ar: "126" },
+      { id: "d", en: "206", ar: "206" },
+    ],
+    correct: "c",
+    explanationEn:
+      "The appendicular skeleton, consisting of the limbs and girdles, contains approximately 126 bones, while the axial skeleton contains about 80.",
+    explanationAr:
+      "يحتوي الهيكل الطرفي، المكوَّن من الأطراف والأحزمة، على حوالي 126 عظمة، بينما يحتوي الهيكل المحوري على حوالي 80 عظمة.",
+  },
+  {
+    lessonSlug: "skeletal-anatomical-structures",
+    type: "MCQ",
+    textEn: "Which part of a long bone is covered with articular cartilage?",
+    textAr: "أي جزء من العظم الطويل مغطى بالغضروف المفصلي؟",
+    choices: [
+      { id: "a", en: "Diaphysis", ar: "الديافيز" },
+      { id: "b", en: "Epiphysis", ar: "المشاش" },
+      { id: "c", en: "Periosteum", ar: "السمحاق" },
+      { id: "d", en: "Medullary cavity", ar: "التجويف النخاعي" },
+    ],
+    correct: "b",
+    explanationEn:
+      "The epiphysis, the wider end of a long bone, is covered with articular cartilage where it forms a joint with another bone.",
+    explanationAr:
+      "المشاش، وهو الطرف الأعرض من العظم الطويل، مغطى بالغضروف المفصلي حيث يشكّل مفصلًا مع عظمة أخرى.",
+  },
+  {
+    lessonSlug: "skeletal-anatomical-structures",
+    type: "MCQ",
+    textEn: "Which membrane lines the internal marrow cavity of a bone?",
+    textAr: "أي غشاء يبطّن التجويف النخاعي الداخلي للعظم؟",
+    choices: [
+      { id: "a", en: "Periosteum", ar: "السمحاق" },
+      { id: "b", en: "Endosteum", ar: "الشغاف العظمي" },
+      { id: "c", en: "Synovial membrane", ar: "الغشاء الزليلي" },
+      { id: "d", en: "Pleura", ar: "الجنبة" },
+    ],
+    correct: "b",
+    explanationEn:
+      "The endosteum is the thin membrane lining the internal marrow cavity, while the periosteum covers the external surface of the bone.",
+    explanationAr:
+      "الشغاف العظمي هو الغشاء الرقيق الذي يبطّن التجويف النخاعي الداخلي، بينما يغطي السمحاق السطح الخارجي للعظم.",
+  },
+  {
+    lessonSlug: "skeletal-organs-locations",
+    type: "MCQ",
+    textEn: "Which bones form the pelvic girdle?",
+    textAr: "ما العظام التي تشكّل الحزام الحوضي؟",
+    choices: [
+      { id: "a", en: "Clavicle and scapula", ar: "الترقوة ولوح الكتف" },
+      { id: "b", en: "Hip bones (ilium, ischium, pubis)", ar: "عظما الورك (الحرقفة والإسك والعانة)" },
+      { id: "c", en: "Radius and ulna", ar: "الكعبرة والزند" },
+      { id: "d", en: "Tibia and fibula", ar: "الظنبوب والشظية" },
+    ],
+    correct: "b",
+    explanationEn:
+      "The pelvic girdle consists of the two hip bones, each formed by the fusion of the ilium, ischium, and pubis.",
+    explanationAr: "يتكوّن الحزام الحوضي من عظمي الورك، ويتشكّل كل منهما من اندماج الحرقفة والإسك والعانة.",
+  },
+  {
+    lessonSlug: "skeletal-organs-locations",
+    type: "MCQ",
+    textEn: "How many cervical vertebrae are in the vertebral column?",
+    textAr: "كم عدد الفقرات العنقية في العمود الفقري؟",
+    choices: [
+      { id: "a", en: "5", ar: "5" },
+      { id: "b", en: "7", ar: "7" },
+      { id: "c", en: "12", ar: "12" },
+      { id: "d", en: "26", ar: "26" },
+    ],
+    correct: "b",
+    explanationEn:
+      "There are 7 cervical vertebrae in the neck region, part of the total 26 bones making up the vertebral column.",
+    explanationAr: "توجد 7 فقرات عنقية في منطقة الرقبة، وهي جزء من إجمالي 26 عظمة تشكّل العمود الفقري.",
+  },
+  {
+    lessonSlug: "skeletal-anatomical-relationships",
+    type: "MCQ",
+    textEn: "Which classification describes a joint that is completely immovable?",
+    textAr: "أي تصنيف يصف مفصلاً غير قابل للحركة إطلاقًا؟",
+    choices: [
+      { id: "a", en: "Synarthrosis", ar: "مفصل ثابت" },
+      { id: "b", en: "Amphiarthrosis", ar: "مفصل شبه متحرك" },
+      { id: "c", en: "Diarthrosis", ar: "مفصل متحرك" },
+      { id: "d", en: "Synovial joint", ar: "مفصل زليلي" },
+    ],
+    correct: "a",
+    explanationEn:
+      "Synarthroses are immovable joints, such as the sutures of the skull. Amphiarthroses allow slight movement, and diarthroses (synovial joints) allow free movement.",
+    explanationAr:
+      "المفاصل الثابتة (السينارثروز) غير قابلة للحركة، مثل دروز الجمجمة. أما شبه المتحركة فتسمح بحركة طفيفة، والمتحركة (الزليلية) تسمح بحركة حرة.",
+  },
+  {
+    lessonSlug: "skeletal-anatomical-relationships",
+    type: "MCQ",
+    textEn: "An example of a cartilaginous joint is:",
+    textAr: "مثال على المفصل الغضروفي هو:",
+    choices: [
+      { id: "a", en: "The knee joint", ar: "مفصل الركبة" },
+      { id: "b", en: "A skull suture", ar: "درز الجمجمة" },
+      { id: "c", en: "An intervertebral disc", ar: "القرص الفقري" },
+      { id: "d", en: "The shoulder joint", ar: "مفصل الكتف" },
+    ],
+    correct: "c",
+    explanationEn:
+      "Intervertebral discs are cartilaginous joints, connecting vertebrae with cartilage and allowing slight movement.",
+    explanationAr: "الأقراص الفقرية مفاصل غضروفية تربط الفقرات بواسطة الغضروف وتسمح بحركة طفيفة.",
+  },
+  {
+    lessonSlug: "skeletal-clinical-anatomy-basics",
+    type: "MCQ",
+    textEn: "Which type of fracture involves the bone shattering into three or more fragments?",
+    textAr: "أي نوع من الكسور يتضمن تشظي العظم إلى ثلاث قطع أو أكثر؟",
+    choices: [
+      { id: "a", en: "Greenstick fracture", ar: "الكسر الغصني الأخضر" },
+      { id: "b", en: "Comminuted fracture", ar: "الكسر المفتت" },
+      { id: "c", en: "Stress fracture", ar: "كسر الإجهاد" },
+      { id: "d", en: "Closed fracture", ar: "الكسر المغلق" },
+    ],
+    correct: "b",
+    explanationEn:
+      "A comminuted fracture occurs when the bone shatters into three or more fragments, often from high-impact trauma.",
+    explanationAr: "يحدث الكسر المفتت عندما يتشظى العظم إلى ثلاث قطع أو أكثر، غالبًا نتيجة إصابة شديدة الأثر.",
+  },
+  {
+    lessonSlug: "skeletal-clinical-anatomy-basics",
+    type: "MCQ",
+    textEn: "Which anatomical landmark is used to count ribs and intercostal spaces during a physical exam?",
+    textAr: "أي معلم تشريحي يُستخدم لعدّ الأضلاع والمسافات الوربية أثناء الفحص السريري؟",
+    choices: [
+      { id: "a", en: "Iliac crest", ar: "قمة الحرقفة" },
+      { id: "b", en: "Sternal angle", ar: "زاوية القص" },
+      { id: "c", en: "Acromion process", ar: "الناتئ الأخرمي" },
+      { id: "d", en: "Patella", ar: "الرضفة" },
+    ],
+    correct: "b",
+    explanationEn:
+      "The sternal angle is a palpable landmark used to count ribs and intercostal spaces, useful for locating heart auscultation points.",
+    explanationAr: "زاوية القص معلم يمكن جسّه يُستخدم لعدّ الأضلاع والمسافات الوربية، ويفيد في تحديد نقاط تسمّع القلب.",
+  },
 ];
 
 module.exports = { lessons, questions, REFERENCES };

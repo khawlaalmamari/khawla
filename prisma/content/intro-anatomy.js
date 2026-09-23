@@ -559,6 +559,172 @@ const questions = [
     explanationAr:
       "تزيل المصطلحات التشريحية الموحدة الغموض وتضمن فهم أي مقدم رعاية صحية للموقع الدقيق المقصود، بصرف النظر عن اللغة أو المؤسسة، مما يقلل من خطر سوء التواصل والأخطاء.",
   },
+  {
+    lessonSlug: "intro-anatomy-overview",
+    type: "MCQ",
+    textEn: "Which of the following best describes histology?",
+    textAr: "أي مما يلي يصف علم الأنسجة بشكل أفضل؟",
+    choices: [
+      { id: "a", en: "Study of cells", ar: "دراسة الخلايا" },
+      { id: "b", en: "Study of tissues", ar: "دراسة الأنسجة" },
+      { id: "c", en: "Study of organs", ar: "دراسة الأعضاء" },
+      { id: "d", en: "Study of whole-body regions", ar: "دراسة مناطق الجسم بالكامل" },
+    ],
+    correct: "b",
+    explanationEn:
+      "Histology is the study of tissues, a branch of microscopic anatomy. Cytology studies cells specifically.",
+    explanationAr: "علم الأنسجة هو دراسة الأنسجة، وهو فرع من التشريح المجهري. أما علم الخلية فيدرس الخلايا تحديدًا.",
+  },
+  {
+    lessonSlug: "intro-anatomy-overview",
+    type: "MCQ",
+    textEn: "Surface anatomy is most useful for which purpose?",
+    textAr: "ما الغرض الأساسي من تشريح السطح؟",
+    choices: [
+      { id: "a", en: "Studying molecules", ar: "دراسة الجزيئات" },
+      { id: "b", en: "Identifying external landmarks to infer internal structures", ar: "تحديد المعالم الخارجية لاستنتاج البنى الداخلية" },
+      { id: "c", en: "Studying single cells under a microscope", ar: "دراسة خلية واحدة تحت المجهر" },
+      { id: "d", en: "Classifying diseases", ar: "تصنيف الأمراض" },
+    ],
+    correct: "b",
+    explanationEn:
+      "Surface anatomy studies visible external landmarks to help locate and understand internal structures, useful in physical examination.",
+    explanationAr:
+      "يدرس تشريح السطح المعالم الخارجية المرئية للمساعدة في تحديد وفهم البنى الداخلية، وهو مفيد في الفحص السريري.",
+  },
+  {
+    lessonSlug: "intro-anatomy-terminology-planes",
+    type: "MCQ",
+    textEn: "Which term describes a structure located away from the point of attachment of a limb?",
+    textAr: "أي مصطلح يصف بنية تقع بعيدًا عن نقطة ارتباط الطرف؟",
+    choices: [
+      { id: "a", en: "Proximal", ar: "قريب" },
+      { id: "b", en: "Distal", ar: "بعيد" },
+      { id: "c", en: "Superior", ar: "علوي" },
+      { id: "d", en: "Medial", ar: "إنسي" },
+    ],
+    correct: "b",
+    explanationEn:
+      "Distal means farther from the point of attachment (e.g., the hand is distal to the elbow).",
+    explanationAr: "بعيد يعني أبعد عن نقطة الارتباط (مثلًا، اليد بعيدة عن المرفق).",
+  },
+  {
+    lessonSlug: "intro-anatomy-terminology-planes",
+    type: "MCQ",
+    textEn: "The frontal (coronal) plane divides the body into which two parts?",
+    textAr: "إلى أي جزأين يقسم المستوى الجبهي (الإكليلي) الجسم؟",
+    choices: [
+      { id: "a", en: "Right and left", ar: "أيمن وأيسر" },
+      { id: "b", en: "Anterior and posterior", ar: "أمامي وخلفي" },
+      { id: "c", en: "Superior and inferior", ar: "علوي وسفلي" },
+      { id: "d", en: "Proximal and distal", ar: "قريب وبعيد" },
+    ],
+    correct: "b",
+    explanationEn:
+      "The frontal (coronal) plane divides the body into anterior (front) and posterior (back) portions.",
+    explanationAr: "يقسم المستوى الجبهي (الإكليلي) الجسم إلى جزء أمامي وجزء خلفي.",
+  },
+  {
+    lessonSlug: "intro-anatomy-cavities-regions",
+    type: "MCQ",
+    textEn: "Which organ is located within the pelvic cavity?",
+    textAr: "أي عضو يقع داخل التجويف الحوضي؟",
+    choices: [
+      { id: "a", en: "Liver", ar: "الكبد" },
+      { id: "b", en: "Stomach", ar: "المعدة" },
+      { id: "c", en: "Urinary bladder", ar: "المثانة البولية" },
+      { id: "d", en: "Lungs", ar: "الرئتان" },
+    ],
+    correct: "c",
+    explanationEn:
+      "The urinary bladder, along with reproductive organs and the rectum, lies within the pelvic cavity.",
+    explanationAr: "تقع المثانة البولية، إلى جانب الأعضاء التناسلية والمستقيم، داخل التجويف الحوضي.",
+  },
+  {
+    lessonSlug: "intro-anatomy-cavities-regions",
+    type: "MCQ",
+    textEn: "How many regions does the more detailed abdominal region system use?",
+    textAr: "كم منطقة يستخدم النظام التفصيلي لمناطق البطن؟",
+    choices: [
+      { id: "a", en: "Two", ar: "اثنتان" },
+      { id: "b", en: "Four", ar: "أربع" },
+      { id: "c", en: "Six", ar: "ست" },
+      { id: "d", en: "Nine", ar: "تسع" },
+    ],
+    correct: "d",
+    explanationEn:
+      "The nine-region system divides the abdomen into regions such as the epigastric, umbilical, hypogastric, and the paired hypochondriac, lumbar, and iliac regions.",
+    explanationAr:
+      "يقسم نظام التسع مناطق البطن إلى مناطق مثل الشرسوفية والسرية وتحت المعدة، والمناطق المزدوجة تحت الضلعية والقطنية والحرقفية.",
+  },
+  {
+    lessonSlug: "intro-anatomy-homeostasis",
+    type: "MCQ",
+    textEn: "Which of the following best defines homeostasis?",
+    textAr: "أي مما يلي يُعرّف الاتزان الداخلي بشكل أفضل؟",
+    choices: [
+      { id: "a", en: "The body's growth process", ar: "عملية نمو الجسم" },
+      { id: "b", en: "The body's ability to maintain a stable internal environment", ar: "قدرة الجسم على الحفاظ على بيئة داخلية مستقرة" },
+      { id: "c", en: "The formation of new cells", ar: "تكوّن خلايا جديدة" },
+      { id: "d", en: "The breakdown of nutrients", ar: "تفكيك المغذيات" },
+    ],
+    correct: "b",
+    explanationEn:
+      "Homeostasis refers to maintaining a relatively stable internal environment despite external changes.",
+    explanationAr: "يشير الاتزان الداخلي إلى الحفاظ على بيئة داخلية مستقرة نسبيًا رغم التغيرات الخارجية.",
+  },
+  {
+    lessonSlug: "intro-anatomy-homeostasis",
+    type: "MCQ",
+    textEn:
+      "Which system regulates the body mainly through hormones acting more slowly but for a longer duration?",
+    textAr: "أي جهاز ينظّم الجسم غالبًا عبر هرمونات تعمل بشكل أبطأ ولكن لفترة أطول؟",
+    choices: [
+      { id: "a", en: "Nervous system", ar: "الجهاز العصبي" },
+      { id: "b", en: "Endocrine system", ar: "الجهاز الصماوي" },
+      { id: "c", en: "Skeletal system", ar: "الجهاز الهيكلي" },
+      { id: "d", en: "Integumentary system", ar: "الجهاز الغلافي" },
+    ],
+    correct: "b",
+    explanationEn:
+      "The endocrine system regulates body functions using hormones, which act more slowly than nerve signals but have longer-lasting effects.",
+    explanationAr:
+      "ينظّم الجهاز الصماوي وظائف الجسم باستخدام الهرمونات، التي تعمل بشكل أبطأ من الإشارات العصبية لكن بتأثير أطول.",
+  },
+  {
+    lessonSlug: "intro-anatomy-clinical-basics",
+    type: "MCQ",
+    textEn: "Which position tilts the body so the head is lower than the feet?",
+    textAr: "أي وضعية تُميل الجسم بحيث يكون الرأس أخفض من القدمين؟",
+    choices: [
+      { id: "a", en: "Fowler's position", ar: "وضعية فاولر" },
+      { id: "b", en: "Supine position", ar: "الاستلقاء الظهري" },
+      { id: "c", en: "Trendelenburg position", ar: "وضعية ترندلينبيرغ" },
+      { id: "d", en: "Prone position", ar: "وضعية الانبطاح" },
+    ],
+    correct: "c",
+    explanationEn:
+      "Trendelenburg position involves lying supine with the body tilted so the head is lower than the feet, used in specific clinical situations.",
+    explanationAr:
+      "تتضمن وضعية ترندلينبيرغ الاستلقاء الظهري مع إمالة الجسم بحيث يكون الرأس أخفض من القدمين، وتُستخدم في حالات سريرية محددة.",
+  },
+  {
+    lessonSlug: "intro-anatomy-clinical-basics",
+    type: "CLINICAL_REASONING",
+    textEn: "Why is standardized anatomical terminology important in multinational healthcare teams?",
+    textAr: "لماذا تُعد المصطلحات التشريحية الموحدة مهمة في فرق الرعاية الصحية متعددة الجنسيات؟",
+    choices: [
+      { id: "a", en: "It looks more professional", ar: "تبدو أكثر احترافية" },
+      { id: "b", en: "It ensures precise, unambiguous communication regardless of language or institution", ar: "تضمن تواصلاً دقيقًا وغير غامض بصرف النظر عن اللغة أو المؤسسة" },
+      { id: "c", en: "It is only a legal requirement", ar: "مطلوبة لأسباب قانونية فقط" },
+      { id: "d", en: "It has no real impact on patient safety", ar: "ليس لها تأثير حقيقي على سلامة المريض" },
+    ],
+    correct: "b",
+    explanationEn:
+      "Standardized terminology ensures any provider, regardless of language or institution, understands the exact location or finding described, reducing miscommunication.",
+    explanationAr:
+      "تضمن المصطلحات الموحدة فهم أي مقدم رعاية، بصرف النظر عن اللغة أو المؤسسة، للموقع أو النتيجة الموصوفة بدقة، مما يقلل من سوء التواصل.",
+  },
 ];
 
 module.exports = { lessons, questions, REFERENCES };

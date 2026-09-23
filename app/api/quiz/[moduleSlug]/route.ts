@@ -14,6 +14,11 @@ function shuffle<T>(items: T[]): T[] {
   return arr;
 }
 
+// A module's question bank can hold more questions than one attempt shows —
+// sampling a random subset (on top of shuffling) means retaking a quiz can
+// genuinely surface different questions, not just a different order.
+const QUIZ_LENGTH = 15;
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ moduleSlug: string }> },
@@ -33,7 +38,8 @@ export async function GET(
     return NextResponse.json({ error: "notFound" }, { status: 404 });
   }
 
-  const questions = shuffle(mod.questions).map((q) => ({
+  const sampled = shuffle(mod.questions).slice(0, QUIZ_LENGTH);
+  const questions = sampled.map((q) => ({
     id: q.id,
     type: q.type,
     text: locale === "ar" ? q.textAr : q.textEn,

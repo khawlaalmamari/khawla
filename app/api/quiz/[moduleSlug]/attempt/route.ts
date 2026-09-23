@@ -44,7 +44,9 @@ export async function POST(
       return { ...a, isCorrect, question };
     });
 
-  const totalQuestions = mod.questions.length;
+  // Score out of the questions actually presented in this attempt (the
+  // module's question bank can be larger than any one quiz sampling).
+  const totalQuestions = gradedAnswers.length;
   const scorePercent =
     totalQuestions === 0 ? 0 : Math.round((correctCount / totalQuestions) * 100);
   const passed = scorePercent >= mod.passThreshold;
