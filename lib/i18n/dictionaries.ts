@@ -160,6 +160,11 @@ export const ar = {
     explanation: "التفسير العلمي",
     retakeQuiz: "إعادة الاختبار",
     goToLesson: "الانتقال إلى الدرس",
+    reviewAnswers: "مراجعة الإجابات",
+    notAnswered: "لم تتم الإجابة",
+    edit: "تعديل",
+    backToQuiz: "العودة إلى الاختبار",
+    reviewIntro: "راجع إجاباتك قبل الإرسال النهائي.",
   },
   novia: {
     widgetTitle: "اسأل نوفيا",
@@ -356,6 +361,11 @@ export const en: Dictionary = {
     explanation: "Explanation",
     retakeQuiz: "Retake Quiz",
     goToLesson: "Go to Lesson",
+    reviewAnswers: "Review Answers",
+    notAnswered: "Not answered",
+    edit: "Edit",
+    backToQuiz: "Back to Quiz",
+    reviewIntro: "Review your answers before final submission.",
   },
   novia: {
     widgetTitle: "Ask Novia",

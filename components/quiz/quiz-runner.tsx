@@ -28,6 +28,7 @@ export function QuizRunner({ courseSlug, moduleSlug }: { courseSlug: string; mod
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reviewing, setReviewing] = useState(false);
 
   useEffect(() => {
     fetch(`/api/quiz/${moduleSlug}`)
@@ -69,6 +70,56 @@ export function QuizRunner({ courseSlug, moduleSlug }: { courseSlug: string; mod
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (reviewing) {
+    return (
+      <div>
+        <h2 className="text-lg font-bold">{dict.quiz.reviewAnswers}</h2>
+        <p className="mt-1 text-sm text-muted">{dict.quiz.reviewIntro}</p>
+
+        <div className="mt-4 space-y-2">
+          {data.questions.map((q, i) => {
+            const chosen = q.choices.find((c) => c.id === answers[q.id]);
+            return (
+              <Card key={q.id} className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs text-muted">
+                    {dict.quiz.question} {i + 1}
+                  </p>
+                  <p className="truncate text-sm font-medium">{q.text}</p>
+                  <p className={`text-sm ${chosen ? "text-foreground" : "text-danger"}`}>
+                    {chosen ? chosen.label : dict.quiz.notAnswered}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="!px-3 !py-1.5 text-xs"
+                  onClick={() => {
+                    setIndex(i);
+                    setReviewing(false);
+                  }}
+                >
+                  {dict.quiz.edit}
+                </Button>
+              </Card>
+            );
+          })}
+        </div>
+
+        {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+
+        <div className="mt-6 flex justify-between">
+          <Button type="button" variant="outline" onClick={() => setReviewing(false)}>
+            {dict.quiz.backToQuiz}
+          </Button>
+          <Button type="button" disabled={!allAnswered || submitting} onClick={submit}>
+            {dict.quiz.submit}
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -122,8 +173,12 @@ export function QuizRunner({ courseSlug, moduleSlug }: { courseSlug: string; mod
         </Button>
 
         {isLast ? (
-          <Button type="button" disabled={!allAnswered || submitting} onClick={submit}>
-            {dict.quiz.submit}
+          <Button
+            type="button"
+            disabled={!answers[question.id]}
+            onClick={() => setReviewing(true)}
+          >
+            {dict.quiz.reviewAnswers}
           </Button>
         ) : (
           <Button
