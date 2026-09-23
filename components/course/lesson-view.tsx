@@ -27,7 +27,7 @@ export async function LessonView({
     locale === "ar" ? lesson.objectivesAr : lesson.objectivesEn,
   );
   const terms: { en: string; ar: string }[] = JSON.parse(lesson.termsJson);
-  const references: string[] = JSON.parse(lesson.referencesJson);
+  const references: { label: string; url: string }[] = JSON.parse(lesson.referencesJson);
   const content = locale === "ar" ? lesson.contentAr : lesson.contentEn;
   const summary = locale === "ar" ? lesson.summaryAr : lesson.summaryEn;
 
@@ -84,9 +84,18 @@ export async function LessonView({
         <h2 className="text-sm font-bold uppercase tracking-wide text-muted">
           {dict.course.references}
         </h2>
-        <ul className="mt-3 space-y-1 text-xs text-muted">
+        <ul className="mt-3 space-y-2 text-sm">
           {references.map((r) => (
-            <li key={r}>{r}</li>
+            <li key={r.url}>
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-700 underline underline-offset-2 hover:text-primary-800"
+              >
+                {r.label}
+              </a>
+            </li>
           ))}
         </ul>
       </Card>

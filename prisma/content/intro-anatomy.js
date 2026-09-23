@@ -5,8 +5,14 @@
 // institutional accreditation.
 
 const REFERENCES = [
-  "OpenStax, Anatomy and Physiology 2e — Chapter 1: An Introduction to the Human Body (openstax.org)",
-  "NCBI Bookshelf, StatPearls — \"Anatomy, Patient Positioning\" (ncbi.nlm.nih.gov/books)",
+  {
+    label: "OpenStax, Anatomy and Physiology 2e — Chapter 1: An Introduction to the Human Body",
+    url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/1-introduction",
+  },
+  {
+    label: "NCBI Bookshelf, StatPearls — \"Anatomy, Patient Positioning\"",
+    url: "https://www.ncbi.nlm.nih.gov/books/NBK513320/",
+  },
 ];
 
 const lessons = [

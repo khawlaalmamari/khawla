@@ -5,9 +5,18 @@
 // institutional accreditation.
 
 const REFERENCES = [
-  "OpenStax, Anatomy and Physiology 2e — Chapter 6: Bone Tissue and the Skeletal System (openstax.org)",
-  "NCBI Bookshelf, StatPearls — \"Anatomy, Bones\" (ncbi.nlm.nih.gov/books)",
-  "NCBI Bookshelf, StatPearls — \"Fracture Healing Overview\" (ncbi.nlm.nih.gov/books)",
+  {
+    label: "OpenStax, Anatomy and Physiology 2e — Chapter 6: Bone Tissue and the Skeletal System",
+    url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/6-introduction",
+  },
+  {
+    label: "NCBI Bookshelf, StatPearls — \"Anatomy, Bones\"",
+    url: "https://www.ncbi.nlm.nih.gov/books/NBK537199/",
+  },
+  {
+    label: "NCBI Bookshelf, StatPearls — \"Fracture Healing Overview\"",
+    url: "https://www.ncbi.nlm.nih.gov/books/NBK551678/",
+  },
 ];
 
 const lessons = [
