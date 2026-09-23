@@ -180,6 +180,22 @@ export const ar = {
     arabic: "العربية",
     english: "English",
   },
+  help: {
+    title: "المساعدة والدعم",
+    intro: "هل تحتاج إلى مساعدة في استخدام منصة E-nursing؟ يسعدنا التواصل معك.",
+    contactLabel: "راسلنا عبر البريد الإلكتروني",
+    faqTitle: "أسئلة شائعة",
+    faqs: [
+      {
+        q: "لماذا لا أستطيع الوصول إلى بعض الموديلات؟",
+        a: "الموديلات المعلَّمة بـ«قريبًا» لم يُضَف محتواها بعد. الموديلات المتاحة حاليًا للدراسة هي «مقدمة في تشريح جسم الإنسان» و«الجهاز الهيكلي».",
+      },
+      {
+        q: "نسيت كلمة المرور، ماذا أفعل؟",
+        a: "استخدم رابط «نسيت كلمة المرور؟» في صفحة تسجيل الدخول لإعادة تعيينها.",
+      },
+    ],
+  },
 };
 
 export const en: Dictionary = {
@@ -359,6 +375,22 @@ export const en: Dictionary = {
     language: "Language",
     arabic: "العربية",
     english: "English",
+  },
+  help: {
+    title: "Help & Support",
+    intro: "Need help using the E-nursing platform? We're happy to help.",
+    contactLabel: "Email us",
+    faqTitle: "Frequently Asked Questions",
+    faqs: [
+      {
+        q: "Why can't I access some modules?",
+        a: "Modules marked \"Coming soon\" don't have their content written yet. The modules available to study right now are \"Introduction to Human Anatomy\" and \"Skeletal System\".",
+      },
+      {
+        q: "I forgot my password, what do I do?",
+        a: "Use the \"Forgot password?\" link on the login page to reset it.",
+      },
+    ],
   },
 };
 
