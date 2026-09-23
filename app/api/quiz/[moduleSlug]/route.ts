@@ -3,6 +3,17 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getServerLocale } from "@/lib/i18n/get-locale";
 
+// Fisher-Yates shuffle. Used so retaking a quiz doesn't show questions and
+// answer choices in the same memorizable order each time.
+function shuffle<T>(items: T[]): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ moduleSlug: string }> },
@@ -22,11 +33,13 @@ export async function GET(
     return NextResponse.json({ error: "notFound" }, { status: 404 });
   }
 
-  const questions = mod.questions.map((q) => ({
+  const questions = shuffle(mod.questions).map((q) => ({
     id: q.id,
     type: q.type,
     text: locale === "ar" ? q.textAr : q.textEn,
-    choices: (JSON.parse(q.choicesJson) as { id: string; en: string; ar: string }[]).map((c) => ({
+    choices: shuffle(
+      JSON.parse(q.choicesJson) as { id: string; en: string; ar: string }[],
+    ).map((c) => ({
       id: c.id,
       label: locale === "ar" ? c.ar : c.en,
     })),
