@@ -104,7 +104,9 @@ export const ar = {
       emailTaken: "هذا البريد الإلكتروني مستخدم بالفعل.",
       usernameTaken: "اسم المستخدم هذا مستخدم بالفعل.",
       passwordMismatch: "كلمتا المرور غير متطابقتين.",
-      weakPassword: "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
+      weakPassword:
+        "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل، وتحتوي على حرف كبير وحرف صغير ورقم ورمز (مثل !@#$%).",
+      invalidUsername: "اسم المستخدم يجب ألا يحتوي إلا على حروف (عربية أو إنجليزية) وأرقام وشرطة سفلية _.",
       genericError: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
       required: "هذا الحقل مطلوب.",
       invalidEmail: "صيغة البريد الإلكتروني غير صحيحة.",
@@ -282,7 +284,9 @@ export const en: Dictionary = {
       emailTaken: "This email is already in use.",
       usernameTaken: "This username is already taken.",
       passwordMismatch: "Passwords do not match.",
-      weakPassword: "Password must be at least 8 characters long.",
+      weakPassword:
+        "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a symbol (e.g. !@#$%).",
+      invalidUsername: "Username can only contain letters (Arabic or English), numbers, and underscores.",
       genericError: "Something went wrong. Please try again.",
       required: "This field is required.",
       invalidEmail: "Invalid email format.",

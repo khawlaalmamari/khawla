@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/locale-provider";
 import { Field, inputClass } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
+import { isStrongPassword } from "@/lib/auth/password-strength";
 
 export function SignupForm() {
   const { dict, locale } = useLocale();
@@ -29,11 +30,15 @@ export function SignupForm() {
     e.preventDefault();
     setError(null);
 
+    if (!/^[\p{L}\p{N}_]+$/u.test(form.username)) {
+      setError(dict.auth.errors.invalidUsername);
+      return;
+    }
     if (form.password !== form.confirmPassword) {
       setError(dict.auth.errors.passwordMismatch);
       return;
     }
-    if (form.password.length < 8) {
+    if (!isStrongPassword(form.password)) {
       setError(dict.auth.errors.weakPassword);
       return;
     }
@@ -85,7 +90,7 @@ export function SignupForm() {
         <input
           id="username"
           required
-          pattern="[a-zA-Z0-9_]+"
+          pattern="[A-Za-z0-9_؀-ۿ]+"
           className={inputClass}
           value={form.username}
           onChange={(e) => update("username", e.target.value)}
@@ -122,6 +127,7 @@ export function SignupForm() {
             {showPassword ? dict.auth.hidePassword : dict.auth.showPassword}
           </button>
         </div>
+        <p className="text-xs text-muted">{dict.auth.errors.weakPassword}</p>
       </Field>
 
       <Field label={dict.auth.confirmPasswordLabel} htmlFor="confirmPassword">

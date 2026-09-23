@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useLocale } from "@/components/locale-provider";
 import { Field, inputClass } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
+import { isStrongPassword } from "@/lib/auth/password-strength";
 
 export function ResetPasswordForm({ token }: { token: string }) {
   const { dict } = useLocale();
@@ -24,7 +25,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
       setError(dict.auth.errors.passwordMismatch);
       return;
     }
-    if (password.length < 8) {
+    if (!isStrongPassword(password)) {
       setError(dict.auth.errors.weakPassword);
       return;
     }
@@ -77,6 +78,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <p className="text-xs text-muted">{dict.auth.errors.weakPassword}</p>
       </Field>
       <Field label={dict.auth.confirmPasswordLabel} htmlFor="confirmPassword">
         <input
