@@ -110,9 +110,16 @@ export const ar = {
       genericError: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
       required: "هذا الحقل مطلوب.",
       invalidEmail: "صيغة البريد الإلكتروني غير صحيحة.",
+      emailNotVerified:
+        "يجب تفعيل بريدك الإلكتروني أولاً قبل تسجيل الدخول. تحقق من بريدك الوارد (وصندوق الرسائل غير المرغوبة).",
     },
     successResetRequested:
       "إذا كان هذا البريد الإلكتروني مسجلاً لدينا، فستصلك رسالة تحتوي على رابط الاستعادة قريبًا.",
+    checkEmailTitle: "تحقق من بريدك الإلكتروني",
+    checkEmailBody: "أرسلنا رابط تفعيل إلى {email}. اضغط عليه لتفعيل حسابك، ثم سجّل الدخول.",
+    goToLogin: "الذهاب إلى تسجيل الدخول",
+    resendVerification: "إعادة إرسال رابط التفعيل",
+    resendSent: "إذا كان الحساب موجودًا وغير مُفعّل، تم إرسال رابط جديد إلى بريدك الإلكتروني.",
   },
   dashboard: {
     welcome: "مرحبًا بك، {name}",
@@ -312,9 +319,16 @@ export const en: Dictionary = {
       genericError: "Something went wrong. Please try again.",
       required: "This field is required.",
       invalidEmail: "Invalid email format.",
+      emailNotVerified:
+        "Please verify your email before logging in. Check your inbox (and spam folder) for the verification link.",
     },
     successResetRequested:
       "If this email is registered with us, you'll receive a reset link shortly.",
+    checkEmailTitle: "Check your email",
+    checkEmailBody: "We've sent a verification link to {email}. Click it to activate your account, then log in.",
+    goToLogin: "Go to login",
+    resendVerification: "Resend verification email",
+    resendSent: "If that account exists and isn't verified yet, a new link was sent to it.",
   },
   dashboard: {
     welcome: "Welcome, {name}",

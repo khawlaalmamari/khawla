@@ -61,13 +61,6 @@ export default async function DashboardPage({
             {locale === "ar" ? "تم تفعيل بريدك الإلكتروني بنجاح!" : "Your email has been verified!"}
           </div>
         )}
-        {verified === "invalid" && (
-          <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
-            {locale === "ar"
-              ? "رابط التفعيل غير صالح أو منتهي الصلاحية."
-              : "That verification link is invalid or expired."}
-          </div>
-        )}
 
         <h1 className="text-2xl font-bold">
           {dict.dashboard.welcome.replace("{name}", user.fullName)}

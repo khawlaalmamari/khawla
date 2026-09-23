@@ -49,6 +49,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalidCredentials" }, { status: 401 });
   }
 
+  if (!user.emailVerified) {
+    return NextResponse.json({ error: "emailNotVerified" }, { status: 403 });
+  }
+
   await recordSuccessfulLogin(user.id, ip);
   await createSession(user.id);
 

@@ -15,10 +15,15 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
+  const [resendDone, setResendDone] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setUnverifiedEmail(null);
+    setResendDone(false);
     setSubmitting(true);
 
     try {
@@ -36,6 +41,9 @@ export function LoginForm() {
           );
         } else if (data.error === "invalidCredentials") {
           setError(dict.auth.errors.invalidCredentials);
+        } else if (data.error === "emailNotVerified") {
+          setError(dict.auth.errors.emailNotVerified);
+          if (identifier.includes("@")) setUnverifiedEmail(identifier);
         } else {
           setError(dict.auth.errors.genericError);
         }
@@ -48,6 +56,21 @@ export function LoginForm() {
       setError(dict.auth.errors.genericError);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function onResend() {
+    if (!unverifiedEmail) return;
+    setResending(true);
+    try {
+      await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: unverifiedEmail }),
+      });
+      setResendDone(true);
+    } finally {
+      setResending(false);
     }
   }
 
@@ -86,6 +109,17 @@ export function LoginForm() {
           </button>
         </div>
         {error && <p className="text-sm text-danger">{error}</p>}
+        {unverifiedEmail && !resendDone && (
+          <button
+            type="button"
+            onClick={onResend}
+            disabled={resending}
+            className="mt-1 text-sm font-medium text-primary-700 hover:underline disabled:opacity-60"
+          >
+            {dict.auth.resendVerification}
+          </button>
+        )}
+        {resendDone && <p className="mt-1 text-sm text-muted">{dict.auth.resendSent}</p>}
       </Field>
 
       <div className="flex justify-end text-sm">

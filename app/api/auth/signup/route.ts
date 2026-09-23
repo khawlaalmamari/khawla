@@ -2,7 +2,6 @@ import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth/password";
-import { createSession } from "@/lib/auth/session";
 import { signupSchema } from "@/lib/auth/schemas";
 import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
 import { sendEmail } from "@/lib/email/send";
@@ -41,8 +40,6 @@ export async function POST(req: NextRequest) {
   const user = await prisma.user.create({
     data: { fullName, username, email, passwordHash, locale, emailVerifyToken },
   });
-
-  await createSession(user.id);
 
   const verifyUrl = `${req.nextUrl.origin}/api/auth/verify-email?token=${emailVerifyToken}`;
 
@@ -91,7 +88,8 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({
-    user: { id: user.id, fullName: user.fullName, username: user.username },
+    pendingVerification: true,
+    email: user.email,
     ...(!emailSent && process.env.NODE_ENV !== "production" ? { devVerifyUrl: verifyUrl } : {}),
   });
 }
