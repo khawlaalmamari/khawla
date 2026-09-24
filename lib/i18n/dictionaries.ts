@@ -124,6 +124,7 @@ export const ar = {
     resendVerification: "إعادة إرسال الرمز",
     resendSent: "إذا كان الحساب موجودًا وغير مُفعّل، تم إرسال رمز جديد إلى بريدك الإلكتروني.",
     resendCodeIn: "يمكنك طلب رمز جديد بعد {seconds} ثانية",
+    verifyCode: "تأكيد الرمز",
   },
   dashboard: {
     welcome: "مرحبًا بك، {name}",
@@ -337,6 +338,7 @@ export const en: Dictionary = {
     resendVerification: "Resend code",
     resendSent: "If that account exists and isn't verified yet, a new code was sent to it.",
     resendCodeIn: "You can request a new code in {seconds}s",
+    verifyCode: "Verify Code",
   },
   dashboard: {
     welcome: "Welcome, {name}",

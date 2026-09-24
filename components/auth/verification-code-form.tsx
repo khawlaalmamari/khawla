@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/locale-provider";
+import { Button } from "@/components/ui/button";
 
 const CODE_LENGTH = 6;
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -23,6 +24,10 @@ export function VerificationCodeForm({
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS);
   const [resending, setResending] = useState(false);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const lastSubmittedCode = useRef<string | null>(null);
+
+  const code = digits.join("");
+  const isComplete = code.length === CODE_LENGTH;
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -34,14 +39,16 @@ export function VerificationCodeForm({
     inputsRef.current[index]?.focus();
   }
 
-  async function submitCode(code: string) {
+  async function submitCode(codeToSubmit: string) {
+    if (submitting) return;
+    lastSubmittedCode.current = codeToSubmit;
     setSubmitting(true);
     setError(null);
     try {
       const res = await fetch("/api/auth/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email, code: codeToSubmit }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -49,6 +56,7 @@ export function VerificationCodeForm({
         else if (data.error === "tooManyAttempts") setError(dict.auth.errors.tooManyAttempts);
         else setError(dict.auth.errors.invalidCode);
         setDigits(Array(CODE_LENGTH).fill(""));
+        lastSubmittedCode.current = null;
         focusInput(0);
         return;
       }
@@ -56,10 +64,20 @@ export function VerificationCodeForm({
       router.refresh();
     } catch {
       setError(dict.auth.errors.genericError);
+      lastSubmittedCode.current = null;
     } finally {
       setSubmitting(false);
     }
   }
+
+  // Auto-submit once all 6 boxes are filled, but only for a code we haven't
+  // already just submitted (avoids re-firing on unrelated re-renders).
+  useEffect(() => {
+    if (isComplete && code !== lastSubmittedCode.current) {
+      submitCode(code);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, isComplete]);
 
   function handleChange(index: number, rawValue: string) {
     const clean = rawValue.replace(/\D/g, "");
@@ -75,7 +93,6 @@ export function VerificationCodeForm({
     }
 
     const chars = clean.split("");
-    let nextDigits: string[] = [];
     setDigits((d) => {
       const next = [...d];
       let i = index;
@@ -84,17 +101,11 @@ export function VerificationCodeForm({
         next[i] = ch;
         i++;
       }
-      nextDigits = next;
       return next;
     });
 
     const lastFilledIndex = Math.min(index + chars.length - 1, CODE_LENGTH - 1);
     focusInput(lastFilledIndex < CODE_LENGTH - 1 ? lastFilledIndex + 1 : lastFilledIndex);
-
-    const fullCode = nextDigits.join("");
-    if (fullCode.length === CODE_LENGTH) {
-      submitCode(fullCode);
-    }
   }
 
   function handleKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
@@ -119,6 +130,7 @@ export function VerificationCodeForm({
         return;
       }
       setCooldown(RESEND_COOLDOWN_SECONDS);
+      lastSubmittedCode.current = null;
       setDigits(Array(CODE_LENGTH).fill(""));
       focusInput(0);
     } finally {
@@ -155,6 +167,17 @@ export function VerificationCodeForm({
       </div>
 
       {error && <p className="text-center text-sm text-danger">{error}</p>}
+
+      <div className="flex justify-center">
+        <Button
+          type="button"
+          onClick={() => submitCode(code)}
+          disabled={!isComplete || submitting}
+          className="px-10"
+        >
+          {dict.auth.verifyCode}
+        </Button>
+      </div>
 
       {devCode && (
         <div className="rounded-lg border border-accent-300 bg-accent-50 px-4 py-3 text-center text-xs text-accent-700">
