@@ -177,13 +177,15 @@ export function passwordResetEmail({
   fullName: string;
   resetUrl: string;
   minutes: number;
-  reason?: "requested" | "lockout";
+  reason?: "requested" | "lockout" | "admin";
 }): { subject: string; html: string } {
   const intro =
     reason === "lockout"
       ? `نظرًا لرصد عدة محاولات دخول فاشلة على حسابك، تم تعليقه مؤقتًا حفاظًا على أمانه. لإعادة تفعيل الحساب، يرجى إعادة تعيين كلمة المرور عبر الزر أدناه:`
-      : `وردنا طلب لإعادة تعيين كلمة المرور الخاصة بحسابك على منصة ${BRAND_NAME}. لإتمام هذه العملية، يرجى الضغط على الزر أدناه:`;
-  const headerColor = reason === "lockout" ? COLOR_ACCENT : COLOR_PRIMARY;
+      : reason === "admin"
+        ? `قام فريق الإدارة في منصة ${BRAND_NAME} بإرسال رابط إعادة تعيين كلمة المرور لحسابك بناءً على طلب دعم فني. إذا كنت تواجه صعوبة في الدخول إلى حسابك، يرجى الضغط على الزر أدناه لتعيين كلمة مرور جديدة:`
+        : `وردنا طلب لإعادة تعيين كلمة المرور الخاصة بحسابك على منصة ${BRAND_NAME}. لإتمام هذه العملية، يرجى الضغط على الزر أدناه:`;
+  const headerColor = reason === "requested" ? COLOR_PRIMARY : COLOR_ACCENT;
 
   const content = `
     <p style="margin:0 0 4px;font-size:16px;">عزيزنا <strong>${fullName}</strong>،</p>

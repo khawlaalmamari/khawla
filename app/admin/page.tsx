@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getServerLocale } from "@/lib/i18n/get-locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { prisma } from "@/lib/db";
+import { isCurrentlyLocked } from "@/lib/auth/login-guard";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { UserManagementTable } from "@/components/admin/user-management-table";
@@ -16,7 +17,7 @@ export default async function AdminPage() {
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
 
-  const users = await prisma.user.findMany({
+  const usersRaw = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -27,8 +28,14 @@ export default async function AdminPage() {
       emailVerified: true,
       createdAt: true,
       lastLoginAt: true,
+      lockedUntil: true,
     },
   });
+
+  const users = usersRaw.map(({ lockedUntil, ...u }) => ({
+    ...u,
+    isLocked: isCurrentlyLocked({ lockedUntil }),
+  }));
 
   const verifiedCount = users.filter((u) => u.emailVerified).length;
 

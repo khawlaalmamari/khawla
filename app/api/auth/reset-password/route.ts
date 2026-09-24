@@ -27,7 +27,14 @@ export async function POST(req: NextRequest) {
   await prisma.$transaction([
     prisma.user.update({
       where: { id: resetToken.userId },
-      data: { passwordHash, failedLoginCount: 0, lockedUntil: null },
+      // Bumping sessionVersion invalidates any other active session for
+      // this account immediately, forcing a fresh login with the new password.
+      data: {
+        passwordHash,
+        failedLoginCount: 0,
+        lockedUntil: null,
+        sessionVersion: { increment: 1 },
+      },
     }),
     prisma.passwordResetToken.update({
       where: { id: resetToken.id },

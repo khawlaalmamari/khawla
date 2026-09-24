@@ -14,7 +14,12 @@ function getSecretKey() {
 }
 
 export async function createSession(userId: string) {
-  const token = await new SignJWT({ sub: userId })
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { sessionVersion: true },
+  });
+
+  const token = await new SignJWT({ sub: userId, sv: user?.sessionVersion ?? 0 })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_TTL_SECONDS}s`)
@@ -35,25 +40,32 @@ export async function clearSession() {
   store.delete(SESSION_COOKIE);
 }
 
-export async function getSessionUserId(): Promise<string | null> {
+/**
+ * Verifies the session cookie's signature only — it does NOT confirm the
+ * session is still valid (see getCurrentUser, which also checks
+ * sessionVersion against the database so that a password reset instantly
+ * invalidates any other active session for that account).
+ */
+async function getSessionPayload(): Promise<{ userId: string; sessionVersion: number } | null> {
   const store = await cookies();
   const token = store.get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
   try {
     const { payload } = await jwtVerify(token, getSecretKey());
-    return typeof payload.sub === "string" ? payload.sub : null;
+    if (typeof payload.sub !== "string") return null;
+    return { userId: payload.sub, sessionVersion: typeof payload.sv === "number" ? payload.sv : 0 };
   } catch {
     return null;
   }
 }
 
 export async function getCurrentUser() {
-  const userId = await getSessionUserId();
-  if (!userId) return null;
+  const session = await getSessionPayload();
+  if (!session) return null;
 
-  return prisma.user.findUnique({
-    where: { id: userId },
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
     select: {
       id: true,
       email: true,
@@ -62,8 +74,20 @@ export async function getCurrentUser() {
       locale: true,
       role: true,
       emailVerified: true,
+      sessionVersion: true,
     },
   });
+  if (!user || user.sessionVersion !== session.sessionVersion) return null;
+
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    fullName: user.fullName,
+    locale: user.locale,
+    role: user.role,
+    emailVerified: user.emailVerified,
+  };
 }
 
 /** Throws-free guard for pages: returns the user or null. Use in Server Components. */

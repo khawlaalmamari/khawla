@@ -17,6 +17,7 @@ export type AdminUser = {
   emailVerified: boolean;
   createdAt: Date;
   lastLoginAt: Date | null;
+  isLocked: boolean;
 };
 
 const emptyAddForm = { fullName: "", username: "", email: "", password: "", role: "student" };
@@ -37,6 +38,8 @@ export function UserManagementTable({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [addForm, setAddForm] = useState(emptyAddForm);
+  const [sendingResetId, setSendingResetId] = useState<string | null>(null);
+  const [resetSentId, setResetSentId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     fullName: "",
     username: "",
@@ -121,6 +124,25 @@ export function UserManagementTable({
       router.refresh();
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function onSendResetLink(u: AdminUser) {
+    setError(null);
+    setResetSentId(null);
+    setSendingResetId(u.id);
+    try {
+      const res = await fetch(`/api/admin/users/${u.id}/send-reset-password`, {
+        method: "POST",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(errorMessage(data.error));
+        return;
+      }
+      setResetSentId(u.id);
+    } finally {
+      setSendingResetId(null);
     }
   }
 
@@ -311,8 +333,10 @@ export function UserManagementTable({
                       </Badge>
                     </td>
                     <td className="px-4 py-3">
-                      {u.emailVerified ? (
-                        <Badge tone="success">{dict.admin.verified}</Badge>
+                      {u.isLocked ? (
+                        <Badge tone="danger">{dict.admin.accountNeedsReset}</Badge>
+                      ) : u.emailVerified ? (
+                        <Badge tone="success">{dict.admin.accountActive}</Badge>
                       ) : (
                         <Badge tone="neutral">{dict.admin.unverified}</Badge>
                       )}
@@ -322,7 +346,7 @@ export function UserManagementTable({
                       {u.lastLoginAt ? formatDate(u.lastLoginAt) : dict.admin.never}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={() => startEdit(u)}
@@ -330,6 +354,17 @@ export function UserManagementTable({
                         >
                           {dict.admin.edit}
                         </button>
+                        <button
+                          type="button"
+                          disabled={sendingResetId === u.id}
+                          onClick={() => onSendResetLink(u)}
+                          className="text-xs font-medium text-accent-700 hover:underline disabled:opacity-60"
+                        >
+                          {dict.admin.sendResetLink}
+                        </button>
+                        {resetSentId === u.id && (
+                          <span className="text-xs text-success">{dict.admin.resetLinkSent}</span>
+                        )}
                         {u.id !== currentUserId && (
                           <button
                             type="button"

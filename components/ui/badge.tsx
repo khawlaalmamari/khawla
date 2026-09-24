@@ -3,6 +3,7 @@ const styles = {
   primary: "bg-primary-100 text-primary-800",
   success: "bg-green-100 text-green-800",
   accent: "bg-accent-100 text-accent-700",
+  danger: "bg-danger/10 text-danger",
 };
 
 export function Badge({
