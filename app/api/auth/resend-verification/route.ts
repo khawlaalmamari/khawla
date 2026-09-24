@@ -19,12 +19,12 @@ export async function POST(req: NextRequest) {
 
   const email = parsed.data.email.toLowerCase();
 
-  // A 60s cooldown per email, checked before we even look the account up, so
+  // A 30s cooldown per email, checked before we even look the account up, so
   // its presence/timing can't be used to tell whether the email is
   // registered.
   const cooldown = checkRateLimit(`resend-verify-cooldown:${email}`, {
     limit: 1,
-    windowMs: 60 * 1000,
+    windowMs: 30 * 1000,
   });
   if (!cooldown.allowed) {
     return NextResponse.json(

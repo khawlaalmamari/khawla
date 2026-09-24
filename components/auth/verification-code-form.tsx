@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/locale-provider";
 
 const CODE_LENGTH = 6;
-const RESEND_COOLDOWN_SECONDS = 60;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 export function VerificationCodeForm({
   email,
