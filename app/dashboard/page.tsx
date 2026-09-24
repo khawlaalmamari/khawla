@@ -14,17 +14,7 @@ import { ScoreTrendChart } from "@/components/dashboard/score-trend-chart";
 import { ModuleBestScoresChart } from "@/components/dashboard/module-best-scores-chart";
 import { NotificationList } from "@/components/dashboard/notification-list";
 import { MessageAdminForm } from "@/components/dashboard/message-admin-form";
-
-function ProgressBar({ percent }: { percent: number }) {
-  return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-surface">
-      <div
-        className="h-full rounded-full bg-primary-600 transition-all"
-        style={{ width: `${percent}%` }}
-      />
-    </div>
-  );
-}
+import { ProgressBar } from "@/components/ui/progress-bar";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();

@@ -8,6 +8,7 @@ import { prisma } from "@/lib/db";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
+import { MarkDoneButton } from "@/components/course/mark-done-button";
 
 export async function ModuleOverview({
   courseSlug,
@@ -75,6 +76,9 @@ export async function ModuleOverview({
     orderBy: { completedAt: "desc" },
   });
 
+  const lockedByQuiz =
+    !!progress?.bestScorePercent && progress.bestScorePercent >= mod.passThreshold;
+
   return (
     <div>
       <Link href={`/${courseSlug}`} className="text-sm text-primary-700 hover:underline">
@@ -106,7 +110,7 @@ export async function ModuleOverview({
         {mod.lessons.map((lesson, i) => (
           <li key={lesson.id}>
             <Link href={`/${courseSlug}/${mod.slug}/${lesson.slug}`}>
-              <Card className="flex items-center gap-4 transition-colors hover:border-primary-300">
+              <Card className="flex items-center gap-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-md">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-800">
                   {i + 1}
                 </span>
@@ -130,6 +134,24 @@ export async function ModuleOverview({
           )}
         </div>
         <ButtonLink href={`/${courseSlug}/${mod.slug}/quiz`}>{dict.course.takeQuiz}</ButtonLink>
+      </Card>
+
+      <Card className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="font-semibold">{dict.course.moduleCompletionTitle}</p>
+          <p className="mt-1 max-w-md text-sm text-muted">
+            {progress?.status === "COMPLETED" && lockedByQuiz
+              ? dict.course.doneAuto
+              : progress?.status === "COMPLETED"
+                ? dict.course.doneManualHint
+                : dict.course.doneIntro}
+          </p>
+        </div>
+        <MarkDoneButton
+          moduleSlug={mod.slug}
+          initialStatus={progress?.status ?? "NOT_STARTED"}
+          lockedByQuiz={lockedByQuiz}
+        />
       </Card>
     </div>
   );

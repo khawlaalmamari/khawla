@@ -8,6 +8,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { CoursesDropdown } from "@/components/courses-dropdown";
 
 export async function Navbar() {
   const locale = await getServerLocale();
@@ -33,12 +34,7 @@ export async function Navbar() {
         <div className="hidden items-center gap-6 text-sm font-medium md:flex">
           {user && (
             <>
-              <Link href="/anatomy" className="hover:text-primary-700">
-                {dict.nav.anatomy}
-              </Link>
-              <Link href="/physiology" className="hover:text-primary-700">
-                {dict.nav.physiology}
-              </Link>
+              <CoursesDropdown dict={dict} />
               <Link href="/study-planner" className="hover:text-primary-700">
                 {dict.nav.studyPlanner}
               </Link>
