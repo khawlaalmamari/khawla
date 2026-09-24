@@ -40,18 +40,24 @@ const lessons = [
   - *Systemic anatomy*: studying the body system by system (e.g., the entire cardiovascular system).
   - *Surface anatomy*: studying external, visible landmarks to understand internal structures (important for physical examination).
 - **Microscopic anatomy**: structures too small to see without magnification, including **cytology** (study of cells) and **histology** (study of tissues).
+- **Developmental anatomy**: structural changes across the lifespan, including **embryology**, the study of how structures form before birth.
+- **Pathological anatomy**: structural changes in cells, tissues, and organs caused by disease.
+- **Radiographic anatomy**: the study of internal structures using imaging such as X-ray, CT, and MRI — directly relevant to nurses who read or assist with imaging orders.
 
 ## Levels of Structural Organization
 The body is organized into increasingly complex levels:
 1. **Chemical level** – atoms combine to form molecules (e.g., water, proteins, DNA).
 2. **Cellular level** – molecules form cells, the smallest units of life.
 3. **Tissue level** – groups of similar cells performing a common function.
-4. **Organ level** – two or more tissue types working together for a specific function (e.g., the heart).
+4. **Organ level** – an anatomically distinct structure composed of two or more tissue types working together for a specific function (e.g., the heart).
 5. **Organ system level** – organs that work together for a common purpose (e.g., the cardiovascular system).
 6. **Organismal level** – all systems combine to make a functioning individual.
 
+![Diagram showing the levels of structural organization of the human body, from chemical to organismal](https://commons.wikimedia.org/wiki/Special:FilePath/Levels_of_Organization.svg)
+*Levels of Organization, via Wikimedia Commons, CC BY-SA 3.0.*
+
 ## Why Anatomy Matters for Nursing Practice
-Nurses use anatomical knowledge every day: to correctly locate landmarks for physical assessment, to understand where symptoms likely originate, to safely perform procedures, and to communicate precisely with other providers using standard terminology.`,
+Nurses use anatomical knowledge every day: to correctly locate landmarks for physical assessment, to understand where symptoms likely originate, to safely perform procedures, and to communicate precisely with other providers using standard terminology. Pathological and radiographic anatomy in particular underlie how nurses interpret disease-related changes and imaging findings during patient assessment.`,
     contentAr: `## ما هو علم التشريح؟
 **علم التشريح** هو الدراسة العلمية لتركيب الجسم والعلاقات بين أجزائه. يجيب عن سؤال "ما هو، وأين يقع؟" — وهو مكمّل لعلم وظائف الأعضاء الذي يجيب عن سؤال "كيف يعمل؟"
 
@@ -61,18 +67,24 @@ Nurses use anatomical knowledge every day: to correctly locate landmarks for phy
   - *التشريح الجهازي*: دراسة الجسم جهازًا بجهاز (مثل الجهاز القلبي الوعائي بالكامل).
   - *تشريح السطح*: دراسة المعالم الخارجية المرئية لفهم البنى الداخلية (مهم للفحص السريري).
 - **التشريح المجهري**: البنى الصغيرة جدًا التي لا تُرى دون تكبير، ويشمل **علم الخلية** (دراسة الخلايا) و**علم الأنسجة** (دراسة الأنسجة).
+- **التشريح التطوري**: التغيرات البنيوية عبر مراحل العمر، ويشمل **علم الأجنة**، أي دراسة تكوّن البنى قبل الولادة.
+- **التشريح المرضي**: التغيرات البنيوية في الخلايا والأنسجة والأعضاء الناتجة عن المرض.
+- **التشريح الإشعاعي**: دراسة البنى الداخلية باستخدام وسائل التصوير كالأشعة السينية والمقطعية والرنين المغناطيسي — وهو مرتبط بشكل مباشر بعمل الممرض الذي يقرأ أو يساعد في طلبات التصوير.
 
 ## مستويات التنظيم البنيوي
 يُنظَّم الجسم في مستويات متزايدة التعقيد:
 1. **المستوى الكيميائي** – تتحد الذرات لتشكّل الجزيئات (مثل الماء والبروتينات والحمض النووي).
 2. **المستوى الخلوي** – تشكّل الجزيئات الخلايا، وهي أصغر وحدات الحياة.
 3. **مستوى الأنسجة** – مجموعات من الخلايا المتشابهة تؤدي وظيفة مشتركة.
-4. **مستوى الأعضاء** – نوعان أو أكثر من الأنسجة تعمل معًا لأداء وظيفة محددة (مثل القلب).
+4. **مستوى الأعضاء** – بنية تشريحية متمايزة مكوّنة من نوعين أو أكثر من الأنسجة تعمل معًا لأداء وظيفة محددة (مثل القلب).
 5. **مستوى الأجهزة** – أعضاء تعمل معًا لتحقيق غرض مشترك (مثل الجهاز القلبي الوعائي).
 6. **المستوى الكائني** – تجتمع جميع الأجهزة لتكوين فرد يعمل بشكل متكامل.
 
+![رسم توضيحي لمستويات التنظيم البنيوي لجسم الإنسان، من المستوى الكيميائي إلى الكائني](https://commons.wikimedia.org/wiki/Special:FilePath/Levels_of_Organization.svg)
+*مستويات التنظيم، عبر Wikimedia Commons، CC BY-SA 3.0.*
+
 ## لماذا يهم علم التشريح الممارسة التمريضية؟
-يستخدم الممرضون المعرفة التشريحية يوميًا: لتحديد المعالم بدقة أثناء الفحص السريري، ولفهم مصدر الأعراض على الأرجح، ولأداء الإجراءات بأمان، وللتواصل بدقة مع مقدمي الرعاية الآخرين باستخدام مصطلحات موحدة.`,
+يستخدم الممرضون المعرفة التشريحية يوميًا: لتحديد المعالم بدقة أثناء الفحص السريري، ولفهم مصدر الأعراض على الأرجح، ولأداء الإجراءات بأمان، وللتواصل بدقة مع مقدمي الرعاية الآخرين باستخدام مصطلحات موحدة. ويُعد التشريح المرضي والإشعاعي تحديدًا أساسًا لفهم الممرض للتغيرات المرتبطة بالمرض ونتائج التصوير أثناء تقييم المريض.`,
     terms: [
       { en: "Gross anatomy", ar: "التشريح العياني" },
       { en: "Histology", ar: "علم الأنسجة" },
@@ -84,6 +96,21 @@ Nurses use anatomical knowledge every day: to correctly locate landmarks for phy
       "Anatomy studies body structure at levels from chemical to organismal, through gross and microscopic branches. This knowledge underlies safe, precise nursing practice.",
     summaryAr:
       "يدرس علم التشريح بنية الجسم عبر مستويات من الكيميائي إلى الكائني، من خلال فرعيه العياني والمجهري. هذه المعرفة أساس الممارسة التمريضية الآمنة والدقيقة.",
+    videoUrl: "https://www.youtube.com/watch?v=uBGl2BujkPQ",
+    videoLabelEn:
+      "This video introduces what anatomy and physiology are and why they matter, previewing core themes like body organization and homeostasis.",
+    videoLabelAr:
+      "يقدّم هذا الفيديو تعريفًا بعلمي التشريح ووظائف الأعضاء وأهميتهما، ويستعرض مفاهيم أساسية مثل تنظيم الجسم والاتزان الداخلي.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 1.1 Overview of Anatomy and Physiology",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/1-1-overview-of-anatomy-and-physiology",
+      },
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 1.2 Structural Organization of the Human Body",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/1-2-structural-organization-of-the-human-body",
+      },
+    ],
   },
   {
     slug: "intro-anatomy-terminology-planes",
@@ -111,11 +138,14 @@ The **anatomical position** is the standard reference position: standing upright
 - **Superficial / Deep** – closer to / farther from the body surface.
 
 ## Body Planes and Sections
-- **Sagittal plane**: divides the body into right and left parts (a *midsagittal* plane divides it evenly).
+- **Sagittal plane**: divides the body into right and left parts. A *midsagittal* plane divides it evenly; any sagittal plane offset from the midline is a **parasagittal** plane.
 - **Frontal (coronal) plane**: divides the body into anterior and posterior parts.
-- **Transverse (horizontal) plane**: divides the body into superior and inferior parts — commonly seen in CT scan images.
+- **Transverse (horizontal) plane**: divides the body into superior and inferior parts. CT and MRI scans are conventionally acquired and read as transverse (axial) slices, so fluency with this plane specifically supports reading imaging reports.
 
-Using standard terminology and planes lets healthcare professionals worldwide describe the exact same location or image orientation without ambiguity.`,
+![Diagram of the human body showing the sagittal, frontal (coronal), and transverse planes](https://commons.wikimedia.org/wiki/Special:FilePath/Human_anatomy_planes,_labeled.svg)
+*Human anatomy planes, labeled, via Wikimedia Commons, CC BY-SA 4.0.*
+
+As OpenStax puts it, "the purpose of this language is not to confuse, but rather to increase precision and reduce medical errors." Using standard terminology and planes lets healthcare professionals worldwide describe the exact same location or image orientation without ambiguity.`,
     contentAr: `## الوضعية التشريحية
 **الوضعية التشريحية** هي وضعية المرجع القياسية: الوقوف منتصبًا، مع تباعد بسيط بين القدمين، والذراعان بجانب الجسم، وراحتا اليدين متجهتان للأمام، والرأس والعينان متجهتان للأمام. تصف جميع المصطلحات الاتجاهية المواقع *كما لو* كان الجسم في هذه الوضعية، بغض النظر عن وضعيته الفعلية — وهذا يمنع الالتباس بين "اليسار" و"اليمين" من منظور المريض مقابل المُلاحِظ.
 
@@ -127,11 +157,14 @@ Using standard terminology and planes lets healthcare professionals worldwide de
 - **سطحي / عميق** – أقرب إلى / أبعد عن سطح الجسم.
 
 ## المستويات والمقاطع الجسدية
-- **المستوى السهمي**: يقسم الجسم إلى جزء أيمن وأيسر (المستوى السهمي المتوسط يقسمه بالتساوي).
+- **المستوى السهمي**: يقسم الجسم إلى جزء أيمن وأيسر. يقسمه المستوى السهمي المتوسط بالتساوي، بينما يُسمى أي مستوى سهمي منزاح عن خط المنتصف **مستوى سهميًا موازيًا**.
 - **المستوى الجبهي (الإكليلي)**: يقسم الجسم إلى جزء أمامي وخلفي.
-- **المستوى المستعرض (الأفقي)**: يقسم الجسم إلى جزء علوي وسفلي — ويُستخدم كثيرًا في صور الأشعة المقطعية.
+- **المستوى المستعرض (الأفقي)**: يقسم الجسم إلى جزء علوي وسفلي. تُلتقط صور الأشعة المقطعية والرنين المغناطيسي عادةً وتُقرأ كمقاطع مستعرضة، لذا فإن إتقان هذا المستوى تحديدًا يساعد على قراءة تقارير التصوير.
 
-يتيح استخدام المصطلحات والمستويات القياسية لمقدمي الرعاية الصحية حول العالم وصف الموقع أو اتجاه الصورة نفسه دون أي لبس.`,
+![رسم توضيحي لجسم الإنسان يبين المستويات السهمي والجبهي والمستعرض](https://commons.wikimedia.org/wiki/Special:FilePath/Human_anatomy_planes,_labeled.svg)
+*مستويات جسم الإنسان الموسومة، عبر Wikimedia Commons، CC BY-SA 4.0.*
+
+وكما تذكر OpenStax: "الغرض من هذه اللغة ليس التعقيد، بل زيادة الدقة وتقليل الأخطاء الطبية." فاستخدام المصطلحات والمستويات القياسية يتيح لمقدمي الرعاية الصحية حول العالم وصف الموقع أو اتجاه الصورة نفسه دون أي لبس.`,
     terms: [
       { en: "Anatomical position", ar: "الوضعية التشريحية" },
       { en: "Sagittal plane", ar: "المستوى السهمي" },
@@ -143,6 +176,17 @@ Using standard terminology and planes lets healthcare professionals worldwide de
       "The anatomical position is the standard reference for describing body locations using directional terms and body planes (sagittal, frontal, transverse).",
     summaryAr:
       "الوضعية التشريحية هي المرجع القياسي لوصف مواقع الجسم باستخدام المصطلحات الاتجاهية والمستويات الجسدية (السهمي والجبهي والمستعرض).",
+    videoUrl: "https://www.youtube.com/watch?v=ORsqD_HmM-I",
+    videoLabelEn:
+      "This video from Kenhub walks through the anatomical position, key directional terms, and the three body planes with visuals.",
+    videoLabelAr:
+      "يستعرض هذا الفيديو من Kenhub الوضعية التشريحية والمصطلحات الاتجاهية الأساسية والمستويات الجسدية الثلاثة بالرسوم التوضيحية.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 1.6 Anatomical Terminology",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/1-6-anatomical-terminology",
+      },
+    ],
   },
   {
     slug: "intro-anatomy-cavities-regions",
@@ -166,10 +210,15 @@ The body has two main closed cavities:
   - *Vertebral (spinal) canal*: contains the spinal cord.
 - **Ventral cavity** (anterior): larger, contains organs collectively called viscera.
   - *Thoracic cavity*: divided into two *pleural cavities* (each surrounding a lung) and the *mediastinum* (heart, esophagus, trachea, major vessels).
-  - *Abdominopelvic cavity*: subdivided into the *abdominal cavity* (stomach, liver, intestines, spleen, kidneys) and *pelvic cavity* (bladder, reproductive organs, rectum), with no physical wall separating them.
+  - *Abdominopelvic cavity*: subdivided into the *abdominal cavity* (stomach, liver, intestines, spleen; the kidneys sit **retroperitoneal**, behind the parietal peritoneum, though commonly grouped here) and *pelvic cavity* (bladder, reproductive organs, rectum), with no physical wall separating them.
+
+Each thoracic and abdominal organ cavity is lined by a **serous membrane** with a parietal layer (lining the body wall) and a visceral layer (adherent to the organ), secreting fluid that reduces friction as organs move — named the pleura around the lungs, the pericardium around the heart, and the peritoneum around the abdominal organs.
+
+![Diagram comparing the dorsal and ventral body cavities and their subdivisions](https://commons.wikimedia.org/wiki/Special:FilePath/Dorsal_Ventral_Body_Cavities.jpg)
+*Dorsal Ventral Body Cavities, OpenStax College, via Wikimedia Commons, CC BY 4.0.*
 
 ## Describing the Abdomen: Quadrants and Regions
-For quick clinical communication, the abdomen is commonly divided into **four quadrants**: RUQ, LUQ, RLQ, LLQ, using the umbilicus as the center point. A more detailed **nine-region** system is used for more precise anatomical description.
+For quick clinical communication, the abdomen is commonly divided into **four quadrants**: RUQ, LUQ, RLQ, LLQ, using the umbilicus as the center point. A more detailed **nine-region** system names, in three rows: the right/left **hypochondriac** and **epigastric** regions; the right/left **lumbar** and **umbilical** regions; and the right/left **iliac (inguinal)** and **hypogastric** regions.
 
 These systems let a nurse quickly document exactly where a patient reports pain — for example, appendicitis pain classically localizes to the RLQ.`,
     contentAr: `## التجويفان الجسديان الظهري والبطني
@@ -179,10 +228,15 @@ These systems let a nurse quickly document exactly where a patient reports pain 
   - *القناة الفقرية (الشوكية)*: تحتوي على النخاع الشوكي.
 - **التجويف البطني** (الأمامي): أكبر حجمًا، ويحتوي على أعضاء تُعرف مجتمعة بالأحشاء.
   - *التجويف الصدري*: ينقسم إلى *تجويفين جنبيين* (يحيط كل منهما برئة) و*المنصف* (القلب، المريء، القصبة الهوائية، الأوعية الكبرى).
-  - *التجويف البطني الحوضي*: ينقسم إلى *التجويف البطني* (المعدة، الكبد، الأمعاء، الطحال، الكليتان) و*التجويف الحوضي* (المثانة، الأعضاء التناسلية، المستقيم)، دون جدار فاصل بينهما.
+  - *التجويف البطني الحوضي*: ينقسم إلى *التجويف البطني* (المعدة، الكبد، الأمعاء، الطحال؛ أما الكليتان فتقعان **خلف الصفاق** خلف الطبقة الجدارية للصفاق، رغم إدراجهما هنا عادةً) و*التجويف الحوضي* (المثانة، الأعضاء التناسلية، المستقيم)، دون جدار فاصل بينهما.
+
+يُبطَّن كل تجويف عضوي صدري وبطني **بغشاء مصلي** له طبقة جدارية (تبطّن جدار الجسم) وطبقة حشوية (ملتصقة بالعضو)، تفرز سائلاً يقلل الاحتكاك أثناء حركة الأعضاء — ويُسمى الجنبة حول الرئتين، والتامور حول القلب، والصفاق حول أعضاء البطن.
+
+![رسم توضيحي يقارن بين التجويفين الظهري والبطني وتقسيماتهما](https://commons.wikimedia.org/wiki/Special:FilePath/Dorsal_Ventral_Body_Cavities.jpg)
+*التجويفان الظهري والبطني، OpenStax College، عبر Wikimedia Commons، CC BY 4.0.*
 
 ## وصف البطن: الأرباع والمناطق
-للتواصل السريري السريع، يُقسَّم البطن عادةً إلى **أربعة أرباع**، باستخدام السرة كنقطة مركزية. يُستخدم نظام أكثر تفصيلاً من **تسع مناطق** لوصف تشريحي أكثر دقة.
+للتواصل السريري السريع، يُقسَّم البطن عادةً إلى **أربعة أرباع**، باستخدام السرة كنقطة مركزية. يُسمّي نظام أكثر تفصيلاً من **تسع مناطق**، على ثلاثة صفوف: المنطقتان **تحت الضلعية** والمنطقة **الشرسوفية** (الصف العلوي)؛ المنطقتان **القطنيتان** والمنطقة **السرية** (الصف الأوسط)؛ والمنطقتان **الحرقفيتان (الإربيتان)** والمنطقة **تحت المعدة** (الصف السفلي).
 
 تتيح هذه الأنظمة للممرض توثيق موقع ألم المريض بسرعة ووضوح — فمثلًا، يتمركز ألم الزائدة الدودية عادةً في الربع السفلي الأيمن.`,
     terms: [
@@ -196,6 +250,21 @@ These systems let a nurse quickly document exactly where a patient reports pain 
       "The dorsal cavity (cranial + spinal) protects the nervous system; the ventral cavity (thoracic + abdominopelvic) houses the viscera. The abdomen is described using four quadrants or nine regions.",
     summaryAr:
       "يحمي التجويف الظهري (القحفي والشوكي) الجهاز العصبي، بينما يحوي التجويف البطني (الصدري والبطني الحوضي) الأحشاء. يُوصف البطن باستخدام أربعة أرباع أو تسع مناطق.",
+    videoUrl: "https://www.youtube.com/watch?v=U5OpX1vinPo",
+    videoLabelEn:
+      "This video from Osmosis explains how the abdomen is divided into four clinical quadrants and nine anatomical regions, and what each contains.",
+    videoLabelAr:
+      "يشرح هذا الفيديو من Osmosis كيفية تقسيم البطن إلى أربعة أرباع سريرية وتسع مناطق تشريحية، ومحتويات كل منها.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 1.6 Anatomical Terminology",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/1-6-anatomical-terminology",
+      },
+      {
+        label: "NCBI Bookshelf, StatPearls — \"Anatomy, Abdomen and Pelvis: Abdomen\"",
+        url: "https://www.ncbi.nlm.nih.gov/books/NBK553104/",
+      },
+    ],
   },
   {
     slug: "intro-anatomy-homeostasis",
@@ -215,9 +284,16 @@ These systems let a nurse quickly document exactly where a patient reports pain 
     contentEn: `## What Is Homeostasis?
 **Homeostasis** is the body's ability to maintain a relatively stable internal environment (temperature, pH, blood glucose, fluid balance) despite external changes. Nearly every organ system contributes to it, and failure to maintain it underlies most disease processes.
 
+A **set point** is the value around which a normal range fluctuates — for body temperature, roughly 37°C (98.6°F). The term "homeostasis" itself was coined by physiologist Walter Cannon in 1926, building on Claude Bernard's 1865 concept of the internal environment.
+
 ## Feedback Mechanisms
+Most feedback loops involve three components: a **sensor/receptor** that monitors a value, a **control center** that compares it to the normal range, and an **effector** that causes the change needed to restore that range.
+
 - **Negative feedback**: the most common mechanism; a change triggers a response that reverses the change (e.g., insulin lowers blood glucose after it rises).
 - **Positive feedback**: a change triggers a response that amplifies the change further, rather than reversing it — less common and normally self-limiting (e.g., contractions during childbirth intensify until delivery).
+
+![Diagram of the negative feedback loop for human body temperature regulation](https://commons.wikimedia.org/wiki/Special:FilePath/Negative_Feedback_Loop_Diagram_for_Human_Body_Temperature_Regulation.svg)
+*Negative Feedback Loop Diagram for Human Body Temperature Regulation, via Wikimedia Commons, CC BY-SA 4.0.*
 
 ## How Body Systems Work Together
 No organ system works in isolation:
@@ -229,9 +305,16 @@ Recognizing these interdependencies helps explain why a problem in one system (e
     contentAr: `## ما هو الاتزان الداخلي؟
 **الاتزان الداخلي** هو قدرة الجسم على الحفاظ على بيئة داخلية مستقرة نسبيًا (درجة الحرارة، الرقم الهيدروجيني، سكر الدم، توازن السوائل) رغم التغيرات الخارجية. يساهم كل جهاز تقريبًا في ذلك، والفشل في الحفاظ عليه هو أساس معظم العمليات المرضية.
 
+**نقطة الضبط** هي القيمة التي يتذبذب حولها المجال الطبيعي — وتبلغ لدرجة حرارة الجسم نحو 37 مئوية (98.6 فهرنهايت). صاغ عالم وظائف الأعضاء والتر كانون مصطلح "الاتزان الداخلي" عام 1926، مستندًا إلى مفهوم "الوسط الداخلي" الذي طرحه كلود برنار عام 1865.
+
 ## آليات التغذية الراجعة
+تتضمن معظم حلقات التغذية الراجعة ثلاثة مكونات: **مستقبل حسي** يراقب قيمة معينة، و**مركز تحكم** يقارنها بالمجال الطبيعي، و**مُنفِّذ** يحدث التغيير اللازم لإعادة القيمة إلى مجالها الطبيعي.
+
 - **التغذية الراجعة السلبية**: الآلية الأكثر شيوعًا؛ يؤدي التغيّر إلى استجابة تعكسه (مثلًا، يخفض الإنسولين سكر الدم بعد ارتفاعه).
 - **التغذية الراجعة الإيجابية**: يؤدي التغيّر إلى استجابة تُضخِّمه بدلًا من عكسه — أقل شيوعًا وعادةً ذاتية الحد (مثلًا، تصبح تقلصات الولادة أقوى حتى تتم الولادة).
+
+![رسم توضيحي لحلقة التغذية الراجعة السلبية لتنظيم درجة حرارة جسم الإنسان](https://commons.wikimedia.org/wiki/Special:FilePath/Negative_Feedback_Loop_Diagram_for_Human_Body_Temperature_Regulation.svg)
+*حلقة التغذية الراجعة السلبية لتنظيم حرارة الجسم، عبر Wikimedia Commons، CC BY-SA 4.0.*
 
 ## كيف تعمل أجهزة الجسم معًا؟
 لا يعمل أي جهاز بمعزل عن غيره:
@@ -251,6 +334,21 @@ Recognizing these interdependencies helps explain why a problem in one system (e
       "Homeostasis is the maintenance of a stable internal environment, mainly through negative feedback. All organ systems cooperate to maintain it, so disruption in one can affect others.",
     summaryAr:
       "الاتزان الداخلي هو الحفاظ على بيئة داخلية مستقرة، غالبًا عبر التغذية الراجعة السلبية. تتعاون جميع الأجهزة للحفاظ عليه، لذا فإن خللًا في جهاز واحد قد يؤثر على غيره.",
+    videoUrl: "https://www.youtube.com/watch?v=0aGMiYVRg_E",
+    videoLabelEn:
+      "This lecture from Ninja Nerd defines homeostasis and explains negative- and positive-feedback mechanisms with worked physiological examples.",
+    videoLabelAr:
+      "تشرح هذه المحاضرة من Ninja Nerd مفهوم الاتزان الداخلي وآليتي التغذية الراجعة السلبية والإيجابية بأمثلة فسيولوجية مطبقة.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 1.5 Homeostasis",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/1-5-homeostasis",
+      },
+      {
+        label: "NCBI Bookshelf, StatPearls — \"Physiology, Homeostasis\"",
+        url: "https://www.ncbi.nlm.nih.gov/books/NBK559138/",
+      },
+    ],
   },
   {
     slug: "intro-anatomy-clinical-basics",
@@ -272,7 +370,12 @@ Recognizing these interdependencies helps explain why a problem in one system (e
 - **Prone**: lying flat on the stomach, face down — used for certain assessments and to relieve pressure elsewhere.
 - **Lateral (recumbent)**: lying on one side — used to relieve pressure, aid drainage, or assist certain exams.
 - **Fowler's position**: sitting up with the head of the bed elevated (semi-Fowler's ~30°, high Fowler's ~90°) — eases breathing and assists eating.
-- **Trendelenburg position**: supine with the body tilted so the head is lower than the feet — used in specific clinical situations under provider direction.
+- **Trendelenburg position**: a variation of supine in which the head of the bed is tilted down **at least 15°** — used for certain intra-abdominal or pelvic procedures.
+- **Reverse Trendelenburg position**: supine with the head of the bed tilted upward instead — facilitates upper abdominal surgery, but can reduce venous return and cerebral perfusion.
+- **Lithotomy position**: supine with the legs abducted and knees flexed, supported in stirrups — used for gynecologic, rectal, and urologic procedures; the legs should be raised and lowered together to avoid injury.
+
+![Diagrams comparing the supine and prone patient positions](https://commons.wikimedia.org/wiki/Special:FilePath/Supine_and_prone_diagrams-en.svg)
+*Supine and prone diagrams, by Jmarchn, via Wikimedia Commons, CC BY-SA 3.0.*
 
 ## Applying Terminology in Documentation
 Precise anatomical language prevents dangerous ambiguity. Compare: "pain near the stomach" versus "pain localized to the right lower quadrant, radiating toward the right iliac region" — the second gives far more diagnostic information.
@@ -286,7 +389,12 @@ Using standardized directional terms, plane references, and cavity/region names 
 - **الانبطاح**: على البطن مع الوجه للأسفل — لبعض التقييمات ولتخفيف الضغط عن مناطق أخرى.
 - **الوضعية الجانبية**: على أحد الجانبين — لتخفيف الضغط أو المساعدة في التصريف أو فحوصات معينة.
 - **وضعية فاولر**: الجلوس مع رفع رأس السرير (فاولر النصفية ~30 درجة، والعالية ~90 درجة) — تسهّل التنفس وتساعد أثناء الأكل.
-- **وضعية ترندلينبيرغ**: استلقاء ظهري مع إمالة الجسم بحيث يكون الرأس أخفض من القدمين — تُستخدم في حالات محددة بتوجيه من مقدم الرعاية.
+- **وضعية ترندلينبيرغ**: شكل من الاستلقاء الظهري يُمال فيه رأس السرير للأسفل **بمقدار 15 درجة على الأقل** — تُستخدم لبعض إجراءات البطن أو الحوض.
+- **وضعية ترندلينبيرغ العكسية**: استلقاء ظهري مع إمالة رأس السرير للأعلى بدلاً من الأسفل — تُسهّل جراحات البطن العلوي، لكنها قد تقلل العائد الوريدي والتروية الدماغية.
+- **وضعية الليثوتومي (وضعية استخراج الحصى)**: استلقاء ظهري مع تبعيد الساقين وثني الركبتين ودعمهما بالركائز — تُستخدم لإجراءات النساء والمستقيم والمسالك البولية؛ ويجب رفع وخفض الساقين معًا لتجنب الإصابة.
+
+![رسوم توضيحية تقارن بين وضعيتي الاستلقاء الظهري والانبطاح](https://commons.wikimedia.org/wiki/Special:FilePath/Supine_and_prone_diagrams-en.svg)
+*رسوم الاستلقاء الظهري والانبطاح، بواسطة Jmarchn، عبر Wikimedia Commons، CC BY-SA 3.0.*
 
 ## تطبيق المصطلحات في التوثيق
 تمنع اللغة التشريحية الدقيقة الغموض الخطير. قارن بين: "ألم قرب المعدة" و"ألم موضعي في الربع السفلي الأيمن، ينتشر باتجاه المنطقة الحرقفية اليمنى" — تقدّم الجملة الثانية معلومات تشخيصية أكبر بكثير.
@@ -306,8 +414,23 @@ Using standardized directional terms, plane references, and cavity/region names 
       "Standard patient positions (supine, prone, lateral, Fowler's, Trendelenburg) and precise anatomical terminology are essential nursing tools that reduce ambiguity and improve patient safety.",
     summaryAr:
       "تُعد وضعيات المريض القياسية (الظهرية، الانبطاح، الجانبية، فاولر، ترندلينبيرغ) والمصطلحات التشريحية الدقيقة أدوات تمريضية أساسية تقلل الغموض وتحسّن سلامة المريض.",
+    videoUrl: "https://www.youtube.com/watch?v=JRTWtLYQhLw",
+    videoLabelEn:
+      "This video from Level Up RN covers the standard nursing patient positions and why each is used.",
+    videoLabelAr:
+      "يستعرض هذا الفيديو من Level Up RN وضعيات المريض التمريضية القياسية والغرض من كل منها.",
+    references: [
+      {
+        label: "NCBI Bookshelf, StatPearls — \"Anatomy, Patient Positioning\"",
+        url: "https://www.ncbi.nlm.nih.gov/books/NBK513320/",
+      },
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 1.6 Anatomical Terminology",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/1-6-anatomical-terminology",
+      },
+    ],
   },
-].map((lesson) => ({ ...lesson, references: REFERENCES }));
+].map((lesson) => ({ ...lesson, references: lesson.references ?? REFERENCES }));
 
 const questions = [
   {

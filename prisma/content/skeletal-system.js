@@ -47,10 +47,16 @@ The skeletal system is the framework of the human body, composed of bones, carti
 6. **Fat storage** – Yellow bone marrow stores triglycerides as an energy reserve.
 
 ## Two Major Divisions
-- **Axial skeleton** (80 bones): skull, vertebral column, and rib cage/sternum — forms the central axis of the body.
-- **Appendicular skeleton** (126 bones): bones of the upper limbs, lower limbs, and the girdles that attach them to the axial skeleton.
+- **Axial skeleton** (80 bones): skull, vertebral column, and rib cage/sternum — forms the vertical, central axis of the body and also serves as the attachment site for muscles that move the head, neck, and back.
+- **Appendicular skeleton** (126 bones): bones of the upper limbs, lower limbs, and the girdles that attach them to the axial skeleton. Its lower portion is specialized for stability during walking or running, while its upper portion has greater mobility, allowing you to lift and carry objects.
 
-Understanding this division helps organize the study of anatomy: the axial skeleton primarily protects vital organs, while the appendicular skeleton primarily enables movement — a distinction that is clinically relevant when assessing trauma or planning patient positioning.`,
+![Diagram of the human skeleton with the axial skeleton highlighted](https://commons.wikimedia.org/wiki/Special:FilePath/Axial_skeleton_diagram.svg)
+*Axial skeleton diagram, by Mariana Ruiz Villarreal (LadyofHats), public domain, via Wikimedia Commons.*
+
+Understanding this division helps organize the study of anatomy: the axial skeleton primarily protects vital organs, while the appendicular skeleton primarily enables movement — a distinction that is clinically relevant when assessing trauma or planning patient positioning.
+
+## Bone as an Endocrine Organ
+Beyond mineral storage, bone tissue itself acts as an endocrine organ. Osteocytes secrete **FGF23**, a hormone that acts on the kidneys to regulate phosphate and vitamin D metabolism, while osteoblasts secrete **osteocalcin**, which promotes insulin secretion and improves glucose metabolism — a reminder that bone health is connected to endocrine and metabolic health, not just structural support.`,
     contentAr: `## نظرة عامة
 الجهاز الهيكلي هو الإطار الداعم لجسم الإنسان، ويتكوّن من العظام والغضاريف والأربطة والمفاصل. يتكوّن هيكل الشخص البالغ عادةً من **206 عظمة**، بينما يولد الرضيع بحوالي 270–300 عظمة وقطعة غضروفية تندمج مع النمو لتشكّل العدد النهائي.
 

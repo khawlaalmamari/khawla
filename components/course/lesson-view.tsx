@@ -7,7 +7,6 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getCurrentUser } from "@/lib/auth/session";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
-import { lessonDiagrams } from "@/components/course/lesson-diagrams";
 
 export async function LessonView({
   courseSlug,
@@ -39,7 +38,6 @@ export async function LessonView({
   const references: { label: string; url: string }[] = JSON.parse(lesson.referencesJson);
   const content = locale === "ar" ? lesson.contentAr : lesson.contentEn;
   const summary = locale === "ar" ? lesson.summaryAr : lesson.summaryEn;
-  const Diagram = lessonDiagrams[lesson.slug];
 
   return (
     <div>
@@ -64,15 +62,6 @@ export async function LessonView({
           ))}
         </ul>
       </Card>
-
-      {Diagram && (
-        <Card className="mt-6">
-          <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-primary-700">
-            {dict.course.diagram}
-          </h2>
-          <Diagram locale={locale} />
-        </Card>
-      )}
 
       <article className="prose prose-sm mt-6 max-w-none rounded-2xl border border-border bg-surface p-6 leading-7 [&_h2]:mt-6 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:first:mt-0 [&_li]:my-1 [&_p]:my-3 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:ps-5">
         <ReactMarkdown>{content}</ReactMarkdown>
