@@ -41,7 +41,7 @@ export async function getDashboardData(userId: string) {
     where: { userId, completedAt: { not: null } },
     orderBy: { completedAt: "desc" },
     take: 5,
-    include: { module: true },
+    include: { module: { include: { course: true } } },
   });
 
   const allAttempts = await prisma.quizAttempt.findMany({
@@ -54,6 +54,35 @@ export async function getDashboardData(userId: string) {
       : Math.round(
           allAttempts.reduce((sum, a) => sum + (a.scorePercent ?? 0), 0) / allAttempts.length,
         );
+
+  // Score trend: the student's last 15 attempts, oldest to newest, for a
+  // simple "am I improving?" chart on the dashboard.
+  const scoreHistoryRaw = await prisma.quizAttempt.findMany({
+    where: { userId, completedAt: { not: null }, scorePercent: { not: null } },
+    orderBy: { completedAt: "desc" },
+    take: 15,
+    include: { module: true },
+  });
+  const scoreHistory = scoreHistoryRaw
+    .slice()
+    .reverse()
+    .map((a) => ({
+      date: a.completedAt!.toLocaleDateString("en-CA"), // YYYY-MM-DD, locale-neutral key
+      score: a.scorePercent ?? 0,
+      moduleTitleEn: a.module.titleEn,
+      moduleTitleAr: a.module.titleAr,
+    }));
+
+  // Best score per module the student has actually attempted, for a
+  // strengths/weaknesses comparison chart.
+  const moduleBestScores = progressRecords
+    .filter((r) => r.bestScorePercent != null)
+    .map((r) => ({
+      titleEn: r.module.titleEn,
+      titleAr: r.module.titleAr,
+      bestScore: r.bestScorePercent!,
+      passThreshold: r.module.passThreshold,
+    }));
 
   // Topics needing review: modules with a failed most-recent attempt.
   const reviewModules = progressRecords.filter(
@@ -79,6 +108,8 @@ export async function getDashboardData(userId: string) {
     completedModulesCount: overallCompleted,
     recentAttempts,
     averageScore,
+    scoreHistory,
+    moduleBestScores,
     reviewModules,
     studyPlans,
     notifications,

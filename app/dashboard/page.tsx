@@ -9,6 +9,10 @@ import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
+import { ProgressRing } from "@/components/dashboard/progress-ring";
+import { ScoreTrendChart } from "@/components/dashboard/score-trend-chart";
+import { ModuleBestScoresChart } from "@/components/dashboard/module-best-scores-chart";
+import { NotificationList } from "@/components/dashboard/notification-list";
 
 function ProgressBar({ percent }: { percent: number }) {
   return (
@@ -57,14 +61,9 @@ export default async function DashboardPage() {
 
         {/* Top stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
+          <Card className="flex items-center gap-4">
+            <ProgressRing percent={data.overallPercent} label={dict.dashboard.overallProgress} />
             <p className="text-sm text-muted">{dict.dashboard.overallProgress}</p>
-            <p className="mt-1 text-3xl font-extrabold text-primary-700">
-              {data.overallPercent}%
-            </p>
-            <div className="mt-3">
-              <ProgressBar percent={data.overallPercent} />
-            </div>
           </Card>
           <Card>
             <p className="text-sm text-muted">{dict.dashboard.anatomyProgress}</p>
@@ -92,6 +91,39 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <h2 className="text-lg font-bold">{dict.dashboard.scoreTrend}</h2>
+            <div className="mt-4">
+              <ScoreTrendChart
+                data={data.scoreHistory.map((h) => ({
+                  date: h.date,
+                  score: h.score,
+                  label: locale === "ar" ? h.moduleTitleAr : h.moduleTitleEn,
+                }))}
+                passThreshold={70}
+                emptyLabel={dict.dashboard.noScoreHistory}
+                passLineLabel={dict.dashboard.passLineLabel}
+              />
+            </div>
+          </Card>
+          <Card>
+            <h2 className="text-lg font-bold">{dict.dashboard.moduleComparison}</h2>
+            <div className="mt-4">
+              <ModuleBestScoresChart
+                data={data.moduleBestScores.map((m) => ({
+                  title: locale === "ar" ? m.titleAr : m.titleEn,
+                  bestScore: m.bestScore,
+                  passThreshold: m.passThreshold,
+                }))}
+                emptyLabel={dict.dashboard.noModuleScores}
+                passedLabel={dict.dashboard.passedShort}
+                notYetLabel={dict.dashboard.notPassedYet}
+              />
+            </div>
+          </Card>
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Recent quizzes */}
           <Card className="lg:col-span-2">
@@ -101,21 +133,26 @@ export default async function DashboardPage() {
             ) : (
               <ul className="mt-4 divide-y divide-border">
                 {data.recentAttempts.map((a) => (
-                  <li key={a.id} className="flex items-center justify-between py-3">
-                    <div>
-                      <p className="font-medium">
-                        {locale === "ar" ? a.module.titleAr : a.module.titleEn}
-                      </p>
-                      <p className="text-xs text-muted">
-                        {a.completedAt?.toLocaleDateString(locale === "ar" ? "ar" : "en-US")}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-semibold">{a.scorePercent}%</span>
-                      <Badge tone={a.passed ? "success" : "neutral"}>
-                        {a.passed ? dict.quiz.passed : dict.quiz.failed}
-                      </Badge>
-                    </div>
+                  <li key={a.id}>
+                    <Link
+                      href={`/${a.module.course.slug}/${a.module.slug}/quiz/${a.id}`}
+                      className="flex items-center justify-between rounded-lg py-3 transition-colors hover:bg-surface"
+                    >
+                      <div>
+                        <p className="font-medium">
+                          {locale === "ar" ? a.module.titleAr : a.module.titleEn}
+                        </p>
+                        <p className="text-xs text-muted">
+                          {a.completedAt?.toLocaleDateString(locale === "ar" ? "ar" : "en-US")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold">{a.scorePercent}%</span>
+                        <Badge tone={a.passed ? "success" : "neutral"}>
+                          {a.passed ? dict.quiz.passed : dict.quiz.failed}
+                        </Badge>
+                      </div>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -180,23 +217,8 @@ export default async function DashboardPage() {
 
           {/* Notifications */}
           <Card>
-            <h2 className="text-lg font-bold">
-              {locale === "ar" ? "الإشعارات" : "Notifications"}
-            </h2>
-            {data.notifications.length === 0 ? (
-              <p className="mt-4 text-sm text-muted">—</p>
-            ) : (
-              <ul className="mt-4 space-y-2">
-                {data.notifications.map((n) => (
-                  <li key={n.id} className="rounded-lg bg-surface px-3 py-2 text-sm">
-                    <p className="font-medium">{locale === "ar" ? n.titleAr : n.titleEn}</p>
-                    <p className="mt-0.5 text-xs text-muted">
-                      {locale === "ar" ? n.bodyAr : n.bodyEn}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <h2 className="text-lg font-bold">{dict.dashboard.notifications}</h2>
+            <NotificationList notifications={data.notifications} />
           </Card>
         </div>
 
