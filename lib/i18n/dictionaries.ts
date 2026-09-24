@@ -18,6 +18,7 @@ export const ar = {
     signup: "إنشاء حساب",
     logout: "تسجيل الخروج",
     profile: "الملف الشخصي",
+    admin: "لوحة الإدارة",
   },
   landing: {
     heroDescription:
@@ -214,6 +215,21 @@ export const ar = {
       },
     ],
   },
+  admin: {
+    title: "الطالبات المسجّلات",
+    totalUsers: "إجمالي الحسابات",
+    verifiedUsers: "حسابات مفعّلة",
+    tableName: "الاسم",
+    tableUsername: "اسم المستخدم",
+    tableEmail: "البريد الإلكتروني",
+    tableStatus: "الحالة",
+    tableJoined: "تاريخ التسجيل",
+    tableLastLogin: "آخر دخول",
+    verified: "مفعّل",
+    unverified: "غير مفعّل",
+    never: "لم يسجّل دخول بعد",
+    noUsers: "لا يوجد أي حساب مسجّل حتى الآن.",
+  },
 };
 
 export const en: Dictionary = {
@@ -232,6 +248,7 @@ export const en: Dictionary = {
     signup: "Sign Up",
     logout: "Log Out",
     profile: "Profile",
+    admin: "Admin",
   },
   landing: {
     heroDescription:
@@ -427,6 +444,21 @@ export const en: Dictionary = {
         a: "Use the \"Forgot password?\" link on the login page to reset it.",
       },
     ],
+  },
+  admin: {
+    title: "Registered Students",
+    totalUsers: "Total Accounts",
+    verifiedUsers: "Verified Accounts",
+    tableName: "Name",
+    tableUsername: "Username",
+    tableEmail: "Email",
+    tableStatus: "Status",
+    tableJoined: "Joined",
+    tableLastLogin: "Last Login",
+    verified: "Verified",
+    unverified: "Unverified",
+    never: "Never logged in",
+    noUsers: "No accounts registered yet.",
   },
 };
 

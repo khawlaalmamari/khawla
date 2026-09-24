@@ -33,6 +33,11 @@ export async function Navbar() {
               {dict.nav.dashboard}
             </Link>
           )}
+          {user?.role === "admin" && (
+            <Link href="/admin" className="hover:text-primary-700">
+              {dict.nav.admin}
+            </Link>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
