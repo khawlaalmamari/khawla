@@ -26,7 +26,6 @@ export const ar = {
     heroShort:
       "E-nursing — افهم جسم الإنسان، وطوّر تفكيرك السريري، واصنع مستقبلك في التمريض.",
     ctaStart: "ابدأ رحلتك التعليمية",
-    ctaExplore: "استكشف المنصة",
     discoverTitle: "اكتشف تجربة التعلّم",
     howItWorksTitle: "كيف تعمل المنصة؟",
     features: [
@@ -306,7 +305,6 @@ export const en: Dictionary = {
     heroShort:
       "E-nursing — Understand the human body, build your clinical thinking, and shape your future in nursing.",
     ctaStart: "Start Your Learning Journey",
-    ctaExplore: "Explore the Platform",
     discoverTitle: "Discover the Learning Experience",
     howItWorksTitle: "How Does the Platform Work?",
     features: [

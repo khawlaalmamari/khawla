@@ -32,9 +32,6 @@ export default async function LandingPage() {
                 <ButtonLink href="/signup" variant="primary">
                   {landing.ctaStart}
                 </ButtonLink>
-                <ButtonLink href="/anatomy" variant="outline">
-                  {landing.ctaExplore}
-                </ButtonLink>
               </div>
             </div>
 
