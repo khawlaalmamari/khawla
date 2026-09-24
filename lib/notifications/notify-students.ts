@@ -25,6 +25,13 @@ export async function notifyAllStudents({
   if (students.length === 0) return;
 
   await prisma.notification.createMany({
-    data: students.map((s) => ({ userId: s.id, titleAr, titleEn, bodyAr, bodyEn })),
+    data: students.map((s) => ({
+      userId: s.id,
+      type: "content_update",
+      titleAr,
+      titleEn,
+      bodyAr,
+      bodyEn,
+    })),
   });
 }

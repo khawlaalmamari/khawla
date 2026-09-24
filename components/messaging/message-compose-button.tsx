@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Field, inputClass } from "@/components/ui/field";
+import { ImageAttachInput } from "@/components/messaging/image-attach-input";
+import { uploadMessageImage } from "@/components/messaging/upload-image";
 
 type RecipientType = "admin" | "user";
 
@@ -13,6 +15,7 @@ export function MessageComposeButton() {
   const [recipientType, setRecipientType] = useState<RecipientType>("admin");
   const [recipientEmail, setRecipientEmail] = useState("");
   const [body, setBody] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
@@ -33,13 +36,31 @@ export function MessageComposeButton() {
     setError(null);
     setSubmitting(true);
     try {
+      let imageUrl: string | undefined;
+      if (imageFile) {
+        const result = await uploadMessageImage(imageFile);
+        if ("error" in result) {
+          setError(
+            result.error === "tooLarge"
+              ? dict.messaging.imageTooLarge
+              : result.error === "invalidType"
+                ? dict.messaging.imageInvalidType
+                : result.error === "notConfigured"
+                  ? dict.messaging.uploadNotConfigured
+                  : dict.messaging.genericError,
+          );
+          return;
+        }
+        imageUrl = result.url;
+      }
+
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           recipientType === "admin"
-            ? { recipientType: "admin", body }
-            : { recipientType: "user", recipientEmail, body },
+            ? { recipientType: "admin", body, imageUrl }
+            : { recipientType: "user", recipientEmail, body, imageUrl },
         ),
       });
       if (!res.ok) {
@@ -56,6 +77,7 @@ export function MessageComposeButton() {
       setSent(true);
       setBody("");
       setRecipientEmail("");
+      setImageFile(null);
     } finally {
       setSubmitting(false);
     }
@@ -134,6 +156,8 @@ export function MessageComposeButton() {
                 onChange={(e) => setBody(e.target.value)}
               />
             </Field>
+
+            <ImageAttachInput file={imageFile} onChange={setImageFile} />
 
             <Button type="submit" disabled={submitting} className="w-full">
               {dict.messaging.send}

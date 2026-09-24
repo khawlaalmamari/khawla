@@ -46,6 +46,13 @@ export const ar = {
     recipientNotFound: "لا يوجد مستخدم مسجل بهذا البريد الإلكتروني.",
     cannotMessageSelf: "لا يمكنك إرسال رسالة لنفسك.",
     genericError: "حدث خطأ أثناء إرسال الرسالة. حاولي مرة أخرى.",
+    reply: "الرد",
+    replyPlaceholder: "اكتبي ردك هنا...",
+    attachImage: "إرفاق صورة",
+    imageTooLarge: "حجم الصورة كبير جدًا (الحد الأقصى 5 ميغابايت).",
+    imageInvalidType: "نوع الصورة غير مدعوم (استخدمي PNG أو JPEG أو WEBP أو GIF).",
+    uploadNotConfigured: "ميزة رفع الصور غير مفعّلة بعد.",
+    replySent: "تم إرسال ردك بنجاح.",
   },
   landing: {
     heroDescription:
@@ -413,6 +420,13 @@ export const en: Dictionary = {
     recipientNotFound: "No registered user was found with this email.",
     cannotMessageSelf: "You can't send a message to yourself.",
     genericError: "Something went wrong while sending your message. Please try again.",
+    reply: "Reply",
+    replyPlaceholder: "Type your reply here...",
+    attachImage: "Attach an image",
+    imageTooLarge: "Image is too large (max 5MB).",
+    imageInvalidType: "Unsupported image type (use PNG, JPEG, WEBP, or GIF).",
+    uploadNotConfigured: "Image uploads aren't configured yet.",
+    replySent: "Your reply was sent successfully.",
   },
   landing: {
     heroDescription:

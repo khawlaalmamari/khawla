@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/components/locale-provider";
+import { Button } from "@/components/ui/button";
+import { ImageAttachInput } from "@/components/messaging/image-attach-input";
+import { uploadMessageImage } from "@/components/messaging/upload-image";
 
 export type BellNotification = {
   id: string;
@@ -11,8 +14,10 @@ export type BellNotification = {
   bodyAr: string;
   bodyEn: string;
   linkUrl: string | null;
+  imageUrl: string | null;
   read: boolean;
   createdAt: string;
+  senderId: string | null;
   senderRole: "admin" | "student" | null;
 };
 
@@ -21,6 +26,12 @@ export function NotificationBell({ notifications }: { notifications: BellNotific
   const [items, setItems] = useState(notifications);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<BellNotification | null>(null);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replyBody, setReplyBody] = useState("");
+  const [replyImage, setReplyImage] = useState<File | null>(null);
+  const [replySending, setReplySending] = useState(false);
+  const [replyError, setReplyError] = useState<string | null>(null);
+  const [replySent, setReplySent] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = items.filter((n) => !n.read).length;
@@ -48,12 +59,64 @@ export function NotificationBell({ notifications }: { notifications: BellNotific
     if (!n.read) markRead(n.id);
     setSelected(n);
     setOpen(false);
+    setReplyOpen(false);
+    setReplyBody("");
+    setReplyImage(null);
+    setReplyError(null);
+    setReplySent(false);
   }
 
   function senderLabel(n: BellNotification) {
     if (n.senderRole === "admin") return dict.notif.fromAdmin;
     if (n.senderRole === "student") return dict.notif.fromStudent;
     return dict.notif.system;
+  }
+
+  async function sendReply(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selected?.senderId) return;
+    setReplyError(null);
+    setReplySending(true);
+    try {
+      let imageUrl: string | undefined;
+      if (replyImage) {
+        const result = await uploadMessageImage(replyImage);
+        if ("error" in result) {
+          setReplyError(
+            result.error === "tooLarge"
+              ? dict.messaging.imageTooLarge
+              : result.error === "invalidType"
+                ? dict.messaging.imageInvalidType
+                : result.error === "notConfigured"
+                  ? dict.messaging.uploadNotConfigured
+                  : dict.messaging.genericError,
+          );
+          return;
+        }
+        imageUrl = result.url;
+      }
+
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipientType: "replyTo",
+          recipientUserId: selected.senderId,
+          body: replyBody,
+          imageUrl,
+        }),
+      });
+      if (!res.ok) {
+        setReplyError(dict.messaging.genericError);
+        return;
+      }
+      setReplySent(true);
+      setReplyBody("");
+      setReplyImage(null);
+      setReplyOpen(false);
+    } finally {
+      setReplySending(false);
+    }
   }
 
   return (
@@ -146,6 +209,14 @@ export function NotificationBell({ notifications }: { notifications: BellNotific
             <p className="mt-4 whitespace-pre-line text-sm leading-6">
               {locale === "ar" ? selected.bodyAr : selected.bodyEn}
             </p>
+            {selected.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- externally hosted (Vercel Blob) image
+              <img
+                src={selected.imageUrl}
+                alt=""
+                className="mt-4 max-h-64 w-full rounded-lg object-contain"
+              />
+            )}
             {selected.linkUrl && (
               <Link
                 href={selected.linkUrl}
@@ -154,6 +225,41 @@ export function NotificationBell({ notifications }: { notifications: BellNotific
               >
                 {dict.notif.openAction}
               </Link>
+            )}
+
+            {selected.senderId && (
+              <div className="mt-5 border-t border-border pt-4">
+                {replySent && (
+                  <p className="mb-3 text-sm text-success">{dict.messaging.replySent}</p>
+                )}
+                {!replyOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setReplyOpen(true)}
+                    className="text-sm font-semibold text-primary-700 hover:underline"
+                  >
+                    {dict.messaging.reply}
+                  </button>
+                ) : (
+                  <form onSubmit={sendReply} className="space-y-3">
+                    {replyError && <p className="text-sm text-danger">{replyError}</p>}
+                    <textarea
+                      required
+                      rows={2}
+                      placeholder={dict.messaging.replyPlaceholder}
+                      className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary-500"
+                      value={replyBody}
+                      onChange={(e) => setReplyBody(e.target.value)}
+                    />
+                    <ImageAttachInput file={replyImage} onChange={setReplyImage} />
+                    <div className="flex justify-end gap-2">
+                      <Button type="submit" disabled={replySending} className="!px-4 !py-1.5 text-xs">
+                        {dict.messaging.send}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+              </div>
             )}
           </div>
         </div>

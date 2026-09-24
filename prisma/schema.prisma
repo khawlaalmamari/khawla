@@ -256,11 +256,17 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   senderId  String? // null = system-generated (security alert, automated content update)
   sender    User?    @relation("SentNotifications", fields: [senderId], references: [id], onDelete: SetNull)
+  // "system" (security alerts, lesson-progress nudges — never shown in the
+  // header bell), "message" (person-to-person), "content_update"
+  // (automated new-module/lesson alert). The header bell only ever queries
+  // for "message" and "content_update".
+  type      String   @default("system")
   titleEn   String
   titleAr   String
   bodyEn    String
   bodyAr    String
   linkUrl   String? // optional deep link (e.g. straight to an unfinished lesson)
+  imageUrl  String? // optional image attachment on a person-to-person message
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 

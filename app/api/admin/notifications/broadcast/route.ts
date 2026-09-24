@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       data: recipients.map((r) => ({
         userId: r.id,
         senderId: admin.id,
+        type: "message",
         titleAr,
         titleEn,
         bodyAr,
