@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email/send";
-import { studyReminderEmail, SITE_ORIGIN } from "@/lib/email/templates";
+import { studyReminderEmail, examReminderEmail, SITE_ORIGIN } from "@/lib/email/templates";
 
 const OMAN_UTC_OFFSET_HOURS = 4;
 const DAILY_MIN_GAP_MS = 20 * 60 * 60 * 1000; // 20h: allows next day, blocks re-fires same hour
@@ -73,5 +73,59 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return NextResponse.json({ ok: true, checked: plans.length, sent, skipped });
+  // Separate concern, same daily run: a one-time "your exam is tomorrow"
+  // email + in-app alert, independent of each plan's own reminder settings.
+  const omanToday = new Date(Date.UTC(omanNow.getUTCFullYear(), omanNow.getUTCMonth(), omanNow.getUTCDate()));
+  const examPlans = await prisma.studyPlan.findMany({
+    where: { examReminderSentAt: null },
+    include: { user: { select: { id: true, email: true, fullName: true } }, course: true },
+  });
+
+  let examRemindersSent = 0;
+
+  for (const plan of examPlans) {
+    const examDay = new Date(
+      Date.UTC(plan.examDate.getUTCFullYear(), plan.examDate.getUTCMonth(), plan.examDate.getUTCDate()),
+    );
+    const daysUntilExam = Math.round((examDay.getTime() - omanToday.getTime()) / 86_400_000);
+    if (daysUntilExam !== 1) continue;
+
+    const { subject, html } = examReminderEmail({
+      fullName: plan.user.fullName,
+      courseName: plan.course.titleAr,
+      siteUrl: SITE_ORIGIN || "",
+    });
+
+    try {
+      const result = await sendEmail({ to: plan.user.email, subject, html });
+      if (result.sent) examRemindersSent++;
+    } catch (err) {
+      console.error("[cron] Failed to send exam reminder email:", err);
+    }
+
+    await prisma.notification.create({
+      data: {
+        userId: plan.user.id,
+        type: "exam_reminder",
+        titleAr: "تذكير باختبار الغد",
+        titleEn: "Tomorrow's exam reminder",
+        bodyAr: `غدًا موعد اختبارك في مادة ${plan.course.titleAr}، كل التوفيق لك! 🌟`,
+        bodyEn: `Tomorrow is your ${plan.course.titleEn} exam — good luck! 🌟`,
+      },
+    });
+
+    await prisma.studyPlan.update({
+      where: { id: plan.id },
+      data: { examReminderSentAt: new Date() },
+    });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    checked: plans.length,
+    sent,
+    skipped,
+    examRemindersChecked: examPlans.length,
+    examRemindersSent,
+  });
 }

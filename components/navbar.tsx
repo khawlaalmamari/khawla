@@ -16,12 +16,12 @@ export async function Navbar() {
   const dict = getDictionary(locale);
   const user = await getCurrentUser();
 
-  // Only person-to-person messages and automated content-update alerts show
-  // in the header bell — security alerts, lesson nudges, and anything else
-  // stay "system"-typed and out of this list, to keep it focused.
+  // Only person-to-person messages, automated content-update alerts, and
+  // exam-day reminders show in the header bell — security alerts, lesson
+  // nudges, and anything else stay "system"-typed and out of this list.
   const notifications = user
     ? await prisma.notification.findMany({
-        where: { userId: user.id, type: { in: ["message", "content_update"] } },
+        where: { userId: user.id, type: { in: ["message", "content_update", "exam_reminder"] } },
         orderBy: { createdAt: "desc" },
         take: 20,
         include: { sender: { select: { id: true, role: true } } },

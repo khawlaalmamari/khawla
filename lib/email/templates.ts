@@ -280,3 +280,28 @@ export function studyReminderEmail({
     html: emailShell({ contentHtml: content, preheader: `حان وقت مذاكرة ${courseName} اليوم` }),
   };
 }
+
+export function examReminderEmail({
+  fullName,
+  courseName,
+  siteUrl,
+}: {
+  fullName: string;
+  courseName: string;
+  siteUrl: string;
+}): { subject: string; html: string } {
+  const content = `
+    <p style="margin:0 0 4px;font-size:16px;">عزيزنا الطالب <strong>${fullName}</strong>،</p>
+    <p style="margin:0 0 16px;color:${COLOR_MUTED};">السلام عليكم ورحمة الله وبركاته،</p>
+    <p style="margin:0 0 16px;color:${COLOR_MUTED};">نود تذكيرك بأن موعد اختبار مادة <strong>${courseName}</strong> سيكون غداً بإذن الله. لقد تابعت منصة ${BRAND_NAME} مسيرتك الدراسية المتميزة وتفانيك في إنهاء الدروس والموديلات خلال الفترة الماضية بكل فخر.</p>
+    <p style="margin:0 0 20px;color:${COLOR_MUTED};">متبقٍّ خطوة واحدة فقط نحو التميز. نوصيك بأخذ قسط كافٍ من الراحة الليلة، والثقة بالجهد الذي بذلته. نحن على يقين تام بأنك قادر على تحقيق أعلى الدرجات.</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr><td align="center">${button(siteUrl, "افتح المنصة", COLOR_PRIMARY)}</td></tr>
+    </table>
+    <p style="margin:24px 0 0;">تمنياتنا لك بالتوفيق والنجاح المستمر،<br /><strong>فريق عمل ${BRAND_NAME}</strong></p>`;
+
+  return {
+    subject: `${BRAND_NAME} | تذكير هام واستعداد لاختبار غدٍ 🩺`,
+    html: emailShell({ contentHtml: content, preheader: `اختبار ${courseName} غدًا — بالتوفيق!` }),
+  };
+}

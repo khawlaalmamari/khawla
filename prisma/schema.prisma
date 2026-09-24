@@ -234,6 +234,10 @@ model StudyPlan {
   reminderFrequency  String    @default("daily") // "daily" | "weekly"
   lastReminderSentAt DateTime?
 
+  // One-time "your exam is tomorrow" email + in-app alert, independent of
+  // the recurring reminder above. Set once sent, so it never repeats.
+  examReminderSentAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
