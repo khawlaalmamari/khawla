@@ -20,15 +20,6 @@ export async function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-6 text-sm font-medium md:flex">
-          <Link href="/anatomy" className="hover:text-primary-700">
-            {dict.nav.anatomy}
-          </Link>
-          <Link href="/physiology" className="hover:text-primary-700">
-            {dict.nav.physiology}
-          </Link>
-          <Link href="/study-planner" className="hover:text-primary-700">
-            {dict.nav.studyPlanner}
-          </Link>
           {user && (
             <Link href="/dashboard" className="hover:text-primary-700">
               {dict.nav.dashboard}
