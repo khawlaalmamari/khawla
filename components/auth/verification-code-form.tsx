@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/locale-provider";
-import { Button } from "@/components/ui/button";
 
 const CODE_LENGTH = 6;
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -24,7 +23,6 @@ export function VerificationCodeForm({
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS);
   const [resending, setResending] = useState(false);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
-  const lastSubmittedCode = useRef<string | null>(null);
 
   const code = digits.join("");
   const isComplete = code.length === CODE_LENGTH;
@@ -41,7 +39,6 @@ export function VerificationCodeForm({
 
   async function submitCode(codeToSubmit: string) {
     if (submitting) return;
-    lastSubmittedCode.current = codeToSubmit;
     setSubmitting(true);
     setError(null);
     try {
@@ -56,7 +53,6 @@ export function VerificationCodeForm({
         else if (data.error === "tooManyAttempts") setError(dict.auth.errors.tooManyAttempts);
         else setError(dict.auth.errors.invalidCode);
         setDigits(Array(CODE_LENGTH).fill(""));
-        lastSubmittedCode.current = null;
         focusInput(0);
         return;
       }
@@ -64,20 +60,10 @@ export function VerificationCodeForm({
       router.refresh();
     } catch {
       setError(dict.auth.errors.genericError);
-      lastSubmittedCode.current = null;
     } finally {
       setSubmitting(false);
     }
   }
-
-  // Auto-submit once all 6 boxes are filled, but only for a code we haven't
-  // already just submitted (avoids re-firing on unrelated re-renders).
-  useEffect(() => {
-    if (isComplete && code !== lastSubmittedCode.current) {
-      submitCode(code);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, isComplete]);
 
   function handleChange(index: number, rawValue: string) {
     const clean = rawValue.replace(/\D/g, "");
@@ -130,7 +116,6 @@ export function VerificationCodeForm({
         return;
       }
       setCooldown(RESEND_COOLDOWN_SECONDS);
-      lastSubmittedCode.current = null;
       setDigits(Array(CODE_LENGTH).fill(""));
       focusInput(0);
     } finally {
@@ -169,14 +154,18 @@ export function VerificationCodeForm({
       {error && <p className="text-center text-sm text-danger">{error}</p>}
 
       <div className="flex justify-center">
-        <Button
+        <button
           type="button"
           onClick={() => submitCode(code)}
           disabled={!isComplete || submitting}
-          className="px-10"
+          className={`inline-flex items-center justify-center gap-2 rounded-lg px-10 py-2.5 text-sm font-semibold transition-colors disabled:pointer-events-none ${
+            isComplete && !submitting
+              ? "bg-green-600 text-white shadow-sm shadow-green-900/10 hover:bg-green-700"
+              : "bg-surface text-muted disabled:opacity-60"
+          }`}
         >
           {dict.auth.verifyCode}
-        </Button>
+        </button>
       </div>
 
       {devCode && (
