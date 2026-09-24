@@ -8,6 +8,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { MessageComposeButton } from "@/components/messaging/message-compose-button";
 import { CoursesDropdown } from "@/components/courses-dropdown";
 
 export async function Navbar() {
@@ -52,18 +53,22 @@ export async function Navbar() {
 
         <div className="flex items-center gap-3">
           {user && (
-            <NotificationBell
-              notifications={notifications.map((n) => ({
-                id: n.id,
-                titleAr: n.titleAr,
-                titleEn: n.titleEn,
-                bodyAr: n.bodyAr,
-                bodyEn: n.bodyEn,
-                read: n.read,
-                createdAt: n.createdAt.toISOString(),
-                senderRole: (n.sender?.role as "admin" | "student" | undefined) ?? null,
-              }))}
-            />
+            <>
+              <MessageComposeButton />
+              <NotificationBell
+                notifications={notifications.map((n) => ({
+                  id: n.id,
+                  titleAr: n.titleAr,
+                  titleEn: n.titleEn,
+                  bodyAr: n.bodyAr,
+                  bodyEn: n.bodyEn,
+                  linkUrl: n.linkUrl,
+                  read: n.read,
+                  createdAt: n.createdAt.toISOString(),
+                  senderRole: (n.sender?.role as "admin" | "student" | undefined) ?? null,
+                }))}
+              />
+            </>
           )}
           <LanguageSwitcher />
           {user ? (

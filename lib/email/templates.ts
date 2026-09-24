@@ -21,7 +21,7 @@ const COLOR_MUTED = "#64748b";
 // point at a build-specific URL instead of the live site. An explicit
 // NEXT_PUBLIC_SITE_URL (e.g. a custom domain) always wins. Emails fall back
 // to a plain text mark when none of these are available (local dev).
-const SITE_ORIGIN =
+export const SITE_ORIGIN =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
@@ -253,5 +253,30 @@ export function failedLoginAlertEmail({
   return {
     subject: `تنبيه أمني: محاولة تسجيل دخول فاشلة — ${BRAND_NAME}`,
     html: emailShell({ contentHtml: content, preheader: "محاولة تسجيل دخول فاشلة إلى حسابك", headerColor: COLOR_ACCENT }),
+  };
+}
+
+export function studyReminderEmail({
+  fullName,
+  courseName,
+  dailyHours,
+  studyPlannerUrl,
+}: {
+  fullName: string;
+  courseName: string;
+  dailyHours: number;
+  studyPlannerUrl: string;
+}): { subject: string; html: string } {
+  const content = `
+    <p style="margin:0 0 4px;font-size:16px;">عزيزتنا <strong>${fullName}</strong>،</p>
+    <p style="margin:0 0 20px;color:${COLOR_MUTED};">هذا تذكير بخطة مذاكرتك لمادة <strong>${courseName}</strong> — هدفك اليوم هو ${dailyHours} ${dailyHours === 1 ? "ساعة" : "ساعات"} من المذاكرة. استمراريتك اليومية هي مفتاح التفوق في التمريض!</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr><td align="center">${button(studyPlannerUrl, "افتح خطة المذاكرة", COLOR_PRIMARY)}</td></tr>
+    </table>
+    ${signOff()}`;
+
+  return {
+    subject: `تذكير بموعد المذاكرة — ${courseName}`,
+    html: emailShell({ contentHtml: content, preheader: `حان وقت مذاكرة ${courseName} اليوم` }),
   };
 }

@@ -13,6 +13,7 @@ import {
   recordFailedAttempt,
   recordSuccessfulLogin,
 } from "@/lib/auth/login-guard";
+import { maybeNotifyIncompleteLesson } from "@/lib/notifications/incomplete-lesson-reminder";
 
 export async function POST(req: NextRequest) {
   const ip = clientIpFrom(req.headers);
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
 
   const { isNewDevice } = await recordSuccessfulLogin(user.id, ip);
   await createSession(user.id);
+  await maybeNotifyIncompleteLesson(user.id);
 
   if (isNewDevice) {
     try {

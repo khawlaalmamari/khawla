@@ -226,8 +226,16 @@ model StudyPlan {
   course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   examDate   DateTime
   dailyHours Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+
+  // Optional daily/weekly study-reminder email, sent by the study-reminders
+  // cron job. reminderHour is 0-23 in Oman local time (UTC+4); null means
+  // reminders are off for this plan.
+  reminderHour       Int?
+  reminderFrequency  String    @default("daily") // "daily" | "weekly"
+  lastReminderSentAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   sessions StudySession[]
 }
@@ -252,6 +260,7 @@ model Notification {
   titleAr   String
   bodyEn    String
   bodyAr    String
+  linkUrl   String? // optional deep link (e.g. straight to an unfinished lesson)
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 

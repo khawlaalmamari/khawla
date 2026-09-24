@@ -95,12 +95,6 @@ export async function getDashboardData(userId: string) {
     orderBy: { createdAt: "desc" },
   });
 
-  const notifications = await prisma.notification.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-  });
-
   return {
     anatomyStats,
     physiologyStats,
@@ -112,6 +106,5 @@ export async function getDashboardData(userId: string) {
     moduleBestScores,
     reviewModules,
     studyPlans,
-    notifications,
   };
 }

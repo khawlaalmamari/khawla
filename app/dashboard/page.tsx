@@ -12,8 +12,6 @@ import { ButtonLink } from "@/components/ui/button";
 import { ProgressRing } from "@/components/dashboard/progress-ring";
 import { ScoreTrendChart } from "@/components/dashboard/score-trend-chart";
 import { ModuleBestScoresChart } from "@/components/dashboard/module-best-scores-chart";
-import { NotificationList } from "@/components/dashboard/notification-list";
-import { MessageAdminForm } from "@/components/dashboard/message-admin-form";
 import { ProgressBar } from "@/components/ui/progress-bar";
 
 export default async function DashboardPage() {
@@ -173,50 +171,36 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Study plan */}
-          <Card>
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold">{dict.dashboard.dailyPlan}</h2>
-              <ButtonLink href="/study-planner" variant="outline" className="!px-3 !py-1.5 text-xs">
-                {dict.nav.studyPlanner}
-              </ButtonLink>
-            </div>
-            {data.studyPlans.length === 0 ? (
-              <p className="mt-4 text-sm text-muted">
-                {locale === "ar"
-                  ? "لم تُنشئ خطة مذاكرة بعد."
-                  : "You haven't created a study plan yet."}
-              </p>
-            ) : (
-              <ul className="mt-4 space-y-2">
-                {data.studyPlans.map((plan) => (
-                  <li key={plan.id} className="rounded-lg bg-surface px-3 py-2 text-sm">
-                    <p className="font-medium">
-                      {locale === "ar" ? plan.course.titleAr : plan.course.titleEn}
-                    </p>
-                    <p className="text-xs text-muted">
-                      {locale === "ar" ? "موعد الامتحان" : "Exam date"}:{" "}
-                      {plan.examDate.toLocaleDateString(locale === "ar" ? "ar" : "en-US")} ·{" "}
-                      {plan.dailyHours} {locale === "ar" ? "ساعة/يوم" : "hrs/day"}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-
-          {/* Notifications */}
-          <Card>
-            <h2 className="text-lg font-bold">{dict.dashboard.notifications}</h2>
-            <NotificationList notifications={data.notifications} />
-          </Card>
-        </div>
-
-        {/* Message admin */}
+        {/* Study plan */}
         <Card>
-          <h2 className="text-lg font-bold">{dict.dashboard.messageAdminTitle}</h2>
-          <MessageAdminForm username={user.username} />
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold">{dict.dashboard.dailyPlan}</h2>
+            <ButtonLink href="/study-planner" variant="outline" className="!px-3 !py-1.5 text-xs">
+              {dict.nav.studyPlanner}
+            </ButtonLink>
+          </div>
+          {data.studyPlans.length === 0 ? (
+            <p className="mt-4 text-sm text-muted">
+              {locale === "ar"
+                ? "لم تُنشئ خطة مذاكرة بعد."
+                : "You haven't created a study plan yet."}
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-2">
+              {data.studyPlans.map((plan) => (
+                <li key={plan.id} className="rounded-lg bg-surface px-3 py-2 text-sm">
+                  <p className="font-medium">
+                    {locale === "ar" ? plan.course.titleAr : plan.course.titleEn}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {locale === "ar" ? "موعد الامتحان" : "Exam date"}:{" "}
+                    {plan.examDate.toLocaleDateString(locale === "ar" ? "ar" : "en-US")} ·{" "}
+                    {plan.dailyHours} {locale === "ar" ? "ساعة/يوم" : "hrs/day"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
 
         <div className="flex justify-center">

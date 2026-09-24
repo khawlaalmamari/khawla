@@ -54,6 +54,8 @@ export default async function StudyPlannerPage() {
             courseId: p.courseId,
             examDate: p.examDate.toISOString(),
             dailyHours: p.dailyHours,
+            reminderHour: p.reminderHour,
+            reminderFrequency: p.reminderFrequency as "daily" | "weekly",
           }))}
         />
 

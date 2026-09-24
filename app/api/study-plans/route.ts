@@ -7,6 +7,8 @@ const schema = z.object({
   courseId: z.string(),
   examDate: z.string(),
   dailyHours: z.number().min(0.5).max(16),
+  reminderHour: z.number().int().min(0).max(23).nullable(),
+  reminderFrequency: z.enum(["daily", "weekly"]),
 });
 
 export async function POST(req: NextRequest) {
@@ -19,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 
-  const { courseId, examDate, dailyHours } = parsed.data;
+  const { courseId, examDate, dailyHours, reminderHour, reminderFrequency } = parsed.data;
 
   const existing = await prisma.studyPlan.findFirst({
     where: { userId: user.id, courseId },
@@ -28,10 +30,17 @@ export async function POST(req: NextRequest) {
   const plan = existing
     ? await prisma.studyPlan.update({
         where: { id: existing.id },
-        data: { examDate: new Date(examDate), dailyHours },
+        data: { examDate: new Date(examDate), dailyHours, reminderHour, reminderFrequency },
       })
     : await prisma.studyPlan.create({
-        data: { userId: user.id, courseId, examDate: new Date(examDate), dailyHours },
+        data: {
+          userId: user.id,
+          courseId,
+          examDate: new Date(examDate),
+          dailyHours,
+          reminderHour,
+          reminderFrequency,
+        },
       });
 
   return NextResponse.json({ plan });
