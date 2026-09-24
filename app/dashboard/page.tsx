@@ -4,7 +4,6 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getServerLocale } from "@/lib/i18n/get-locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getDashboardData } from "@/lib/dashboard/queries";
-import { getDueStudySession } from "@/lib/study/sessions";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,29 +20,11 @@ export default async function DashboardPage() {
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
   const data = await getDashboardData(user.id);
-  const dueSession = await getDueStudySession(user.id);
 
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-4 py-10 sm:px-6">
-        {dueSession?.module && (
-          <div className="flex flex-col items-start justify-between gap-3 rounded-lg border border-accent-300 bg-accent-50 px-4 py-3 text-sm text-accent-800 sm:flex-row sm:items-center">
-            <span>
-              {locale === "ar" ? "حان وقت المذاكرة: " : "Time to study: "}
-              <strong>
-                {locale === "ar" ? dueSession.module.titleAr : dueSession.module.titleEn}
-              </strong>
-            </span>
-            <ButtonLink
-              href={`/${dueSession.module.course.slug}/${dueSession.module.slug}`}
-              className="!px-4 !py-1.5 text-xs"
-            >
-              {locale === "ar" ? "ابدأ الآن" : "Start Now"}
-            </ButtonLink>
-          </div>
-        )}
-
         <h1 className="text-2xl font-bold">
           {dict.dashboard.welcome.replace("{name}", user.fullName)}
         </h1>
