@@ -4,6 +4,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
+import { LogoIcon } from "@/components/logo";
 
 export default async function LandingPage() {
   const locale = await getServerLocale();
@@ -88,9 +89,12 @@ export default async function LandingPage() {
       </main>
 
       <footer className="border-t border-border py-8 text-center text-sm text-muted">
-        <p>
-          {meta.siteName} — {meta.tagline}
-        </p>
+        <div className="flex items-center justify-center gap-2">
+          <LogoIcon size={24} />
+          <p>
+            {meta.siteName} — {meta.tagline}
+          </p>
+        </div>
         <div className="mt-2 flex justify-center gap-4">
           <Link href="/help" className="hover:text-primary-700">
             {locale === "ar" ? "المساعدة والدعم" : "Help & Support"}

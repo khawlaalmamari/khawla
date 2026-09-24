@@ -15,11 +15,17 @@ const COLOR_DANGER = "#b91c1c";
 const COLOR_TEXT = "#1e293b";
 const COLOR_MUTED = "#64748b";
 
-// Resolves automatically on Vercel (no configuration needed); an explicit
-// NEXT_PUBLIC_SITE_URL (e.g. a custom domain) always takes priority. Emails
-// fall back to a plain text mark when neither is available (local dev).
+// Resolves automatically on Vercel (no configuration needed): prefers the
+// project's stable production domain (VERCEL_PROJECT_PRODUCTION_URL, e.g.
+// "khawla-two.vercel.app") over the per-deployment VERCEL_URL, which can
+// point at a build-specific URL instead of the live site. An explicit
+// NEXT_PUBLIC_SITE_URL (e.g. a custom domain) always wins. Emails fall back
+// to a plain text mark when none of these are available (local dev).
 const SITE_ORIGIN =
   process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "") ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
 const LOGO_URL = SITE_ORIGIN ? `${SITE_ORIGIN}/brand/logo-email.png` : null;
 
