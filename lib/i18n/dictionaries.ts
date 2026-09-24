@@ -269,6 +269,14 @@ export const ar = {
     summaryArLabel: "ملخص الدرس (عربي)",
     summaryEnLabel: "ملخص الدرس (إنجليزي)",
     saveSuccess: "تم الحفظ بنجاح.",
+    searchImage: "بحث عن صورة",
+    searchImagePlaceholder: "اكتبي كلمة بحث (مثلاً: هيكل عظمي)",
+    searchButton: "بحث",
+    insertImage: "إدراج",
+    noImageResults: "لا توجد نتائج.",
+    imageSearchNotConfigured: "ميزة البحث عن الصور غير مفعّلة بعد.",
+    imageSearchError: "حدث خطأ أثناء البحث عن الصور.",
+    photoCredit: "تصوير",
   },
 };
 
@@ -539,6 +547,14 @@ export const en: Dictionary = {
     summaryArLabel: "Lesson Summary (Arabic)",
     summaryEnLabel: "Lesson Summary (English)",
     saveSuccess: "Saved successfully.",
+    searchImage: "Search Image",
+    searchImagePlaceholder: "Type a search term (e.g. skeleton)",
+    searchButton: "Search",
+    insertImage: "Insert",
+    noImageResults: "No results found.",
+    imageSearchNotConfigured: "Image search isn't configured yet.",
+    imageSearchError: "Something went wrong while searching for images.",
+    photoCredit: "Photo by",
   },
 };
 

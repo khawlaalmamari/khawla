@@ -38,6 +38,9 @@ export type AdminModule = {
 
 const textareaClass = `${inputClass} min-h-[140px] font-mono text-xs leading-relaxed`;
 
+type ImageResult = { id: string; thumbUrl: string; fullUrl: string; alt: string; credit: string };
+type ContentField = "contentAr" | "contentEn";
+
 function toLessonForm(lesson: AdminLesson) {
   return {
     titleAr: lesson.titleAr,
@@ -70,6 +73,12 @@ export function ModuleManagementPanel({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  const [imageSearchTarget, setImageSearchTarget] = useState<ContentField | null>(null);
+  const [imageQuery, setImageQuery] = useState("");
+  const [imageResults, setImageResults] = useState<ImageResult[]>([]);
+  const [imageSearching, setImageSearching] = useState(false);
+  const [imageSearchErr, setImageSearchErr] = useState<string | null>(null);
 
   const modulesForCourse = useMemo(
     () => modules.filter((m) => m.courseId === courseId),
@@ -118,6 +127,60 @@ export function ModuleManagementPanel({
     setForm(toLessonForm(lesson));
     setError(null);
     setSaved(false);
+    closeImageSearch();
+  }
+
+  function openImageSearch(target: ContentField) {
+    setImageSearchTarget(target);
+    setImageQuery("");
+    setImageResults([]);
+    setImageSearchErr(null);
+  }
+
+  function closeImageSearch() {
+    setImageSearchTarget(null);
+    setImageQuery("");
+    setImageResults([]);
+    setImageSearchErr(null);
+  }
+
+  async function runImageSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (!imageQuery.trim()) return;
+    setImageSearching(true);
+    setImageSearchErr(null);
+    try {
+      const res = await fetch(`/api/admin/image-search?q=${encodeURIComponent(imageQuery)}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setImageSearchErr(
+          data.error === "notConfigured"
+            ? dict.admin.imageSearchNotConfigured
+            : dict.admin.imageSearchError,
+        );
+        setImageResults([]);
+        return;
+      }
+      setImageResults(data.results ?? []);
+    } finally {
+      setImageSearching(false);
+    }
+  }
+
+  function insertImage(image: ImageResult) {
+    if (!imageSearchTarget) return;
+    const markdown = `![${image.alt}](${image.fullUrl})`;
+    setForm((f) =>
+      f
+        ? {
+            ...f,
+            [imageSearchTarget]: f[imageSearchTarget]
+              ? `${f[imageSearchTarget]}\n\n${markdown}\n`
+              : `${markdown}\n`,
+          }
+        : f,
+    );
+    closeImageSearch();
   }
 
   async function saveLesson() {
@@ -312,6 +375,13 @@ export function ModuleManagementPanel({
                 value={form.contentAr}
                 onChange={(e) => setForm((f) => (f ? { ...f, contentAr: e.target.value } : f))}
               />
+              <button
+                type="button"
+                onClick={() => openImageSearch("contentAr")}
+                className="mt-1 text-xs font-medium text-primary-700 hover:underline"
+              >
+                {dict.admin.searchImage}
+              </button>
             </Field>
             <Field label={dict.admin.contentEnLabel} htmlFor="lesson-contentEn">
               <textarea
@@ -320,8 +390,69 @@ export function ModuleManagementPanel({
                 value={form.contentEn}
                 onChange={(e) => setForm((f) => (f ? { ...f, contentEn: e.target.value } : f))}
               />
+              <button
+                type="button"
+                onClick={() => openImageSearch("contentEn")}
+                className="mt-1 text-xs font-medium text-primary-700 hover:underline"
+              >
+                {dict.admin.searchImage}
+              </button>
             </Field>
           </div>
+
+          {imageSearchTarget && (
+            <Card className="space-y-3 bg-surface">
+              <form onSubmit={runImageSearch} className="flex gap-2">
+                <input
+                  className={inputClass}
+                  placeholder={dict.admin.searchImagePlaceholder}
+                  value={imageQuery}
+                  onChange={(e) => setImageQuery(e.target.value)}
+                  autoFocus
+                />
+                <Button type="submit" disabled={imageSearching} className="shrink-0">
+                  {dict.admin.searchButton}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={closeImageSearch}
+                  className="shrink-0"
+                >
+                  {dict.common.cancel}
+                </Button>
+              </form>
+
+              {imageSearchErr && <p className="text-sm text-danger">{imageSearchErr}</p>}
+
+              {imageResults.length > 0 && (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {imageResults.map((img) => (
+                    <button
+                      key={img.id}
+                      type="button"
+                      onClick={() => insertImage(img)}
+                      className="group overflow-hidden rounded-lg border border-border text-start"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={img.thumbUrl} alt={img.alt} className="h-24 w-full object-cover" />
+                      <span className="block px-2 py-1 text-[10px] text-muted">
+                        {dict.admin.photoCredit} {img.credit}
+                      </span>
+                      <span className="block bg-primary-600 px-2 py-1 text-center text-[10px] font-semibold text-white opacity-0 group-hover:opacity-100">
+                        {dict.admin.insertImage}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {!imageSearching &&
+                imageResults.length === 0 &&
+                !imageSearchErr &&
+                imageQuery && <p className="text-sm text-muted">{dict.admin.noImageResults}</p>}
+            </Card>
+          )}
 
           <p className="text-xs text-muted">{dict.admin.imageHint}</p>
 
@@ -331,7 +462,14 @@ export function ModuleManagementPanel({
             <Button type="button" disabled={saving} onClick={saveLesson}>
               {dict.common.save}
             </Button>
-            <Button type="button" variant="outline" onClick={() => setEditingLessonId(null)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setEditingLessonId(null);
+                closeImageSearch();
+              }}
+            >
               {dict.common.cancel}
             </Button>
           </div>
