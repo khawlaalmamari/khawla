@@ -13,6 +13,7 @@ import { ProgressRing } from "@/components/dashboard/progress-ring";
 import { ScoreTrendChart } from "@/components/dashboard/score-trend-chart";
 import { ModuleBestScoresChart } from "@/components/dashboard/module-best-scores-chart";
 import { NotificationList } from "@/components/dashboard/notification-list";
+import { MessageAdminForm } from "@/components/dashboard/message-admin-form";
 
 function ProgressBar({ percent }: { percent: number }) {
   return (
@@ -221,6 +222,12 @@ export default async function DashboardPage() {
             <NotificationList notifications={data.notifications} />
           </Card>
         </div>
+
+        {/* Message admin */}
+        <Card>
+          <h2 className="text-lg font-bold">{dict.dashboard.messageAdminTitle}</h2>
+          <MessageAdminForm username={user.username} />
+        </Card>
 
         <div className="flex justify-center">
           <ButtonLink href="/anatomy">{dict.dashboard.continueLearning}</ButtonLink>

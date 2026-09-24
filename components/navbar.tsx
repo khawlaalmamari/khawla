@@ -2,15 +2,26 @@ import Link from "next/link";
 import { getServerLocale } from "@/lib/i18n/get-locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getCurrentUser } from "@/lib/auth/session";
+import { prisma } from "@/lib/db";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { LogoutButton } from "@/components/logout-button";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 export async function Navbar() {
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
   const user = await getCurrentUser();
+
+  const notifications = user
+    ? await prisma.notification.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        include: { sender: { select: { role: true } } },
+      })
+    : [];
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
@@ -44,6 +55,20 @@ export async function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
+          {user && (
+            <NotificationBell
+              notifications={notifications.map((n) => ({
+                id: n.id,
+                titleAr: n.titleAr,
+                titleEn: n.titleEn,
+                bodyAr: n.bodyAr,
+                bodyEn: n.bodyEn,
+                read: n.read,
+                createdAt: n.createdAt.toISOString(),
+                senderRole: (n.sender?.role as "admin" | "student" | undefined) ?? null,
+              }))}
+            />
+          )}
           <LanguageSwitcher />
           {user ? (
             <LogoutButton />

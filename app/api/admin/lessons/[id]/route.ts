@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { adminUpdateLessonSchema } from "@/lib/auth/schemas";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { logAdminAction } from "@/lib/auth/audit-log";
+import { notifyAllStudents } from "@/lib/notifications/notify-students";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin();
@@ -35,6 +36,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     targetType: "lesson",
     targetId: lesson.id,
     detail: lesson.titleEn,
+  });
+
+  await notifyAllStudents({
+    titleAr: "تحديث في محتوى الدرس",
+    titleEn: "Lesson content updated",
+    bodyAr: `تم تحديث درس "${lesson.titleAr}" — راجع المحتوى الجديد.`,
+    bodyEn: `The lesson "${lesson.titleEn}" was updated — check out the new content.`,
   });
 
   return NextResponse.json({ lesson: { id: lesson.id } });

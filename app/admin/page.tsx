@@ -118,6 +118,12 @@ export default async function AdminPage({
     return { date: key, count: signupsByDay.get(key) ?? 0, label: dayFormatter.format(date) };
   });
 
+  const students = await prisma.user.findMany({
+    where: { role: "student" },
+    orderBy: { fullName: "asc" },
+    select: { id: true, fullName: true, username: true },
+  });
+
   const courses = await prisma.course.findMany({
     orderBy: { order: "asc" },
     select: { id: true, slug: true, titleAr: true, titleEn: true },
@@ -223,7 +229,7 @@ export default async function AdminPage({
           totalPages={Math.max(1, Math.ceil(totalFiltered / PAGE_SIZE))}
         />
 
-        <BroadcastForm />
+        <BroadcastForm students={students} />
 
         <AuditLogPanel
           entries={auditLogs.map((log) => ({

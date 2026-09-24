@@ -57,14 +57,15 @@ model User {
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 
-  resetTokens   PasswordResetToken[]
-  quizAttempts  QuizAttempt[]
-  progress      ProgressRecord[]
-  studyPlans    StudyPlan[]
-  notifications Notification[]
-  chatSessions  ChatSession[]
-  loginEvents   LoginEvent[]
-  auditLogs     AdminAuditLog[] @relation("AdminAuditLogs")
+  resetTokens        PasswordResetToken[]
+  quizAttempts       QuizAttempt[]
+  progress           ProgressRecord[]
+  studyPlans         StudyPlan[]
+  notifications      Notification[]
+  sentNotifications  Notification[] @relation("SentNotifications")
+  chatSessions       ChatSession[]
+  loginEvents        LoginEvent[]
+  auditLogs          AdminAuditLog[] @relation("AdminAuditLogs")
 }
 
 model AdminAuditLog {
@@ -243,14 +244,18 @@ model StudySession {
 
 model Notification {
   id        String   @id @default(cuid())
-  userId    String
+  userId    String // recipient
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  senderId  String? // null = system-generated (security alert, automated content update)
+  sender    User?    @relation("SentNotifications", fields: [senderId], references: [id], onDelete: SetNull)
   titleEn   String
   titleAr   String
   bodyEn    String
   bodyAr    String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model ChatSession {

@@ -6,9 +6,22 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Field, inputClass } from "@/components/ui/field";
 
-const emptyForm = { titleAr: "", titleEn: "", bodyAr: "", bodyEn: "", audience: "students" as const };
+export type BroadcastStudentOption = {
+  id: string;
+  fullName: string;
+  username: string;
+};
 
-export function BroadcastForm() {
+const emptyForm = {
+  titleAr: "",
+  titleEn: "",
+  bodyAr: "",
+  bodyEn: "",
+  audience: "students" as "students" | "admins" | "all" | "specific",
+  recipientId: "",
+};
+
+export function BroadcastForm({ students }: { students: BroadcastStudentOption[] }) {
   const { dict } = useLocale();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -104,13 +117,34 @@ export function BroadcastForm() {
               id="bc-audience"
               className={inputClass}
               value={form.audience}
-              onChange={(e) => setForm((f) => ({ ...f, audience: e.target.value as typeof f.audience }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, audience: e.target.value as typeof f.audience }))
+              }
             >
               <option value="students">{dict.admin.broadcastAudienceStudents}</option>
               <option value="admins">{dict.admin.broadcastAudienceAdmins}</option>
               <option value="all">{dict.admin.broadcastAudienceAll}</option>
+              <option value="specific">{dict.admin.broadcastAudienceSpecific}</option>
             </select>
           </Field>
+          {form.audience === "specific" && (
+            <Field label={dict.admin.broadcastRecipientLabel} htmlFor="bc-recipient">
+              <select
+                id="bc-recipient"
+                required
+                className={inputClass}
+                value={form.recipientId}
+                onChange={(e) => setForm((f) => ({ ...f, recipientId: e.target.value }))}
+              >
+                <option value="">{dict.admin.broadcastRecipientPlaceholder}</option>
+                {students.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.fullName} ({s.username})
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
           <div className="flex items-end">
             <Button type="submit" disabled={submitting}>
               {dict.admin.broadcastSend}
