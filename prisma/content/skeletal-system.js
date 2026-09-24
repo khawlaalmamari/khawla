@@ -69,10 +69,16 @@ Beyond mineral storage, bone tissue itself acts as an endocrine organ. Osteocyte
 6. **تخزين الدهون** – يخزّن نخاع العظم الأصفر الدهون الثلاثية كمخزون للطاقة.
 
 ## التقسيمان الرئيسيان
-- **الهيكل المحوري** (80 عظمة): الجمجمة والعمود الفقري والقفص الصدري/عظم القص — يشكّل المحور المركزي للجسم.
-- **الهيكل الطرفي** (126 عظمة): عظام الأطراف العلوية والسفلية، وأحزمة ربطها بالهيكل المحوري.
+- **الهيكل المحوري** (80 عظمة): الجمجمة والعمود الفقري والقفص الصدري/عظم القص — يشكّل المحور المركزي للجسم، ويُعدّ أيضًا نقطة ارتباط للعضلات التي تحرّك الرأس والرقبة والظهر.
+- **الهيكل الطرفي** (126 عظمة): عظام الأطراف العلوية والسفلية، وأحزمة ربطها بالهيكل المحوري. يتميّز جزؤه السفلي بالثبات أثناء المشي أو الجري، بينما يتميّز جزؤه العلوي بمرونة أكبر تتيح رفع الأشياء وحملها.
 
-فهم هذا التقسيم يساعد على تنظيم دراسة التشريح: يهتم الهيكل المحوري أساسًا بحماية الأعضاء الحيوية، بينما يهتم الهيكل الطرفي أساسًا بالحركة — وهو تمييز له أهمية سريرية عند تقييم الإصابات أو تخطيط وضعية المريض.`,
+![رسم توضيحي لهيكل الإنسان مع تظليل الهيكل المحوري](https://commons.wikimedia.org/wiki/Special:FilePath/Axial_skeleton_diagram.svg)
+*رسم الهيكل المحوري، بريشة ماريانا رويز فيلاريال (LadyofHats)، ملكية عامة، عبر ويكيميديا كومنز.*
+
+فهم هذا التقسيم يساعد على تنظيم دراسة التشريح: يهتم الهيكل المحوري أساسًا بحماية الأعضاء الحيوية، بينما يهتم الهيكل الطرفي أساسًا بالحركة — وهو تمييز له أهمية سريرية عند تقييم الإصابات أو تخطيط وضعية المريض.
+
+## الهيكل العظمي كعضو صمّاوي
+لا يقتصر دور النسيج العظمي على تخزين المعادن، بل يعمل أيضًا كعضو من أعضاء الغدد الصماء. تُفرز الخلايا العظمية الناضجة هرمون **FGF23**، الذي يعمل على الكليتين لتنظيم استقلاب الفوسفات وفيتامين د، بينما تُفرز بانيات العظم هرمون **الأوستيوكالسين**، الذي يعزز إفراز الإنسولين ويحسّن استقلاب الجلوكوز — وهو تذكير بأن صحة العظام مرتبطة بالصحة الصمّاوية والاستقلابية، وليس فقط بالدعم البنيوي.`,
     terms: [
       { en: "Axial skeleton", ar: "الهيكل المحوري" },
       { en: "Appendicular skeleton", ar: "الهيكل الطرفي" },
@@ -84,6 +90,21 @@ Beyond mineral storage, bone tissue itself acts as an endocrine organ. Osteocyte
       "The skeletal system supports, protects, and moves the body, stores minerals and fat, and produces blood cells. It is divided into the axial skeleton (skull, spine, rib cage) and appendicular skeleton (limbs and girdles).",
     summaryAr:
       "يدعم الجهاز الهيكلي الجسم ويحميه ويحرّكه، ويخزّن المعادن والدهون، وينتج خلايا الدم. ينقسم إلى الهيكل المحوري (الجمجمة، العمود الفقري، القفص الصدري) والهيكل الطرفي (الأطراف والأحزمة).",
+    videoUrl: "https://www.youtube.com/watch?v=rDGqkMHPDqE",
+    videoLabelEn:
+      "This video from Crash Course Anatomy & Physiology walks through the functions of the skeleton, how bones are classified by shape, and how bone tissue remodels itself — a good visual recap of this lesson.",
+    videoLabelAr:
+      "يشرح هذا الفيديو من سلسلة Crash Course وظائف الجهاز الهيكلي، وتصنيف العظام حسب الشكل، وكيفية إعادة تشكّل النسيج العظمي — وهو ملخص مرئي جيد لهذا الدرس.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 6.1 The Functions of the Skeletal System",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/6-1-the-functions-of-the-skeletal-system",
+      },
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 7.1 Divisions of the Skeletal System",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/7-1-divisions-of-the-skeletal-system",
+      },
+    ],
   },
   {
     slug: "skeletal-anatomical-structures",
@@ -116,7 +137,18 @@ Beyond mineral storage, bone tissue itself acts as an endocrine organ. Osteocyte
 - **Epiphysis** (proximal and distal): the wider ends, mostly spongy bone, covered with **articular cartilage** where the bone forms a joint.
 - **Metaphysis**: the region between diaphysis and epiphysis; site of the growth plate in growing bones.
 - **Periosteum**: tough connective tissue membrane covering the outer surface, containing nerves, blood vessels, and cells responsible for bone growth and repair.
-- **Endosteum**: thin membrane lining the internal marrow cavity.`,
+- **Endosteum**: thin membrane lining the internal marrow cavity.
+
+![Labeled diagram of a long bone showing the epiphysis, diaphysis, periosteum, and medullary cavity](https://commons.wikimedia.org/wiki/Special:FilePath/603_Anatomy_of_a_Long_Bone.jpg)
+*Anatomy of a long bone, OpenStax College, CC BY 4.0, via Wikimedia Commons.*
+
+## Bone Cells and Remodeling
+Bone is a living, dynamic tissue maintained by three main cell types working together:
+- **Osteoblasts**: bone-building cells that synthesize new bone matrix.
+- **Osteocytes**: mature osteoblasts trapped within the matrix they built; they maintain bone tissue and sense mechanical stress.
+- **Osteoclasts**: large, multinucleated cells that break down (resorb) bone tissue, releasing calcium into the blood.
+
+This continuous balance between osteoblast-driven formation and osteoclast-driven resorption is called **bone remodeling**. According to **Wolff's Law**, bone adapts its internal structure to the mechanical loads placed on it — bone under regular stress (e.g., weight-bearing exercise) becomes denser, while immobilized or unloaded bone (e.g., during prolonged bed rest) loses density. This principle underlies why early mobilization is emphasized in nursing care after surgery or injury.`,
     contentAr: `## تصنيف العظام حسب الشكل
 - **العظام الطويلة**: طولها أكبر من عرضها (مثل عظم الفخذ وعظم العضد). وظيفتها الأساسية الرفع والحركة.
 - **العظام القصيرة**: شبه مكعبة الشكل (مثل عظام الرسغ والكاحل). توفر ثباتًا مع حركة محدودة.
@@ -133,7 +165,18 @@ Beyond mineral storage, bone tissue itself acts as an endocrine organ. Osteocyte
 - **المشاش (القريب والبعيد)**: الأطراف العريضة، غالبيته عظم إسفنجي، ومغطى بـ **الغضروف المفصلي** حيث يشكّل العظم مفصلًا.
 - **المنطقة الكردوسية (الميتافيز)**: المنطقة بين الديافيز والمشاش، وهي موضع صفيحة النمو لدى العظام النامية.
 - **السمحاق**: غشاء ضام قوي يغطي السطح الخارجي، ويحتوي على أعصاب وأوعية دموية وخلايا مسؤولة عن نمو العظم وإصلاحه.
-- **الشغاف العظمي**: غشاء رقيق يبطّن التجويف النخاعي الداخلي.`,
+- **الشغاف العظمي**: غشاء رقيق يبطّن التجويف النخاعي الداخلي.
+
+![رسم توضيحي مُعنون للعظم الطويل يوضح المشاش والديافيز والسمحاق والتجويف النخاعي](https://commons.wikimedia.org/wiki/Special:FilePath/603_Anatomy_of_a_Long_Bone.jpg)
+*تركيب العظم الطويل، OpenStax College، مرخّص بموجب CC BY 4.0، عبر ويكيميديا كومنز.*
+
+## خلايا العظم وإعادة تشكّله
+العظم نسيج حي ونشط تحافظ عليه ثلاثة أنواع رئيسية من الخلايا تعمل معًا:
+- **بانيات العظم**: خلايا بانية للعظم تُصنّع مادة العظم الجديدة.
+- **الخلايا العظمية**: بانيات عظم ناضجة محبوسة داخل المادة التي كوّنتها، وتحافظ على النسيج العظمي وتستشعر الضغط الميكانيكي.
+- **ناقضات العظم**: خلايا كبيرة متعددة النوى تعمل على تحليل (امتصاص) النسيج العظمي، مما يُحرّر الكالسيوم في الدم.
+
+يُطلَق على هذا التوازن المستمر بين تكوّن العظم بفعل بانياته وامتصاصه بفعل ناقضاته اسم **إعادة تشكّل العظم**. ووفقًا لـ**قانون وولف**، يتكيّف التركيب الداخلي للعظم مع الأحمال الميكانيكية المطبقة عليه — فالعظام المعرّضة لضغط منتظم (كما في التمارين الحاملة للوزن) تصبح أكثر كثافة، بينما يفقد العظم المُثبّت أو غير المحمَّل كثافته (كما يحدث أثناء الراحة الطويلة في السرير). ويُفسّر هذا المبدأ التركيز التمريضي على التحرك المبكر بعد الجراحة أو الإصابة.`,
     terms: [
       { en: "Osteon", ar: "السيخ العظمي" },
       { en: "Diaphysis", ar: "الديافيز (جسم العظم)" },
@@ -144,7 +187,26 @@ Beyond mineral storage, bone tissue itself acts as an endocrine organ. Osteocyte
     summaryEn:
       "Bones are classified by shape (long, short, flat, irregular, sesamoid) and made of compact and spongy tissue. A long bone has a diaphysis, epiphyses, metaphysis, periosteum, and endosteum.",
     summaryAr:
-      "تُصنَّف العظام حسب الشكل (طويلة، قصيرة، مسطحة، غير منتظمة، سمسمانية) وتتكوّن من نسيج متراص وإسفنجي. يتكوّن العظم الطويل من الديافيز والمشاش والمنطقة الكردوسية والسمحاق والشغاف العظمي.",
+      "تُصنَّف العظام حسب الشكل (طويلة، قصيرة، مسطحة، غير منتظمة، سمسمانية) وتتكوّن من نسيج متراص وإسفنجي. يتكوّن العظم الطويل من الديافيز والمشاش والمنطقة الكردوسية والسمحاق والشغاف العظمي، ويحافظ على نفسه باستمرار عبر توازن بين بانيات العظم وناقضاته.",
+    videoUrl: "https://www.youtube.com/watch?v=zRVNHdxRw00",
+    videoLabelEn:
+      "This overview from Armando Hasudungan covers how bones are classified by shape and the basic tissue and cellular organization of bone.",
+    videoLabelAr:
+      "يستعرض هذا الفيديو من Armando Hasudungan تصنيف العظام حسب الشكل والتنظيم النسيجي والخلوي الأساسي للعظم.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 6.2 Bone Classification",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/6-2-bone-classification",
+      },
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 6.3 Bone Structure",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/6-3-bone-structure",
+      },
+      {
+        label: "NCBI Bookshelf, StatPearls — \"Anatomy, Bones\"",
+        url: "https://www.ncbi.nlm.nih.gov/books/NBK537199/",
+      },
+    ],
   },
   {
     slug: "skeletal-organs-locations",
@@ -166,11 +228,17 @@ Beyond mineral storage, bone tissue itself acts as an endocrine organ. Osteocyte
 - **Vertebral column**: 26 bones total — 7 cervical, 12 thoracic, 5 lumbar vertebrae, plus the sacrum and coccyx.
 - **Thoracic cage**: sternum and 12 pairs of ribs (7 "true" ribs attached directly to the sternum, 3 pairs of "false" ribs attached indirectly, and 2 pairs of "floating" ribs).
 
+## Vertebral Column and Curvatures
+The vertebral column is not a straight column — it has four normal curvatures (cervical, thoracic, lumbar, and sacral) that work together like a spring to absorb shock and keep the body's center of gravity balanced over the pelvis. When these curvatures become abnormal, three conditions are commonly recognized: **kyphosis** (an exaggerated thoracic curve, causing a rounded upper back), **lordosis** (an exaggerated lumbar curve, causing a swayback appearance), and **scoliosis** (an abnormal lateral curvature). Recognizing these patterns is part of a routine nursing postural assessment.
+
 ## Appendicular Skeleton
 - **Pectoral (shoulder) girdle**: clavicle and scapula, connecting the upper limb to the axial skeleton.
 - **Upper limb**: humerus (arm), radius and ulna (forearm), carpals (wrist), metacarpals and phalanges (hand and fingers).
 - **Pelvic girdle**: the hip bones (each formed by fusion of the ilium, ischium, and pubis), connecting the lower limb to the axial skeleton.
 - **Lower limb**: femur (thigh), patella (kneecap), tibia and fibula (leg), tarsals (ankle), metatarsals and phalanges (foot and toes).
+
+![Diagram of the appendicular skeleton with the limb bones and girdles highlighted](https://commons.wikimedia.org/wiki/Special:FilePath/Appendicular_skeleton_diagram.svg)
+*Appendicular skeleton diagram, by Mariana Ruiz Villarreal (LadyofHats), public domain, via Wikimedia Commons.*
 
 ## Why Location Matters Clinically
 Knowing precisely where each bone sits allows a nurse to describe pain location accurately, recognize anatomical landmarks used for procedures (e.g., the iliac crest for intramuscular injections or bone marrow aspiration), and understand which organs a given bone protects when assessing trauma.`,
@@ -179,11 +247,17 @@ Knowing precisely where each bone sits allows a nurse to describe pain location 
 - **العمود الفقري**: 26 عظمة إجمالًا — 7 فقرات عنقية، و12 فقرة صدرية، و5 فقرات قطنية، بالإضافة إلى العجز والعصعص.
 - **القفص الصدري**: عظم القص و12 زوجًا من الأضلاع (7 أزواج "حقيقية" متصلة مباشرة بعظم القص، و3 أزواج "كاذبة"، وزوجان "عائمان").
 
+## العمود الفقري والانحناءات
+لا يُعدّ العمود الفقري عمودًا مستقيمًا، بل يحتوي على أربعة انحناءات طبيعية (عنقي وصدري وقطني وعجزي) تعمل معًا كنابض يمتص الصدمات ويحافظ على توازن مركز ثقل الجسم فوق الحوض. وعندما تصبح هذه الانحناءات غير طبيعية، تُعرف ثلاث حالات شائعة: **الحداب** وهو انحناء صدري مبالغ فيه يسبب تحدّب أعلى الظهر، و**القعس** وهو انحناء قطني مبالغ فيه يسبب تقوّس أسفل الظهر، و**الجنف** وهو انحناء جانبي غير طبيعي. يُعدّ التعرّف على هذه الأنماط جزءًا من التقييم التمريضي الروتيني لوضعية الجسم.
+
 ## الهيكل الطرفي
 - **الحزام الصدري (الكتف)**: عظم الترقوة ولوح الكتف، ويربطان الطرف العلوي بالهيكل المحوري.
 - **الطرف العلوي**: عظم العضد، الكعبرة والزند، عظام الرسغ، عظام المشط والسلاميات.
 - **الحزام الحوضي**: عظما الورك (يتشكّل كل منهما من اندماج الحرقفة والإسك والعانة)، ويربطان الطرف السفلي بالهيكل المحوري.
 - **الطرف السفلي**: عظم الفخذ، الرضفة، الظنبوب والشظية، عظام الكاحل، عظام المشط والسلاميات.
+
+![رسم توضيحي للهيكل الطرفي يوضح عظام الأطراف والأحزمة](https://commons.wikimedia.org/wiki/Special:FilePath/Appendicular_skeleton_diagram.svg)
+*رسم الهيكل الطرفي، بريشة ماريانا رويز فيلاريال (LadyofHats)، ملكية عامة، عبر ويكيميديا كومنز.*
 
 ## أهمية الموقع من الناحية السريرية
 معرفة الموقع الدقيق لكل عظمة تتيح للممرض وصف مكان الألم بدقة، والتعرّف على المعالم التشريحية المستخدمة في الإجراءات (مثل قمة الحرقفة للحقن العضلي أو سحب نخاع العظم)، وفهم أي الأعضاء تحميها عظمة معينة عند تقييم الإصابات.`,
@@ -198,6 +272,16 @@ Knowing precisely where each bone sits allows a nurse to describe pain location 
       "The axial skeleton (skull, vertebral column, thoracic cage) protects vital organs; the appendicular skeleton (girdles and limbs) enables movement. Precise knowledge of bone location supports clinical assessment and procedures.",
     summaryAr:
       "يحمي الهيكل المحوري (الجمجمة والعمود الفقري والقفص الصدري) الأعضاء الحيوية، بينما يتيح الهيكل الطرفي (الأحزمة والأطراف) الحركة. تدعم المعرفة الدقيقة بمواقع العظام التقييم السريري والإجراءات.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 7.1 Divisions of the Skeletal System",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/7-1-divisions-of-the-skeletal-system",
+      },
+      {
+        label: "NCBI Bookshelf, StatPearls — \"Anatomy, Bony Pelvis and Lower Limb: Pelvic Bones\"",
+        url: "https://www.ncbi.nlm.nih.gov/books/NBK551580/",
+      },
+    ],
   },
   {
     slug: "skeletal-anatomical-relationships",
@@ -225,6 +309,18 @@ Knowing precisely where each bone sits allows a nurse to describe pain location 
 - **Amphiarthroses**: slightly movable joints.
 - **Diarthroses**: freely movable joints (all synovial joints).
 
+## Types of Synovial Joints
+Synovial joints are further classified by the shape of their articulating surfaces, which determines the type and range of movement possible:
+- **Hinge joint**: movement in one plane only, like a door hinge (e.g., elbow, knee).
+- **Ball-and-socket joint**: the widest range of motion, in almost every direction (e.g., shoulder, hip).
+- **Pivot joint**: rotation around a single axis (e.g., between the first and second cervical vertebrae, allowing the head to turn side to side).
+- **Saddle joint**: allows movement in two planes (e.g., the base of the thumb).
+- **Condyloid (ellipsoid) joint**: allows movement in two planes but no rotation (e.g., the wrist).
+- **Plane (gliding) joint**: flat surfaces that glide past each other (e.g., between carpal bones).
+
+![Diagram of the six types of synovial joints: hinge, ball-and-socket, pivot, saddle, condyloid, and plane](https://commons.wikimedia.org/wiki/Special:FilePath/909_Types_of_Synovial_Joints.jpg)
+*Types of synovial joints, OpenStax College, CC BY 3.0, via Wikimedia Commons.*
+
 ## Skeletal–Muscular Relationship
 Muscles attach to bones via **tendons**. When a muscle contracts, it pulls on the bone it is attached to, and the bone acts as a lever pivoting at a joint, producing movement. The attachment point on the more stationary bone is the **origin**; the attachment point on the bone that moves is the **insertion**.
 
@@ -243,6 +339,18 @@ Muscles attach to bones via **tendons**. When a muscle contracts, it pulls on th
 - **مفاصل شبه متحركة**: بحركة محدودة.
 - **مفاصل متحركة**: حرة الحركة (جميع المفاصل الزليلية).
 
+## أنواع المفاصل الزليلية
+تُصنَّف المفاصل الزليلية كذلك حسب شكل أسطحها المفصلية، وهو ما يحدد نوع ومدى الحركة الممكنة:
+- **المفصل المفصلي (الرزّي)**: يسمح بالحركة في مستوى واحد فقط، كمفصلة الباب (مثل المرفق والركبة).
+- **المفصل الكروي المقبسي**: يوفر أوسع مدى للحركة، في جميع الاتجاهات تقريبًا (مثل الكتف والورك).
+- **المفصل المحوري**: يسمح بالدوران حول محور واحد (مثل المفصل بين الفقرتين العنقيتين الأولى والثانية، الذي يتيح دوران الرأس جانبيًا).
+- **المفصل السرجي**: يسمح بالحركة في مستويين (مثل قاعدة الإبهام).
+- **المفصل اللقمي (البيضوي)**: يسمح بالحركة في مستويين دون دوران (مثل مفصل الرسغ).
+- **المفصل المستوي (الانزلاقي)**: أسطح مسطحة تنزلق فوق بعضها (مثل ما بين عظام الرسغ).
+
+![رسم توضيحي لأنواع المفاصل الزليلية الستة: الرزّي، والكروي المقبسي، والمحوري، والسرجي، واللقمي، والمستوي](https://commons.wikimedia.org/wiki/Special:FilePath/909_Types_of_Synovial_Joints.jpg)
+*أنواع المفاصل الزليلية، OpenStax College، مرخّص بموجب CC BY 3.0، عبر ويكيميديا كومنز.*
+
 ## العلاقة بين الجهاز الهيكلي والعضلي
 ترتبط العضلات بالعظام عبر **الأوتار**. عند تقلّص العضلة، تشدّ العظمة المرتبطة بها، وتعمل العظمة كرافعة تدور حول المفصل، مما ينتج الحركة. تسمى نقطة ارتباط العضلة بالعظمة الأقل حركة **المنشأ**، ونقطة ارتباطها بالعظمة المتحركة **الاندراج**.
 
@@ -260,7 +368,22 @@ Muscles attach to bones via **tendons**. When a muscle contracts, it pulls on th
     summaryEn:
       "Joints are classified structurally (fibrous, cartilaginous, synovial) and functionally (synarthroses, amphiarthroses, diarthroses). Muscles move bones via tendons at origin/insertion points, and bones interact with the nervous and circulatory systems through foramina and bone marrow.",
     summaryAr:
-      "تُصنَّف المفاصل بنيويًا (ليفية، غضروفية، زليلية) ووظيفيًا (ثابتة، شبه متحركة، متحركة). تحرّك العضلات العظام عبر الأوتار عند نقطتي المنشأ والاندراج، وتتفاعل العظام مع الجهازين العصبي والدوري عبر الثقوب ونخاع العظم.",
+      "تُصنَّف المفاصل بنيويًا (ليفية، غضروفية، زليلية) ووظيفيًا (ثابتة، شبه متحركة، متحركة)، وتُصنَّف المفاصل الزليلية كذلك إلى ستة أنواع حسب مدى حركتها. تحرّك العضلات العظام عبر الأوتار عند نقطتي المنشأ والاندراج، وتتفاعل العظام مع الجهازين العصبي والدوري عبر الثقوب ونخاع العظم.",
+    videoUrl: "https://www.youtube.com/watch?v=DLxYDoN634c",
+    videoLabelEn:
+      "This video from Crash Course Anatomy & Physiology covers how joints are classified structurally and functionally, with clear visuals of each synovial joint type.",
+    videoLabelAr:
+      "يشرح هذا الفيديو من سلسلة Crash Course تصنيف المفاصل بنيويًا ووظيفيًا، مع رسوم توضيحية واضحة لكل نوع من المفاصل الزليلية.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 9.1 Classification of Joints",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/9-1-classification-of-joints",
+      },
+      {
+        label: "NCBI Bookshelf, StatPearls — \"Anatomy, Joints\"",
+        url: "https://www.ncbi.nlm.nih.gov/books/NBK507893/",
+      },
+    ],
   },
   {
     slug: "skeletal-clinical-anatomy-basics",
@@ -286,17 +409,32 @@ Muscles attach to bones via **tendons**. When a muscle contracts, it pulls on th
 - **Comminuted fracture**: the bone shatters into three or more fragments.
 - **Stress fracture**: a small crack caused by repetitive force rather than a single traumatic event.
 
+![Illustration comparing a closed fracture and an open fracture](https://commons.wikimedia.org/wiki/Special:FilePath/Kind_of_fractures_-_Closed_fracture_Open_fracture_--_Smart-Servier.jpg)
+*Closed vs. open fracture, SMART–Servier Medical Art, CC BY 3.0, via Wikimedia Commons.*
+
 ## Basic Stages of Fracture Healing
 1. **Hematoma formation** (first few days): a blood clot forms at the fracture site.
 2. **Fibrocartilaginous callus formation** (about 1–3 weeks): soft callus bridges the fracture.
 3. **Bony callus formation** (about 3–4 months): the soft callus is replaced by hard, spongy bone.
 4. **Bone remodeling** (months to years): the bony callus is remodeled into compact bone resembling the bone's original shape.
 
+![Illustration of the stages of fracture repair](https://commons.wikimedia.org/wiki/Special:FilePath/Fracture_repair_--_Smart-Servier_%28cropped%29.jpg)
+*Stages of fracture repair, SMART–Servier Medical Art, CC BY 3.0, via Wikimedia Commons.*
+
 ## Anatomical Landmarks in Nursing Practice
 - **Iliac crest**: landmark for ventrogluteal intramuscular injections and bone marrow aspiration.
 - **Deltoid tuberosity area / acromion process**: used to locate the deltoid intramuscular injection site.
 - **Vertebral spinous processes**: landmarks for lumbar puncture and epidural procedures.
 - **Sternal angle**: a palpable landmark used to count ribs and intercostal spaces.
+
+## Neurovascular Assessment: The "5 Ps"
+Whenever a nurse cares for a patient with a suspected fracture — especially a limb injury that may be in a cast or splint — a neurovascular assessment distal to the injury is essential to detect compartment syndrome or vascular compromise early. The classic "5 Ps" to assess are:
+1. **Pain** – disproportionate to the injury, or not relieved by analgesia.
+2. **Pallor** – unusually pale or cool skin distal to the injury.
+3. **Pulselessness** – a weak or absent distal pulse.
+4. **Paresthesia** – numbness or a "pins and needles" sensation.
+5. **Paralysis** – inability to move the digits distal to the injury.
+Any of these findings should be reported immediately, as they may indicate a limb-threatening emergency.
 
 ## Osteoporosis: A Key Clinical Consideration
 Osteoporosis is a condition in which bone density decreases and bone tissue becomes more porous and fragile, increasing fracture risk — most commonly at the hip, spine, and wrist. Risk factors include older age, female sex (especially post-menopause), low calcium/vitamin D intake, sedentary lifestyle, and smoking. Nursing considerations include fall-prevention measures, patient education, and careful handling during positioning and transfers.
@@ -309,17 +447,32 @@ Osteoporosis is a condition in which bone density decreases and bone tissue beco
 - **الكسر المفتت**: يتشظى العظم إلى ثلاث قطع أو أكثر.
 - **كسر الإجهاد**: شق صغير ناتج عن قوة متكررة وليس عن حادث رضحي واحد.
 
+![رسم توضيحي يقارن بين الكسر المغلق والكسر المفتوح](https://commons.wikimedia.org/wiki/Special:FilePath/Kind_of_fractures_-_Closed_fracture_Open_fracture_--_Smart-Servier.jpg)
+*الكسر المغلق مقابل الكسر المفتوح، SMART–Servier Medical Art، مرخّص بموجب CC BY 3.0، عبر ويكيميديا كومنز.*
+
 ## المراحل الأساسية لالتئام الكسر
 1. **تكوّن الورم الدموي** (الأيام القليلة الأولى): تتشكّل خثرة دموية في موضع الكسر.
 2. **تكوّن الكالس الليفي الغضروفي** (حوالي 1–3 أسابيع): كالس لين يربط بين طرفي الكسر.
 3. **تكوّن الكالس العظمي** (حوالي 3–4 أشهر): يُستبدل الكالس اللين بعظم إسفنجي صلب.
 4. **إعادة تشكّل العظم** (أشهر إلى سنوات): يُعاد تشكيل الكالس العظمي ليصبح عظمًا متراصًا يشبه الشكل الأصلي.
 
+![رسم توضيحي لمراحل التئام الكسر](https://commons.wikimedia.org/wiki/Special:FilePath/Fracture_repair_--_Smart-Servier_%28cropped%29.jpg)
+*مراحل التئام الكسر، SMART–Servier Medical Art، مرخّص بموجب CC BY 3.0، عبر ويكيميديا كومنز.*
+
 ## المعالم التشريحية في الممارسة التمريضية
 - **قمة الحرقفة**: معلم للحقن العضلي الإلوي الأمامي ولسحب نخاع العظم.
 - **منطقة درنة الدالية / الناتئ الأخرمي**: تُستخدم لتحديد موضع الحقن العضلي في عضلة الدالية.
 - **النواتئ الشوكية للفقرات**: معالم للبزل القطني وإجراءات فوق الجافية.
 - **زاوية القص**: معلم يمكن جسّه يُستخدم لعدّ الأضلاع والمسافات الوربية.
+
+## التقييم العصبي الوعائي: علامات الـ"5 Ps"
+عند رعاية مريض يُشتبه بإصابته بكسر — خصوصًا إصابة في أحد الأطراف قد تكون داخل جبيرة أو دعامة — يُعدّ التقييم العصبي الوعائي البعيد عن موضع الإصابة أمرًا أساسيًا للكشف المبكر عن متلازمة الحيز أو ضعف التروية الدموية. وتشمل العلامات الخمس الكلاسيكية التي يجب تقييمها:
+1. **الألم** – ألم غير متناسب مع الإصابة، أو لا يخف مع المسكنات.
+2. **الشحوب** – جلد شاحب أو بارد بشكل غير معتاد أسفل موضع الإصابة.
+3. **غياب النبض** – نبض ضعيف أو غائب في الجزء البعيد.
+4. **التنمّل** – خدر أو إحساس بـ"الوخز والدبابيس".
+5. **الشلل** – عدم القدرة على تحريك الأصابع أسفل موضع الإصابة.
+يجب الإبلاغ فورًا عن أي من هذه العلامات، لأنها قد تشير إلى حالة طارئة تهدد سلامة الطرف.
 
 ## هشاشة العظام: اعتبار سريري مهم
 هشاشة العظام حالة تنخفض فيها كثافة العظم ويصبح النسيج العظمي أكثر مسامية وهشاشة، مما يزيد من خطر الكسور — وأكثرها شيوعًا عند الورك والعمود الفقري والرسغ. تشمل عوامل الخطر التقدم في العمر، والجنس الأنثوي (خاصة بعد انقطاع الطمث)، وانخفاض تناول الكالسيوم وفيتامين د، ونمط الحياة الخامل، والتدخين. تشمل الاعتبارات التمريضية الوقاية من السقوط، وتثقيف المريض، والتعامل بحذر أثناء التموضع والنقل.
@@ -335,9 +488,24 @@ Osteoporosis is a condition in which bone density decreases and bone tissue beco
     summaryEn:
       "Fractures are classified as closed, open, greenstick, comminuted, or stress fractures, and heal through hematoma formation, callus formation, and remodeling. Nurses use bone landmarks for common procedures and must consider osteoporosis risk in patient care.",
     summaryAr:
-      "تُصنَّف الكسور إلى مغلقة ومفتوحة وغصنية خضراء ومفتتة وإجهادية، وتلتئم عبر تكوّن الورم الدموي ثم الكالس ثم إعادة التشكّل. يستخدم الممرضون المعالم العظمية في الإجراءات الشائعة، ويجب مراعاة خطر هشاشة العظام في رعاية المرضى.",
+      "تُصنَّف الكسور إلى مغلقة ومفتوحة وغصنية خضراء ومفتتة وإجهادية، وتلتئم عبر تكوّن الورم الدموي ثم الكالس ثم إعادة التشكّل. يستخدم الممرضون المعالم العظمية في الإجراءات الشائعة والعلامات الخمس لتقييم السلامة العصبية الوعائية، ويجب مراعاة خطر هشاشة العظام في رعاية المرضى.",
+    videoUrl: "https://www.youtube.com/watch?v=p5a8m18SzIU",
+    videoLabelEn:
+      "This video from Level Up RN covers common fracture types and the nursing care and monitoring they require.",
+    videoLabelAr:
+      "يستعرض هذا الفيديو من Level Up RN أنواع الكسور الشائعة والرعاية التمريضية والمراقبة التي تتطلبها.",
+    references: [
+      {
+        label: "OpenStax, Anatomy and Physiology 2e — 6.5 Fractures: Bone Repair",
+        url: "https://openstax.org/books/anatomy-and-physiology-2e/pages/6-5-fractures-bone-repair",
+      },
+      {
+        label: "NCBI Bookshelf, StatPearls — \"Osteoporosis (Nursing)\"",
+        url: "https://www.ncbi.nlm.nih.gov/books/NBK568781/",
+      },
+    ],
   },
-].map((lesson) => ({ ...lesson, references: REFERENCES }));
+].map((lesson) => ({ ...lesson, references: lesson.references ?? REFERENCES }));
 
 const questions = [
   {
