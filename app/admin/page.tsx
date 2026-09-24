@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { UserManagementTable } from "@/components/admin/user-management-table";
+import { ModuleManagementTable } from "@/components/admin/module-management-table";
 
 export default async function AdminPage() {
   const user = await getCurrentUser();
@@ -31,6 +32,28 @@ export default async function AdminPage() {
 
   const verifiedCount = users.filter((u) => u.emailVerified).length;
 
+  const modules = await prisma.module.findMany({
+    orderBy: [{ course: { order: "asc" } }, { order: "asc" }],
+    select: {
+      id: true,
+      titleAr: true,
+      titleEn: true,
+      isPublished: true,
+      lessons: { select: { id: true } },
+      course: { select: { titleAr: true, titleEn: true } },
+    },
+  });
+
+  const moduleRows = modules.map((mod) => ({
+    id: mod.id,
+    titleAr: mod.titleAr,
+    titleEn: mod.titleEn,
+    isPublished: mod.isPublished,
+    hasContent: mod.lessons.length > 0,
+    courseTitleAr: mod.course.titleAr,
+    courseTitleEn: mod.course.titleEn,
+  }));
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
@@ -49,6 +72,8 @@ export default async function AdminPage() {
         </div>
 
         <UserManagementTable users={users} currentUserId={user.id} locale={locale} />
+
+        <ModuleManagementTable modules={moduleRows} locale={locale} />
       </main>
     </div>
   );

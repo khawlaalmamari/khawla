@@ -101,16 +101,17 @@ model Course {
 }
 
 model Module {
-  id            String @id @default(cuid())
-  slug          String @unique
+  id            String  @id @default(cuid())
+  slug          String  @unique
   courseId      String
-  course        Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course        Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
   order         Int
   titleEn       String
   titleAr       String
   descriptionEn String
   descriptionAr String
-  passThreshold Int    @default(70) // percent required to mark module complete
+  passThreshold Int     @default(70) // percent required to mark module complete
+  isPublished   Boolean @default(true) // admin can temporarily hide a module from students
 
   lessons      Lesson[]
   questions    Question[]

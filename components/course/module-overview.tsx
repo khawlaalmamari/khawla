@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getModuleBySlug } from "@/lib/content/queries";
 import { getServerLocale } from "@/lib/i18n/get-locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,9 @@ export async function ModuleOverview({
   const title = locale === "ar" ? mod.titleAr : mod.titleEn;
   const description = locale === "ar" ? mod.descriptionAr : mod.descriptionEn;
 
+  const currentUser = await getCurrentUser();
+  const isAdmin = currentUser?.role === "admin";
+
   if (mod.lessons.length === 0) {
     return (
       <div>
@@ -38,6 +42,24 @@ export async function ModuleOverview({
             {locale === "ar"
               ? "محتوى هذا الموديل قيد الإعداد حاليًا من قبل فريق المحتوى الطبي، وسيتوفر قريبًا."
               : "This module's content is currently being developed by the medical content team and will be available soon."}
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!mod.isPublished && !isAdmin) {
+    return (
+      <div>
+        <Link href={`/${courseSlug}`} className="text-sm text-primary-700 hover:underline">
+          ← {locale === "ar" ? mod.course.titleAr : mod.course.titleEn}
+        </Link>
+        <h1 className="mt-3 text-2xl font-bold">{title}</h1>
+        <Card className="mt-6">
+          <p className="text-sm text-muted">
+            {locale === "ar"
+              ? "هذا الموديل غير متاح حاليًا. يرجى المحاولة لاحقًا."
+              : "This module isn't available right now. Please check back later."}
           </p>
         </Card>
       </div>
@@ -58,6 +80,14 @@ export async function ModuleOverview({
       <Link href={`/${courseSlug}`} className="text-sm text-primary-700 hover:underline">
         ← {locale === "ar" ? mod.course.titleAr : mod.course.titleEn}
       </Link>
+
+      {!mod.isPublished && isAdmin && (
+        <div className="mt-4 rounded-lg border border-accent-300 bg-accent-50 px-4 py-3 text-sm text-accent-700">
+          {locale === "ar"
+            ? "هذا الموديل مخفي حاليًا عن الطالبات (تظهر لك أنت فقط بصفتك مديرة)."
+            : "This module is currently hidden from students (visible to you only as an admin)."}
+        </div>
+      )}
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{title}</h1>

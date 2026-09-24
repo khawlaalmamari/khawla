@@ -38,6 +38,10 @@ export async function GET(
     return NextResponse.json({ error: "notFound" }, { status: 404 });
   }
 
+  if (!mod.isPublished && user.role !== "admin") {
+    return NextResponse.json({ error: "notFound" }, { status: 404 });
+  }
+
   const sampled = shuffle(mod.questions).slice(0, QUIZ_LENGTH);
   const questions = sampled.map((q) => ({
     id: q.id,

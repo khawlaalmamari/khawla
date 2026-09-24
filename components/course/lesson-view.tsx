@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { getLessonBySlugs } from "@/lib/content/queries";
 import { getServerLocale } from "@/lib/i18n/get-locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getCurrentUser } from "@/lib/auth/session";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
 import { lessonDiagrams } from "@/components/course/lesson-diagrams";
@@ -23,6 +24,13 @@ export async function LessonView({
 
   if (!result) notFound();
   const { lesson, module: mod, prevLesson, nextLesson } = result;
+
+  if (mod.course.slug !== courseSlug) notFound();
+
+  if (!mod.isPublished) {
+    const user = await getCurrentUser();
+    if (user?.role !== "admin") notFound();
+  }
 
   const objectives: string[] = JSON.parse(
     locale === "ar" ? lesson.objectivesAr : lesson.objectivesEn,

@@ -32,7 +32,8 @@ export async function CourseOverview({
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {course.modules.map((mod) => {
           const record = progress.get(mod.id);
-          const available = mod.lessons.length > 0;
+          const hasContent = mod.lessons.length > 0;
+          const available = hasContent && mod.isPublished;
           const title = locale === "ar" ? mod.titleAr : mod.titleEn;
           const description = locale === "ar" ? mod.descriptionAr : mod.descriptionEn;
 
@@ -57,6 +58,8 @@ export async function CourseOverview({
                 </span>
                 {available ? (
                   <Badge tone={statusTone}>{statusLabel}</Badge>
+                ) : hasContent ? (
+                  <Badge tone="neutral">{locale === "ar" ? "غير متاحة حاليًا" : "Unavailable"}</Badge>
                 ) : (
                   <Badge tone="accent">{locale === "ar" ? "قريبًا" : "Coming soon"}</Badge>
                 )}

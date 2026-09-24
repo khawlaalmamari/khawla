@@ -42,7 +42,7 @@ export function hasFullContent(mod: { lessons: unknown[] }) {
 export async function getLessonBySlugs(moduleSlug: string, lessonSlug: string) {
   const mod = await prisma.module.findUnique({
     where: { slug: moduleSlug },
-    include: { lessons: { orderBy: { order: "asc" } } },
+    include: { course: true, lessons: { orderBy: { order: "asc" } } },
   });
   if (!mod) return null;
 
