@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { prisma } from "@/lib/db";
 
 const SESSION_COOKIE = "en_session";
@@ -60,7 +61,10 @@ async function getSessionPayload(): Promise<{ userId: string; sessionVersion: nu
   }
 }
 
-export async function getCurrentUser() {
+// Memoized per request: many Server Components on the same page (Navbar,
+// the page itself, now RootLayout) each call this independently, and
+// without `cache()` every one of them would re-hit the database.
+export const getCurrentUser = cache(async function getCurrentUser() {
   const session = await getSessionPayload();
   if (!session) return null;
 
@@ -88,7 +92,7 @@ export async function getCurrentUser() {
     role: user.role,
     emailVerified: user.emailVerified,
   };
-}
+});
 
 /** Throws-free guard for pages: returns the user or null. Use in Server Components. */
 export async function requireUser() {

@@ -4,9 +4,10 @@ import "./globals.css";
 import { getServerLocale } from "@/lib/i18n/get-locale";
 import { dirFor } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getCurrentUser } from "@/lib/auth/session";
 import { LocaleProvider } from "@/components/locale-provider";
 import { NoviaWidget } from "@/components/novia/novia-widget";
-import { NoviaEmbed } from "@/components/novia/novia-embed";
+import { TidioEmbed } from "@/components/novia/tidio-embed";
 
 const tajawal = Tajawal({
   variable: "--font-body",
@@ -31,10 +32,11 @@ export default async function RootLayout({
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
 
-  // Once NEXT_PUBLIC_NOVIA_EMBED_SRC is configured (see .env.example), the
-  // external chatbot platform's own widget takes over from the site's
-  // built-in one — never both at once.
-  const externalNoviaConfigured = Boolean(process.env.NEXT_PUBLIC_NOVIA_EMBED_SRC);
+  // Once NEXT_PUBLIC_TIDIO_PUBLIC_KEY is configured (see .env.example),
+  // Tidio's own widget takes over from the site's built-in one — never
+  // both at once.
+  const tidioPublicKey = process.env.NEXT_PUBLIC_TIDIO_PUBLIC_KEY;
+  const user = tidioPublicKey ? await getCurrentUser() : null;
 
   return (
     <html
@@ -45,7 +47,16 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <LocaleProvider locale={locale}>
           {children}
-          {externalNoviaConfigured ? <NoviaEmbed /> : <NoviaWidget />}
+          {tidioPublicKey ? (
+            <TidioEmbed
+              publicKey={tidioPublicKey}
+              visitor={
+                user ? { id: user.id, email: user.email, fullName: user.fullName } : null
+              }
+            />
+          ) : (
+            <NoviaWidget />
+          )}
         </LocaleProvider>
         <noscript>{dict.meta.siteName}</noscript>
       </body>
