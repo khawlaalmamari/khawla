@@ -21,20 +21,44 @@ export function StudyPlanForm({ courses, plans }: { courses: Course[]; plans: Pl
   const { locale, dict } = useLocale();
   const router = useRouter();
   const planByCourse = new Map(plans.map((p) => [p.courseId, p]));
+  const [selectedCourseId, setSelectedCourseId] = useState(courses[0]?.id ?? "");
+
+  if (courses.length === 0) return null;
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2">
+    <Card>
+      <Field
+        label={locale === "ar" ? "اختاري المادة" : "Select course"}
+        htmlFor="study-plan-course-select"
+      >
+        <select
+          id="study-plan-course-select"
+          className={inputClass}
+          value={selectedCourseId}
+          onChange={(e) => setSelectedCourseId(e.target.value)}
+        >
+          {courses.map((course) => (
+            <option key={course.id} value={course.id}>
+              {locale === "ar" ? course.titleAr : course.titleEn}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      {/* Every course's form stays mounted (just hidden) so switching the
+          dropdown never loses unsaved edits for the other courses. */}
       {courses.map((course) => (
-        <CourseForm
-          key={course.id}
-          course={course}
-          existing={planByCourse.get(course.id)}
-          locale={locale}
-          dict={dict}
-          onSaved={() => router.refresh()}
-        />
+        <div key={course.id} className={course.id === selectedCourseId ? "mt-6" : "hidden"}>
+          <CourseForm
+            course={course}
+            existing={planByCourse.get(course.id)}
+            locale={locale}
+            dict={dict}
+            onSaved={() => router.refresh()}
+          />
+        </div>
       ))}
-    </div>
+    </Card>
   );
 }
 
@@ -87,93 +111,90 @@ function CourseForm({
   }
 
   return (
-    <Card>
-      <h2 className="text-lg font-bold">{locale === "ar" ? course.titleAr : course.titleEn}</h2>
-      <form onSubmit={onSubmit} className="mt-4 space-y-4">
-        <Field
-          label={locale === "ar" ? "موعد الامتحان" : "Exam date"}
-          htmlFor={`exam-${course.id}`}
-        >
+    <form onSubmit={onSubmit} className="space-y-4">
+      <Field
+        label={locale === "ar" ? "موعد الامتحان" : "Exam date"}
+        htmlFor={`exam-${course.id}`}
+      >
+        <input
+          id={`exam-${course.id}`}
+          type="date"
+          required
+          className={inputClass}
+          value={examDate}
+          onChange={(e) => setExamDate(e.target.value)}
+        />
+      </Field>
+      <Field
+        label={locale === "ar" ? "ساعات المذاكرة اليومية" : "Daily study hours"}
+        htmlFor={`hours-${course.id}`}
+      >
+        <input
+          id={`hours-${course.id}`}
+          type="number"
+          min={0.5}
+          max={16}
+          step={0.5}
+          required
+          className={inputClass}
+          value={dailyHours}
+          onChange={(e) => setDailyHours(Number(e.target.value))}
+        />
+      </Field>
+
+      <div className="rounded-lg border border-border bg-surface p-3">
+        <label className="flex items-center gap-2 text-sm font-medium">
           <input
-            id={`exam-${course.id}`}
-            type="date"
-            required
-            className={inputClass}
-            value={examDate}
-            onChange={(e) => setExamDate(e.target.value)}
+            type="checkbox"
+            checked={reminderEnabled}
+            onChange={(e) => setReminderEnabled(e.target.checked)}
+            className="h-4 w-4 rounded border-border"
           />
-        </Field>
-        <Field
-          label={locale === "ar" ? "ساعات المذاكرة اليومية" : "Daily study hours"}
-          htmlFor={`hours-${course.id}`}
-        >
-          <input
-            id={`hours-${course.id}`}
-            type="number"
-            min={0.5}
-            max={16}
-            step={0.5}
-            required
-            className={inputClass}
-            value={dailyHours}
-            onChange={(e) => setDailyHours(Number(e.target.value))}
-          />
-        </Field>
+          {locale === "ar"
+            ? "أرسلي لي تذكيرًا بالبريد الإلكتروني للمذاكرة"
+            : "Send me an email reminder to study"}
+        </label>
 
-        <div className="rounded-lg border border-border bg-surface p-3">
-          <label className="flex items-center gap-2 text-sm font-medium">
-            <input
-              type="checkbox"
-              checked={reminderEnabled}
-              onChange={(e) => setReminderEnabled(e.target.checked)}
-              className="h-4 w-4 rounded border-border"
-            />
-            {locale === "ar"
-              ? "أرسلي لي تذكيرًا بالبريد الإلكتروني للمذاكرة"
-              : "Send me an email reminder to study"}
-          </label>
-
-          {reminderEnabled && (
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <Field
-                label={locale === "ar" ? "الوقت الأنسب" : "Preferred time"}
-                htmlFor={`reminder-hour-${course.id}`}
+        {reminderEnabled && (
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <Field
+              label={locale === "ar" ? "الوقت الأنسب" : "Preferred time"}
+              htmlFor={`reminder-hour-${course.id}`}
+            >
+              <select
+                id={`reminder-hour-${course.id}`}
+                className={inputClass}
+                value={reminderHour}
+                onChange={(e) => setReminderHour(Number(e.target.value))}
               >
-                <select
-                  id={`reminder-hour-${course.id}`}
-                  className={inputClass}
-                  value={reminderHour}
-                  onChange={(e) => setReminderHour(Number(e.target.value))}
-                >
-                  {HOURS_IN_DAY.map((h) => (
-                    <option key={h} value={h}>
-                      {String(h).padStart(2, "0")}:00
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field
-                label={locale === "ar" ? "التكرار" : "Frequency"}
-                htmlFor={`reminder-freq-${course.id}`}
+                {HOURS_IN_DAY.map((h) => (
+                  <option key={h} value={h}>
+                    {String(h).padStart(2, "0")}:00
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field
+              label={locale === "ar" ? "التكرار" : "Frequency"}
+              htmlFor={`reminder-freq-${course.id}`}
+            >
+              <select
+                id={`reminder-freq-${course.id}`}
+                className={inputClass}
+                value={reminderFrequency}
+                onChange={(e) => setReminderFrequency(e.target.value as "daily" | "weekly")}
               >
-                <select
-                  id={`reminder-freq-${course.id}`}
-                  className={inputClass}
-                  value={reminderFrequency}
-                  onChange={(e) => setReminderFrequency(e.target.value as "daily" | "weekly")}
-                >
-                  <option value="daily">{locale === "ar" ? "يوميًا" : "Daily"}</option>
-                  <option value="weekly">{locale === "ar" ? "أسبوعيًا" : "Weekly"}</option>
-                </select>
-              </Field>
-            </div>
-          )}
-        </div>
+                <option value="daily">{locale === "ar" ? "يوميًا" : "Daily"}</option>
+                <option value="weekly">{locale === "ar" ? "أسبوعيًا" : "Weekly"}</option>
+              </select>
+            </Field>
+          </div>
+        )}
+      </div>
 
-        <Button type="submit" disabled={saving} className="w-full">
-          {saved ? `✓ ${dict.common.save}` : dict.common.save}
-        </Button>
-      </form>
-    </Card>
+      <Button type="submit" disabled={saving} className="w-full">
+        {saved ? `✓ ${dict.common.save}` : dict.common.save}
+      </Button>
+    </form>
   );
 }
