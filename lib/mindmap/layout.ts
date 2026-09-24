@@ -1,12 +1,15 @@
 import type { MindMapData, MindMapNode } from "./types";
 
-const NODE_SLOT_WIDTH = 200;
-const LEVEL_HEIGHT = 130;
+const RADIUS_STEP = 220;
 
 /**
- * A simple tiered-tree layout (module → lessons → terms), computed purely
- * from parent/child relationships — no external layout library needed for
- * a tree this shallow.
+ * A radial "sunburst" tree layout: the root sits at the center, and every
+ * other node is placed at `depth * RADIUS_STEP` from center, within an
+ * angular slice inherited from its parent and split among siblings in
+ * proportion to how many leaves each of their subtrees has. This is fully
+ * generic over tree shape/depth, so it keeps working unchanged if a future
+ * AI-generated map has more (or fewer) levels than today's module → lesson
+ * → term data.
  */
 export function computeMindMapLayout(data: MindMapData): Map<string, { x: number; y: number }> {
   const childrenOf = new Map<string, MindMapNode[]>();
@@ -22,27 +25,31 @@ export function computeMindMapLayout(data: MindMapData): Map<string, { x: number
   const positions = new Map<string, { x: number; y: number }>();
   if (!root) return positions;
 
-  function subtreeWidth(node: MindMapNode): number {
+  function leafCount(node: MindMapNode): number {
     const children = childrenOf.get(node.id) ?? [];
     if (children.length === 0) return 1;
-    return children.reduce((sum, child) => sum + subtreeWidth(child), 0);
+    return children.reduce((sum, child) => sum + leafCount(child), 0);
   }
 
-  function place(node: MindMapNode, depth: number, leftEdge: number): void {
-    const children = childrenOf.get(node.id) ?? [];
-    const width = subtreeWidth(node);
-    positions.set(node.id, {
-      x: leftEdge + (width * NODE_SLOT_WIDTH) / 2,
-      y: depth * LEVEL_HEIGHT,
-    });
+  function place(node: MindMapNode, depth: number, angleStart: number, angleEnd: number): void {
+    const angle = (angleStart + angleEnd) / 2;
+    const radius = depth * RADIUS_STEP;
+    positions.set(node.id, { x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
 
-    let cursor = leftEdge;
+    const children = childrenOf.get(node.id) ?? [];
+    if (children.length === 0) return;
+
+    const totalLeaves = children.reduce((sum, child) => sum + leafCount(child), 0);
+    let cursor = angleStart;
+    const span = angleEnd - angleStart;
     for (const child of children) {
-      place(child, depth + 1, cursor);
-      cursor += subtreeWidth(child) * NODE_SLOT_WIDTH;
+      const share = (leafCount(child) / totalLeaves) * span;
+      place(child, depth + 1, cursor, cursor + share);
+      cursor += share;
     }
   }
 
-  place(root, 0, 0);
+  // Start the first branch at the top (-90deg) and sweep a full circle.
+  place(root, 0, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI);
   return positions;
 }
