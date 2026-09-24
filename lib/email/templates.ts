@@ -15,6 +15,14 @@ const COLOR_DANGER = "#b91c1c";
 const COLOR_TEXT = "#1e293b";
 const COLOR_MUTED = "#64748b";
 
+// Resolves automatically on Vercel (no configuration needed); an explicit
+// NEXT_PUBLIC_SITE_URL (e.g. a custom domain) always takes priority. Emails
+// fall back to a plain text mark when neither is available (local dev).
+const SITE_ORIGIN =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+const LOGO_URL = SITE_ORIGIN ? `${SITE_ORIGIN}/brand/logo-email.png` : null;
+
 function button(url: string, label: string, color: string): string {
   return `
     <table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px auto 20px;">
@@ -65,8 +73,11 @@ function emailShell({
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
           <tr>
             <td style="background-color:${headerColor};padding:28px 32px;text-align:center;">
-              <!-- Logo: replace this placeholder with <img src="https://your-domain/logo.png" width="48" height="48" alt="${BRAND_NAME}" style="display:block;margin:0 auto 12px;border-radius:12px;" /> once a hosted logo image is available. -->
-              <div style="width:48px;height:48px;background-color:#ffffff;border-radius:12px;margin:0 auto 12px;line-height:48px;font-size:22px;font-weight:bold;color:${headerColor};font-family:Tahoma,Arial,sans-serif;">E</div>
+              ${
+                LOGO_URL
+                  ? `<img src="${LOGO_URL}" width="48" height="48" alt="${BRAND_NAME}" style="display:block;margin:0 auto 12px;border-radius:12px;" />`
+                  : `<div style="width:48px;height:48px;background-color:#ffffff;border-radius:12px;margin:0 auto 12px;line-height:48px;font-size:22px;font-weight:bold;color:${headerColor};font-family:Tahoma,Arial,sans-serif;">E</div>`
+              }
               <div style="font-size:20px;font-weight:bold;color:#ffffff;">${BRAND_NAME}</div>
               <div style="font-size:12px;color:rgba(255,255,255,0.9);margin-top:2px;">${BRAND_TAGLINE}</div>
             </td>

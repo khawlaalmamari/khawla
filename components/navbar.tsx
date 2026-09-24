@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { LogoutButton } from "@/components/logout-button";
 import { ButtonLink } from "@/components/ui/button";
+import { Logo } from "@/components/logo";
 
 export async function Navbar() {
   const locale = await getServerLocale();
@@ -14,8 +15,8 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="text-lg font-extrabold text-primary-700">
-          {dict.meta.siteName}
+        <Link href="/">
+          <Logo wordmark={dict.meta.siteName} />
         </Link>
 
         <div className="hidden items-center gap-6 text-sm font-medium md:flex">

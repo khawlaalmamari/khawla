@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLocale } from "@/components/locale-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { LogoIcon } from "@/components/logo";
 
 export function AuthShell({
   children,
@@ -16,8 +17,9 @@ export function AuthShell({
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       <div className="hidden flex-col justify-between bg-gradient-to-br from-primary-800 to-primary-600 p-10 text-white lg:flex">
-        <Link href="/" className="text-2xl font-extrabold tracking-tight">
-          {dict.meta.siteName}
+        <Link href="/" className="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+          <LogoIcon size={36} />
+          <span dir="ltr">{dict.meta.siteName}</span>
         </Link>
         <div className="space-y-6">
           <p className="text-lg font-semibold opacity-90">{dict.meta.tagline}</p>
@@ -32,8 +34,9 @@ export function AuthShell({
 
       <div className="flex flex-col justify-center px-6 py-10 sm:px-16">
         <div className="mb-6 flex items-center justify-between lg:hidden">
-          <Link href="/" className="text-xl font-extrabold text-primary-700">
-            {dict.meta.siteName}
+          <Link href="/" className="flex items-center gap-2 text-xl font-extrabold text-primary-700">
+            <LogoIcon size={28} />
+            <span dir="ltr">{dict.meta.siteName}</span>
           </Link>
           <LanguageSwitcher />
         </div>
