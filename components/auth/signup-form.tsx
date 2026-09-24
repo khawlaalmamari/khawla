@@ -6,6 +6,7 @@ import { useLocale } from "@/components/locale-provider";
 import { Field, inputClass } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { isStrongPassword } from "@/lib/auth/password-strength";
+import { VerificationCodeForm } from "@/components/auth/verification-code-form";
 
 export function SignupForm() {
   const { dict, locale } = useLocale();
@@ -20,9 +21,7 @@ export function SignupForm() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  const [devVerifyUrl, setDevVerifyUrl] = useState<string | null>(null);
-  const [resending, setResending] = useState(false);
-  const [resendDone, setResendDone] = useState(false);
+  const [devVerifyCode, setDevVerifyCode] = useState<string | null>(null);
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -62,7 +61,7 @@ export function SignupForm() {
       }
 
       setPendingEmail(data.email ?? form.email);
-      if (data.devVerifyUrl) setDevVerifyUrl(data.devVerifyUrl);
+      if (data.devVerifyCode) setDevVerifyCode(data.devVerifyCode);
     } catch {
       setError(dict.auth.errors.genericError);
     } finally {
@@ -70,57 +69,8 @@ export function SignupForm() {
     }
   }
 
-  async function onResend() {
-    if (!pendingEmail) return;
-    setResending(true);
-    try {
-      const res = await fetch("/api/auth/resend-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: pendingEmail }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (data.devVerifyUrl) setDevVerifyUrl(data.devVerifyUrl);
-      setResendDone(true);
-    } finally {
-      setResending(false);
-    }
-  }
-
   if (pendingEmail) {
-    return (
-      <div className="space-y-4">
-        <div className="rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 text-sm text-primary-800">
-          <p className="font-medium">{dict.auth.checkEmailTitle}</p>
-          <p className="mt-1">{dict.auth.checkEmailBody.replace("{email}", pendingEmail)}</p>
-        </div>
-        {devVerifyUrl && (
-          <div className="rounded-lg border border-accent-300 bg-accent-50 px-4 py-3 text-xs text-accent-700">
-            Dev mode (no email provider configured):{" "}
-            <a className="underline" href={devVerifyUrl}>
-              {devVerifyUrl}
-            </a>
-          </div>
-        )}
-        {resendDone ? (
-          <p className="text-sm text-muted">{dict.auth.resendSent}</p>
-        ) : (
-          <button
-            type="button"
-            onClick={onResend}
-            disabled={resending}
-            className="text-sm font-medium text-primary-700 hover:underline disabled:opacity-60"
-          >
-            {dict.auth.resendVerification}
-          </button>
-        )}
-        <div>
-          <Link href="/login" className="text-sm text-primary-700 hover:underline">
-            {dict.auth.goToLogin}
-          </Link>
-        </div>
-      </div>
-    );
+    return <VerificationCodeForm email={pendingEmail} initialDevCode={devVerifyCode} />;
   }
 
   return (

@@ -1,10 +1,9 @@
-import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth/password";
 import { signupSchema } from "@/lib/auth/schemas";
 import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
-import { sendEmail } from "@/lib/email/send";
+import { sendVerificationCode } from "@/lib/auth/send-verification-code";
 
 export async function POST(req: NextRequest) {
   const ip = clientIpFrom(req.headers);
@@ -35,61 +34,26 @@ export async function POST(req: NextRequest) {
   }
 
   const passwordHash = await hashPassword(password);
-  const emailVerifyToken = crypto.randomBytes(32).toString("hex");
 
   const user = await prisma.user.create({
-    data: { fullName, username, email, passwordHash, locale, emailVerifyToken },
+    data: { fullName, username, email, passwordHash, locale },
   });
 
-  const verifyUrl = `${req.nextUrl.origin}/api/auth/verify-email?token=${emailVerifyToken}`;
-
-  let emailSent = false;
-  try {
-    const result = await sendEmail({
-      to: user.email,
-      subject: "Verify your E-nursing email / فعّل بريدك الإلكتروني",
-      html: `
-        <p>Hi ${user.fullName},</p>
-        <p>Click the link below to verify your E-nursing account.</p>
-        <p><a href="${verifyUrl}">${verifyUrl}</a></p>
-        <hr />
-        <p dir="rtl">مرحبًا ${user.fullName}،</p>
-        <p dir="rtl">اضغط على الرابط أعلاه لتفعيل حسابك في منصة E-nursing.</p>
-      `,
-    });
-    emailSent = result.sent;
-  } catch (err) {
-    console.error("[email] Failed to send verification email:", err);
-  }
-
-  // No email provider configured (or sending failed). In development we log
-  // the link so the flow is testable; in production this must never leak
-  // the link outside of an actual email.
-  if (!emailSent && process.env.NODE_ENV !== "production") {
-    console.log(`[dev] Email verification link for ${user.email}: ${verifyUrl}`);
-  }
+  const { devCode } = await sendVerificationCode(user);
 
   await prisma.notification.create({
     data: {
       userId: user.id,
       titleEn: "Verify your email",
       titleAr: "فعّل بريدك الإلكتروني",
-      bodyEn: emailSent
-        ? "Please check your inbox for a verification link."
-        : process.env.NODE_ENV !== "production"
-          ? `Email sending isn't configured yet. For now, the verification link was printed to the server console: ${verifyUrl}`
-          : "Please check your inbox for a verification link.",
-      bodyAr: emailSent
-        ? "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التفعيل."
-        : process.env.NODE_ENV !== "production"
-          ? `لم يتم إعداد إرسال البريد الإلكتروني بعد. تم طباعة رابط التفعيل في سجل الخادم: ${verifyUrl}`
-          : "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التفعيل.",
+      bodyEn: "Enter the 6-digit code we emailed you to activate your account.",
+      bodyAr: "أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى بريدك الإلكتروني لتفعيل حسابك.",
     },
   });
 
   return NextResponse.json({
     pendingVerification: true,
     email: user.email,
-    ...(!emailSent && process.env.NODE_ENV !== "production" ? { devVerifyUrl: verifyUrl } : {}),
+    ...(devCode ? { devVerifyCode: devCode } : {}),
   });
 }

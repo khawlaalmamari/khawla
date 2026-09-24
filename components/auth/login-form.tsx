@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/locale-provider";
 import { Field, inputClass } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
+import { VerificationCodeForm } from "@/components/auth/verification-code-form";
 
 export function LoginForm() {
   const { dict } = useLocale();
@@ -16,14 +17,11 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
-  const [resending, setResending] = useState(false);
-  const [resendDone, setResendDone] = useState(false);
+  const [devVerifyCode, setDevVerifyCode] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setUnverifiedEmail(null);
-    setResendDone(false);
     setSubmitting(true);
 
     try {
@@ -41,9 +39,19 @@ export function LoginForm() {
           );
         } else if (data.error === "invalidCredentials") {
           setError(dict.auth.errors.invalidCredentials);
+        } else if (data.error === "emailNotVerified" && identifier.includes("@")) {
+          // Trigger a fresh code straight away so the student isn't stuck
+          // waiting on an old one they may not have received.
+          const resendRes = await fetch("/api/auth/resend-verification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: identifier }),
+          });
+          const resendData = await resendRes.json().catch(() => ({}));
+          if (resendData.devVerifyCode) setDevVerifyCode(resendData.devVerifyCode);
+          setUnverifiedEmail(identifier);
         } else if (data.error === "emailNotVerified") {
           setError(dict.auth.errors.emailNotVerified);
-          if (identifier.includes("@")) setUnverifiedEmail(identifier);
         } else {
           setError(dict.auth.errors.genericError);
         }
@@ -59,19 +67,8 @@ export function LoginForm() {
     }
   }
 
-  async function onResend() {
-    if (!unverifiedEmail) return;
-    setResending(true);
-    try {
-      await fetch("/api/auth/resend-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: unverifiedEmail }),
-      });
-      setResendDone(true);
-    } finally {
-      setResending(false);
-    }
+  if (unverifiedEmail) {
+    return <VerificationCodeForm email={unverifiedEmail} initialDevCode={devVerifyCode} />;
   }
 
   return (
@@ -109,17 +106,6 @@ export function LoginForm() {
           </button>
         </div>
         {error && <p className="text-sm text-danger">{error}</p>}
-        {unverifiedEmail && !resendDone && (
-          <button
-            type="button"
-            onClick={onResend}
-            disabled={resending}
-            className="mt-1 text-sm font-medium text-primary-700 hover:underline disabled:opacity-60"
-          >
-            {dict.auth.resendVerification}
-          </button>
-        )}
-        {resendDone && <p className="mt-1 text-sm text-muted">{dict.auth.resendSent}</p>}
       </Field>
 
       <div className="flex justify-end text-sm">

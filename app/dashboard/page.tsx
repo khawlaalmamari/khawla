@@ -21,18 +21,13 @@ function ProgressBar({ percent }: { percent: number }) {
   );
 }
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ verified?: string }>;
-}) {
+export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
   const data = await getDashboardData(user.id);
-  const { verified } = await searchParams;
   const dueSession = await getDueStudySession(user.id);
 
   return (
@@ -53,12 +48,6 @@ export default async function DashboardPage({
             >
               {locale === "ar" ? "ابدأ الآن" : "Start Now"}
             </ButtonLink>
-          </div>
-        )}
-
-        {verified === "success" && (
-          <div className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800">
-            {locale === "ar" ? "تم تفعيل بريدك الإلكتروني بنجاح!" : "Your email has been verified!"}
           </div>
         )}
 

@@ -39,28 +39,30 @@ enum ChatRole {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
-  username          String    @unique
-  passwordHash      String
-  fullName          String
-  locale            String    @default("ar") // "ar" | "en"
-  role              String    @default("student")
-  emailVerified     Boolean   @default(false)
-  emailVerifyToken  String?
-  failedLoginCount  Int       @default(0)
-  lockedUntil       DateTime?
-  lastLoginAt       DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                       String    @id @default(cuid())
+  email                    String    @unique
+  username                 String    @unique
+  passwordHash             String
+  fullName                 String
+  locale                   String    @default("ar") // "ar" | "en"
+  role                     String    @default("student")
+  emailVerified            Boolean   @default(false)
+  emailVerifyCode          String?
+  emailVerifyCodeExpiresAt DateTime?
+  emailVerifyAttempts      Int       @default(0)
+  failedLoginCount         Int       @default(0)
+  lockedUntil              DateTime?
+  lastLoginAt              DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
-  resetTokens    PasswordResetToken[]
-  quizAttempts   QuizAttempt[]
-  progress       ProgressRecord[]
-  studyPlans     StudyPlan[]
-  notifications  Notification[]
-  chatSessions   ChatSession[]
-  loginEvents    LoginEvent[]
+  resetTokens   PasswordResetToken[]
+  quizAttempts  QuizAttempt[]
+  progress      ProgressRecord[]
+  studyPlans    StudyPlan[]
+  notifications Notification[]
+  chatSessions  ChatSession[]
+  loginEvents   LoginEvent[]
 }
 
 model LoginEvent {
@@ -75,95 +77,95 @@ model LoginEvent {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token     String   @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 }
 
 model Course {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  subject     Subject
-  titleEn     String
-  titleAr     String
+  id            String  @id @default(cuid())
+  slug          String  @unique
+  subject       Subject
+  titleEn       String
+  titleAr       String
   descriptionEn String
   descriptionAr String
-  order       Int      @default(0)
+  order         Int     @default(0)
 
-  modules Module[]
+  modules    Module[]
   studyPlans StudyPlan[]
 }
 
 model Module {
-  id            String   @id @default(cuid())
-  slug          String   @unique
+  id            String @id @default(cuid())
+  slug          String @unique
   courseId      String
-  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course        Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   order         Int
   titleEn       String
   titleAr       String
   descriptionEn String
   descriptionAr String
-  passThreshold Int      @default(70) // percent required to mark module complete
+  passThreshold Int    @default(70) // percent required to mark module complete
 
-  lessons  Lesson[]
-  questions Question[]
-  progress ProgressRecord[]
+  lessons      Lesson[]
+  questions    Question[]
+  progress     ProgressRecord[]
   quizAttempts QuizAttempt[]
 }
 
 model Lesson {
-  id            String @id @default(cuid())
-  slug          String @unique
-  moduleId      String
-  module        Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  order         Int
-  titleEn       String
-  titleAr       String
-  objectivesEn  String // JSON-encoded string[]
-  objectivesAr  String // JSON-encoded string[]
-  contentEn     String // markdown
-  contentAr     String // markdown
-  termsJson     String // JSON-encoded {en, ar}[] medical terminology pairs
-  summaryEn     String
-  summaryAr     String
+  id             String @id @default(cuid())
+  slug           String @unique
+  moduleId       String
+  module         Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  order          Int
+  titleEn        String
+  titleAr        String
+  objectivesEn   String // JSON-encoded string[]
+  objectivesAr   String // JSON-encoded string[]
+  contentEn      String // markdown
+  contentAr      String // markdown
+  termsJson      String // JSON-encoded {en, ar}[] medical terminology pairs
+  summaryEn      String
+  summaryAr      String
   referencesJson String // JSON-encoded string[] (citations, not claims of accreditation)
 
   questions Question[]
 }
 
 model Question {
-  id             String       @id @default(cuid())
-  moduleId       String
-  module         Module       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  lessonId       String?
-  lesson         Lesson?      @relation(fields: [lessonId], references: [id])
-  type           QuestionType @default(MCQ)
-  order          Int          @default(0)
-  textEn         String
-  textAr         String
-  choicesJson    String       // JSON-encoded {id, en, ar}[]
+  id              String       @id @default(cuid())
+  moduleId        String
+  module          Module       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lessonId        String?
+  lesson          Lesson?      @relation(fields: [lessonId], references: [id])
+  type            QuestionType @default(MCQ)
+  order           Int          @default(0)
+  textEn          String
+  textAr          String
+  choicesJson     String // JSON-encoded {id, en, ar}[]
   correctChoiceId String
-  explanationEn  String
-  explanationAr  String
+  explanationEn   String
+  explanationAr   String
 
   studentAnswers StudentAnswer[]
 }
 
 model QuizAttempt {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  moduleId    String
-  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId     String
+  module       Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   scorePercent Int?
-  passed      Boolean   @default(false)
-  startedAt   DateTime  @default(now())
-  completedAt DateTime?
+  passed       Boolean   @default(false)
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
 
   answers StudentAnswer[]
 
@@ -171,53 +173,53 @@ model QuizAttempt {
 }
 
 model StudentAnswer {
-  id           String      @id @default(cuid())
-  attemptId    String
-  attempt      QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  questionId   String
-  question     Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  id               String      @id @default(cuid())
+  attemptId        String
+  attempt          QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId       String
+  question         Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
   selectedChoiceId String
-  isCorrect    Boolean
+  isCorrect        Boolean
 
   @@index([attemptId])
 }
 
 model ProgressRecord {
-  id          String         @id @default(cuid())
-  userId      String
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  moduleId    String
-  module      Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  status      ProgressStatus @default(NOT_STARTED)
+  id               String         @id @default(cuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId         String
+  module           Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  status           ProgressStatus @default(NOT_STARTED)
   bestScorePercent Int?
-  completedAt DateTime?
-  updatedAt   DateTime       @updatedAt
+  completedAt      DateTime?
+  updatedAt        DateTime       @updatedAt
 
   @@unique([userId, moduleId])
 }
 
 model StudyPlan {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId    String
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  examDate    DateTime
-  dailyHours  Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId   String
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  examDate   DateTime
+  dailyHours Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   sessions StudySession[]
 }
 
 model StudySession {
-  id          String    @id @default(cuid())
-  studyPlanId String
-  studyPlan   StudyPlan @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
-  scheduledFor DateTime
-  moduleId    String
+  id              String    @id @default(cuid())
+  studyPlanId     String
+  studyPlan       StudyPlan @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  scheduledFor    DateTime
+  moduleId        String
   durationMinutes Int
-  completed   Boolean   @default(false)
+  completed       Boolean   @default(false)
 }
 
 model Notification {
