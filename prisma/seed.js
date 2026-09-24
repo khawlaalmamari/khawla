@@ -127,6 +127,9 @@ async function main() {
           summaryEn: lesson.summaryEn,
           summaryAr: lesson.summaryAr,
           referencesJson: JSON.stringify(lesson.references),
+          videoUrl: lesson.videoUrl ?? null,
+          videoLabelEn: lesson.videoLabelEn ?? null,
+          videoLabelAr: lesson.videoLabelAr ?? null,
         },
         create: {
           slug: lesson.slug,
@@ -142,6 +145,9 @@ async function main() {
           summaryEn: lesson.summaryEn,
           summaryAr: lesson.summaryAr,
           referencesJson: JSON.stringify(lesson.references),
+          videoUrl: lesson.videoUrl ?? null,
+          videoLabelEn: lesson.videoLabelEn ?? null,
+          videoLabelAr: lesson.videoLabelAr ?? null,
         },
       });
       lessonIdBySlug[lesson.slug] = created.id;

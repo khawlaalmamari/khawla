@@ -120,10 +120,10 @@ model Module {
 }
 
 model Lesson {
-  id             String @id @default(cuid())
-  slug           String @unique
+  id             String  @id @default(cuid())
+  slug           String  @unique
   moduleId       String
-  module         Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  module         Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   order          Int
   titleEn        String
   titleAr        String
@@ -135,6 +135,9 @@ model Lesson {
   summaryEn      String
   summaryAr      String
   referencesJson String // JSON-encoded string[] (citations, not claims of accreditation)
+  videoUrl       String? // optional real YouTube link for this lesson's topic
+  videoLabelEn   String? // one-line note telling the student what the video covers
+  videoLabelAr   String?
 
   questions Question[]
 }

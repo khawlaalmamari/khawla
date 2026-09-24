@@ -158,6 +158,8 @@ export const ar = {
     takeQuiz: "ابدأ الاختبار القصير",
     backToModule: "الرجوع إلى الموديل",
     diagram: "رسم توضيحي",
+    videoTitle: "فيديو تعليمي",
+    watchVideo: "مشاهدة الفيديو على يوتيوب",
   },
   quiz: {
     question: "السؤال",
@@ -436,6 +438,8 @@ export const en: Dictionary = {
     takeQuiz: "Take the Quiz",
     backToModule: "Back to Module",
     diagram: "Illustration",
+    videoTitle: "Video Lesson",
+    watchVideo: "Watch on YouTube",
   },
   quiz: {
     question: "Question",

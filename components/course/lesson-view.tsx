@@ -92,12 +92,31 @@ export async function LessonView({
         </dl>
       </Card>
 
-      <Card className="mt-6 border-primary-200 bg-primary-50">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-primary-800">
+      <Card className="mt-6 border-s-4 border-s-primary-600 bg-surface">
+        <h2 className="text-sm font-bold uppercase tracking-wide text-primary-700">
           {dict.course.summary}
         </h2>
-        <p className="mt-2 text-sm leading-6 text-primary-900">{summary}</p>
+        <p className="mt-2 text-sm leading-6 text-foreground">{summary}</p>
       </Card>
+
+      {lesson.videoUrl && (
+        <Card className="mt-6 border-s-4 border-s-accent-500 bg-surface">
+          <h2 className="text-sm font-bold uppercase tracking-wide text-accent-700">
+            {dict.course.videoTitle}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-foreground">
+            {locale === "ar" ? lesson.videoLabelAr : lesson.videoLabelEn}
+          </p>
+          <a
+            href={lesson.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-block text-sm font-medium text-primary-700 underline underline-offset-2 hover:text-primary-800"
+          >
+            {dict.course.watchVideo} ↗
+          </a>
+        </Card>
+      )}
 
       <Card className="mt-6">
         <h2 className="text-sm font-bold uppercase tracking-wide text-muted">
