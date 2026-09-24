@@ -6,6 +6,7 @@ import { dirFor } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { LocaleProvider } from "@/components/locale-provider";
 import { NoviaWidget } from "@/components/novia/novia-widget";
+import { NoviaEmbed } from "@/components/novia/novia-embed";
 
 const tajawal = Tajawal({
   variable: "--font-body",
@@ -30,6 +31,11 @@ export default async function RootLayout({
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
 
+  // Once NEXT_PUBLIC_NOVIA_EMBED_SRC is configured (see .env.example), the
+  // external chatbot platform's own widget takes over from the site's
+  // built-in one — never both at once.
+  const externalNoviaConfigured = Boolean(process.env.NEXT_PUBLIC_NOVIA_EMBED_SRC);
+
   return (
     <html
       lang={locale}
@@ -39,7 +45,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <LocaleProvider locale={locale}>
           {children}
-          <NoviaWidget />
+          {externalNoviaConfigured ? <NoviaEmbed /> : <NoviaWidget />}
         </LocaleProvider>
         <noscript>{dict.meta.siteName}</noscript>
       </body>

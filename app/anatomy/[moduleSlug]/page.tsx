@@ -15,7 +15,7 @@ export default async function AnatomyModulePage({
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6">
+      <main className="mx-auto w-full max-w-4xl flex-1 px-4 pt-10 pb-28 sm:px-6">
         <ModuleOverview courseSlug="anatomy" moduleSlug={moduleSlug} userId={user.id} />
       </main>
     </div>
