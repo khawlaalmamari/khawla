@@ -13,6 +13,11 @@ const WEEKLY_MIN_GAP_MS = 6.5 * 24 * 60 * 60 * 1000;
  * ${CRON_SECRET}` on cron-triggered requests when CRON_SECRET is set — see
  * .env.example. This route refuses to run at all if that isn't configured,
  * rather than running unauthenticated.
+ *
+ * vercel.json schedules this once a day (Hobby plan limit) at a single
+ * fixed hour, so only plans whose reminderHour matches that run actually
+ * get an email — see .env.example's CRON_SECRET comment for the full
+ * explanation and what changes once the project is on a paid plan.
  */
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
