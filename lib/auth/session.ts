@@ -4,7 +4,9 @@ import { cache } from "react";
 import { prisma } from "@/lib/db";
 
 const SESSION_COOKIE = "en_session";
-const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
+// Hard cap on the signed token itself — a server-side backstop, independent
+// of how long the browser happens to keep the cookie around.
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
 function getSecretKey() {
   const secret = process.env.SESSION_SECRET;
@@ -23,7 +25,7 @@ export async function createSession(userId: string) {
   const token = await new SignJWT({ sub: userId, sv: user?.sessionVersion ?? 0 })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_TTL_SECONDS}s`)
+    .setExpirationTime(`${SESSION_MAX_AGE_SECONDS}s`)
     .sign(getSecretKey());
 
   const store = await cookies();
@@ -32,7 +34,9 @@ export async function createSession(userId: string) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_TTL_SECONDS,
+    // No maxAge/expires: a true browser-session cookie. The browser drops
+    // it when it closes, so re-opening the site always requires logging in
+    // again — the JWT's own expiry above is just a secondary hard cap.
   });
 }
 
