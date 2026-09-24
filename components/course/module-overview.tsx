@@ -9,6 +9,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { MarkDoneButton } from "@/components/course/mark-done-button";
+import { ModuleMindMap } from "@/components/course/module-mind-map";
+import { buildModuleMindMap } from "@/lib/mindmap/build-module-mindmap";
 
 export async function ModuleOverview({
   courseSlug,
@@ -122,6 +124,23 @@ export async function ModuleOverview({
           </li>
         ))}
       </ol>
+
+      <h2 className="mt-8 text-lg font-bold">{dict.course.mindMapTitle}</h2>
+      <div className="mt-4">
+        <ModuleMindMap
+          data={buildModuleMindMap({
+            id: mod.id,
+            titleAr: mod.titleAr,
+            titleEn: mod.titleEn,
+            lessons: mod.lessons.map((l) => ({
+              id: l.id,
+              titleAr: l.titleAr,
+              titleEn: l.titleEn,
+              termsJson: l.termsJson,
+            })),
+          })}
+        />
+      </div>
 
       <Card className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

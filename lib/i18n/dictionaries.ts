@@ -222,6 +222,8 @@ export const ar = {
     doneIntro: "بعد الانتهاء من دراسة محتوى هذا الموديل، اضغطي هنا لتحديده كمُنجز ومتابعة تقدمك.",
     doneManualHint: "يمكنك إلغاء هذا التحديد بالضغط على الزر مرة أخرى.",
     doneAuto: "تم إنجاز هذا الموديل تلقائيًا لأنك اجتزتِ اختباره بنجاح.",
+    mindMapTitle: "الخريطة الذهنية التفاعلية",
+    mindMapHint: "اسحبي لتحريك الخريطة، وكبّري أو صغّري بعجلة الفأرة. اضغطي على أي درس لعرض أو إخفاء مصطلحاته.",
   },
   quiz: {
     question: "السؤال",
@@ -596,6 +598,8 @@ export const en: Dictionary = {
     doneIntro: "Once you've finished studying this module's content, click here to mark it as done and track your progress.",
     doneManualHint: "You can undo this by clicking the button again.",
     doneAuto: "This module was automatically marked done because you passed its quiz.",
+    mindMapTitle: "Interactive Mind Map",
+    mindMapHint: "Drag to pan, scroll to zoom. Click a lesson to show or hide its terms.",
   },
   quiz: {
     question: "Question",
