@@ -5,7 +5,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { prisma } from "@/lib/db";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { UserManagementTable } from "@/components/admin/user-management-table";
 
 export default async function AdminPage() {
   const user = await getCurrentUser();
@@ -22,6 +22,7 @@ export default async function AdminPage() {
       fullName: true,
       username: true,
       email: true,
+      role: true,
       emailVerified: true,
       createdAt: true,
       lastLoginAt: true,
@@ -29,14 +30,6 @@ export default async function AdminPage() {
   });
 
   const verifiedCount = users.filter((u) => u.emailVerified).length;
-
-  function formatDate(date: Date) {
-    return date.toLocaleDateString(locale === "ar" ? "ar" : "en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -55,44 +48,7 @@ export default async function AdminPage() {
           </Card>
         </div>
 
-        <Card className="overflow-x-auto p-0">
-          {users.length === 0 ? (
-            <p className="p-6 text-sm text-muted">{dict.admin.noUsers}</p>
-          ) : (
-            <table className="w-full min-w-[720px] text-start text-sm">
-              <thead className="border-b border-border text-start text-xs uppercase text-muted">
-                <tr>
-                  <th className="px-4 py-3 text-start">{dict.admin.tableName}</th>
-                  <th className="px-4 py-3 text-start">{dict.admin.tableUsername}</th>
-                  <th className="px-4 py-3 text-start">{dict.admin.tableEmail}</th>
-                  <th className="px-4 py-3 text-start">{dict.admin.tableStatus}</th>
-                  <th className="px-4 py-3 text-start">{dict.admin.tableJoined}</th>
-                  <th className="px-4 py-3 text-start">{dict.admin.tableLastLogin}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3 font-medium">{u.fullName}</td>
-                    <td className="px-4 py-3 text-muted">{u.username}</td>
-                    <td className="px-4 py-3 text-muted">{u.email}</td>
-                    <td className="px-4 py-3">
-                      {u.emailVerified ? (
-                        <Badge tone="success">{dict.admin.verified}</Badge>
-                      ) : (
-                        <Badge tone="neutral">{dict.admin.unverified}</Badge>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-muted">{formatDate(u.createdAt)}</td>
-                    <td className="px-4 py-3 text-muted">
-                      {u.lastLoginAt ? formatDate(u.lastLoginAt) : dict.admin.never}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </Card>
+        <UserManagementTable users={users} currentUserId={user.id} locale={locale} />
       </main>
     </div>
   );
