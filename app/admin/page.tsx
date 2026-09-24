@@ -11,6 +11,8 @@ import { UserManagementTable } from "@/components/admin/user-management-table";
 import { ModuleManagementPanel } from "@/components/admin/module-management-panel";
 import { BroadcastForm } from "@/components/admin/broadcast-form";
 import { AuditLogPanel } from "@/components/admin/audit-log-panel";
+import { SignupsTrendChart } from "@/components/admin/signups-trend-chart";
+import { ModuleScoresChart } from "@/components/admin/module-scores-chart";
 
 const PAGE_SIZE = 20;
 
@@ -61,7 +63,7 @@ export default async function AdminPage({
     isLocked: isCurrentlyLocked({ lockedUntil }),
   }));
 
-  const [activeThisWeek, scoreAgg, moduleScores, auditLogs] = await Promise.all([
+  const [activeThisWeek, scoreAgg, moduleScores, auditLogs, recentSignups] = await Promise.all([
     prisma.user.count({ where: { lastLoginAt: { gte: daysAgo(7) } } }),
     prisma.quizAttempt.aggregate({
       _avg: { scorePercent: true },
@@ -78,6 +80,10 @@ export default async function AdminPage({
       take: 20,
       include: { admin: { select: { fullName: true } } },
     }),
+    prisma.user.findMany({
+      where: { createdAt: { gte: daysAgo(30) } },
+      select: { createdAt: true },
+    }),
   ]);
 
   const moduleTitles = await prisma.module.findMany({
@@ -86,16 +92,31 @@ export default async function AdminPage({
   });
   const moduleTitleById = new Map(moduleTitles.map((m) => [m.id, m]));
 
-  const hardestModules = moduleScores
+  const moduleScoreChartData = moduleScores
     .filter((m) => m._count._all >= 3) // ignore modules with too few attempts to be meaningful
     .sort((a, b) => (a._avg.scorePercent ?? 0) - (b._avg.scorePercent ?? 0))
-    .slice(0, 3)
     .map((m) => ({
       title: locale === "ar" ? moduleTitleById.get(m.moduleId)?.titleAr : moduleTitleById.get(m.moduleId)?.titleEn,
       avgScore: Math.round(m._avg.scorePercent ?? 0),
       attempts: m._count._all,
     }))
-    .filter((m) => m.title);
+    .filter((m): m is { title: string; avgScore: number; attempts: number } => Boolean(m.title));
+
+  // Bucket the last 30 days of sign-ups into a daily series (zero-filled).
+  const dayFormatter = new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en-US", {
+    month: "short",
+    day: "numeric",
+  });
+  const signupsByDay = new Map<string, number>();
+  for (const u of recentSignups) {
+    const key = u.createdAt.toISOString().slice(0, 10);
+    signupsByDay.set(key, (signupsByDay.get(key) ?? 0) + 1);
+  }
+  const signupsTrend = Array.from({ length: 30 }, (_, i) => {
+    const date = daysAgo(29 - i);
+    const key = date.toISOString().slice(0, 10);
+    return { date: key, count: signupsByDay.get(key) ?? 0, label: dayFormatter.format(date) };
+  });
 
   const courses = await prisma.course.findMany({
     orderBy: { order: "asc" },
@@ -173,22 +194,24 @@ export default async function AdminPage({
           </Card>
         </div>
 
-        {hardestModules.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Card>
+            <p className="mb-3 text-sm font-bold">{dict.admin.signupsTrend}</p>
+            <SignupsTrendChart
+              data={signupsTrend}
+              emptyLabel={dict.admin.noSignupsYet}
+              totalLabel={dict.admin.signupsTotalLabel}
+            />
+          </Card>
           <Card>
             <p className="mb-3 text-sm font-bold">{dict.admin.hardestModules}</p>
-            <ul className="space-y-2">
-              {hardestModules.map((m) => (
-                <li key={m.title} className="flex items-center justify-between text-sm">
-                  <span>{m.title}</span>
-                  <span className="text-muted">
-                    {dict.admin.avgScoreLabel.replace("{score}", String(m.avgScore))} ·{" "}
-                    {dict.admin.attemptsLabel.replace("{count}", String(m.attempts))}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <ModuleScoresChart
+              data={moduleScoreChartData}
+              emptyLabel={dict.admin.noQuizDataYet}
+              attemptsLabel={dict.admin.attemptsLabel}
+            />
           </Card>
-        )}
+        </div>
 
         <UserManagementTable
           users={users}
