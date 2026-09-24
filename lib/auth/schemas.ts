@@ -62,6 +62,17 @@ export const adminUpdateUserSchema = z.object({
   emailVerified: z.boolean().optional(),
 });
 
+export const adminUpdateLessonSchema = z.object({
+  titleEn: z.string().trim().min(1),
+  titleAr: z.string().trim().min(1),
+  objectivesEn: z.array(z.string().trim().min(1)),
+  objectivesAr: z.array(z.string().trim().min(1)),
+  contentEn: z.string().trim().min(1),
+  contentAr: z.string().trim().min(1),
+  summaryEn: z.string().trim().min(1),
+  summaryAr: z.string().trim().min(1),
+});
+
 export const resetPasswordSchema = z
   .object({
     token: z.string().min(1),

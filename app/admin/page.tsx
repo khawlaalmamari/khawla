@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { UserManagementTable } from "@/components/admin/user-management-table";
-import { ModuleManagementTable } from "@/components/admin/module-management-table";
+import { ModuleManagementPanel } from "@/components/admin/module-management-panel";
 
 export default async function AdminPage() {
   const user = await getCurrentUser();
@@ -32,26 +32,53 @@ export default async function AdminPage() {
 
   const verifiedCount = users.filter((u) => u.emailVerified).length;
 
+  const courses = await prisma.course.findMany({
+    orderBy: { order: "asc" },
+    select: { id: true, slug: true, titleAr: true, titleEn: true },
+  });
+
   const modules = await prisma.module.findMany({
     orderBy: [{ course: { order: "asc" } }, { order: "asc" }],
     select: {
       id: true,
+      courseId: true,
       titleAr: true,
       titleEn: true,
       isPublished: true,
-      lessons: { select: { id: true } },
-      course: { select: { titleAr: true, titleEn: true } },
+      lessons: {
+        orderBy: { order: "asc" },
+        select: {
+          id: true,
+          titleAr: true,
+          titleEn: true,
+          objectivesAr: true,
+          objectivesEn: true,
+          contentAr: true,
+          contentEn: true,
+          summaryAr: true,
+          summaryEn: true,
+        },
+      },
     },
   });
 
   const moduleRows = modules.map((mod) => ({
     id: mod.id,
+    courseId: mod.courseId,
     titleAr: mod.titleAr,
     titleEn: mod.titleEn,
     isPublished: mod.isPublished,
-    hasContent: mod.lessons.length > 0,
-    courseTitleAr: mod.course.titleAr,
-    courseTitleEn: mod.course.titleEn,
+    lessons: mod.lessons.map((l) => ({
+      id: l.id,
+      titleAr: l.titleAr,
+      titleEn: l.titleEn,
+      objectivesAr: JSON.parse(l.objectivesAr) as string[],
+      objectivesEn: JSON.parse(l.objectivesEn) as string[],
+      contentAr: l.contentAr,
+      contentEn: l.contentEn,
+      summaryAr: l.summaryAr,
+      summaryEn: l.summaryEn,
+    })),
   }));
 
   return (
@@ -73,7 +100,7 @@ export default async function AdminPage() {
 
         <UserManagementTable users={users} currentUserId={user.id} locale={locale} />
 
-        <ModuleManagementTable modules={moduleRows} locale={locale} />
+        <ModuleManagementPanel courses={courses} modules={moduleRows} locale={locale} />
       </main>
     </div>
   );
