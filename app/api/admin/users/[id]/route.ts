@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { adminUpdateUserSchema } from "@/lib/auth/schemas";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { logAdminAction } from "@/lib/auth/audit-log";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin();
@@ -38,6 +39,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const user = await prisma.user.update({ where: { id }, data });
 
+  await logAdminAction({
+    adminId: admin.id,
+    action: "user.update",
+    targetType: "user",
+    targetId: user.id,
+    detail: user.email,
+  });
+
   return NextResponse.json({
     user: {
       id: user.id,
@@ -62,7 +71,16 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ error: "cannotDeleteSelf" }, { status: 400 });
   }
 
+  const target = await prisma.user.findUnique({ where: { id }, select: { email: true } });
   await prisma.user.delete({ where: { id } });
+
+  await logAdminAction({
+    adminId: admin.id,
+    action: "user.delete",
+    targetType: "user",
+    targetId: id,
+    detail: target?.email,
+  });
 
   return NextResponse.json({ ok: true });
 }

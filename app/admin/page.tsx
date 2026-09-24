@@ -4,12 +4,21 @@ import { getServerLocale } from "@/lib/i18n/get-locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { prisma } from "@/lib/db";
 import { isCurrentlyLocked } from "@/lib/auth/login-guard";
+import { buildUserWhere, daysAgo, type UserStatusFilter } from "@/lib/admin/user-filters";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { UserManagementTable } from "@/components/admin/user-management-table";
 import { ModuleManagementPanel } from "@/components/admin/module-management-panel";
+import { BroadcastForm } from "@/components/admin/broadcast-form";
+import { AuditLogPanel } from "@/components/admin/audit-log-panel";
 
-export default async function AdminPage() {
+const PAGE_SIZE = 20;
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
+}) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   if (user.role !== "admin") redirect("/dashboard");
@@ -17,27 +26,76 @@ export default async function AdminPage() {
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
 
-  const usersRaw = await prisma.user.findMany({
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      fullName: true,
-      username: true,
-      email: true,
-      role: true,
-      emailVerified: true,
-      createdAt: true,
-      lastLoginAt: true,
-      lockedUntil: true,
-    },
-  });
+  const params = await searchParams;
+  const q = params.q?.trim() || undefined;
+  const status = (params.status as UserStatusFilter) || "all";
+  const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
+
+  const where = buildUserWhere(q, status);
+
+  const [usersRaw, totalFiltered, totalUsers, verifiedCount] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+      select: {
+        id: true,
+        fullName: true,
+        username: true,
+        email: true,
+        role: true,
+        emailVerified: true,
+        createdAt: true,
+        lastLoginAt: true,
+        lockedUntil: true,
+      },
+    }),
+    prisma.user.count({ where }),
+    prisma.user.count(),
+    prisma.user.count({ where: { emailVerified: true } }),
+  ]);
 
   const users = usersRaw.map(({ lockedUntil, ...u }) => ({
     ...u,
     isLocked: isCurrentlyLocked({ lockedUntil }),
   }));
 
-  const verifiedCount = users.filter((u) => u.emailVerified).length;
+  const [activeThisWeek, scoreAgg, moduleScores, auditLogs] = await Promise.all([
+    prisma.user.count({ where: { lastLoginAt: { gte: daysAgo(7) } } }),
+    prisma.quizAttempt.aggregate({
+      _avg: { scorePercent: true },
+      where: { scorePercent: { not: null } },
+    }),
+    prisma.quizAttempt.groupBy({
+      by: ["moduleId"],
+      _avg: { scorePercent: true },
+      _count: { _all: true },
+      where: { scorePercent: { not: null } },
+    }),
+    prisma.adminAuditLog.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      include: { admin: { select: { fullName: true } } },
+    }),
+  ]);
+
+  const moduleTitles = await prisma.module.findMany({
+    where: { id: { in: moduleScores.map((m) => m.moduleId) } },
+    select: { id: true, titleAr: true, titleEn: true },
+  });
+  const moduleTitleById = new Map(moduleTitles.map((m) => [m.id, m]));
+
+  const hardestModules = moduleScores
+    .filter((m) => m._count._all >= 3) // ignore modules with too few attempts to be meaningful
+    .sort((a, b) => (a._avg.scorePercent ?? 0) - (b._avg.scorePercent ?? 0))
+    .slice(0, 3)
+    .map((m) => ({
+      title: locale === "ar" ? moduleTitleById.get(m.moduleId)?.titleAr : moduleTitleById.get(m.moduleId)?.titleEn,
+      avgScore: Math.round(m._avg.scorePercent ?? 0),
+      attempts: m._count._all,
+    }))
+    .filter((m) => m.title);
 
   const courses = await prisma.course.findMany({
     orderBy: { order: "asc" },
@@ -94,18 +152,66 @@ export default async function AdminPage() {
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-10 sm:px-6">
         <h1 className="text-2xl font-bold">{dict.admin.title}</h1>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
             <p className="text-sm text-muted">{dict.admin.totalUsers}</p>
-            <p className="mt-1 text-3xl font-bold">{users.length}</p>
+            <p className="mt-1 text-3xl font-bold">{totalUsers}</p>
           </Card>
           <Card>
             <p className="text-sm text-muted">{dict.admin.verifiedUsers}</p>
             <p className="mt-1 text-3xl font-bold">{verifiedCount}</p>
           </Card>
+          <Card>
+            <p className="text-sm text-muted">{dict.admin.activeThisWeek}</p>
+            <p className="mt-1 text-3xl font-bold">{activeThisWeek}</p>
+          </Card>
+          <Card>
+            <p className="text-sm text-muted">{dict.admin.avgQuizScore}</p>
+            <p className="mt-1 text-3xl font-bold">
+              {scoreAgg._avg.scorePercent != null ? `${Math.round(scoreAgg._avg.scorePercent)}%` : "—"}
+            </p>
+          </Card>
         </div>
 
-        <UserManagementTable users={users} currentUserId={user.id} locale={locale} />
+        {hardestModules.length > 0 && (
+          <Card>
+            <p className="mb-3 text-sm font-bold">{dict.admin.hardestModules}</p>
+            <ul className="space-y-2">
+              {hardestModules.map((m) => (
+                <li key={m.title} className="flex items-center justify-between text-sm">
+                  <span>{m.title}</span>
+                  <span className="text-muted">
+                    {dict.admin.avgScoreLabel.replace("{score}", String(m.avgScore))} ·{" "}
+                    {dict.admin.attemptsLabel.replace("{count}", String(m.attempts))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        <UserManagementTable
+          users={users}
+          currentUserId={user.id}
+          locale={locale}
+          q={q ?? ""}
+          status={status}
+          page={page}
+          totalPages={Math.max(1, Math.ceil(totalFiltered / PAGE_SIZE))}
+        />
+
+        <BroadcastForm />
+
+        <AuditLogPanel
+          entries={auditLogs.map((log) => ({
+            id: log.id,
+            adminName: log.admin.fullName,
+            action: log.action,
+            detail: log.detail,
+            createdAt: log.createdAt,
+          }))}
+          locale={locale}
+        />
 
         <ModuleManagementPanel courses={courses} modules={moduleRows} locale={locale} />
       </main>

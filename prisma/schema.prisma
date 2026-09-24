@@ -64,6 +64,20 @@ model User {
   notifications Notification[]
   chatSessions  ChatSession[]
   loginEvents   LoginEvent[]
+  auditLogs     AdminAuditLog[] @relation("AdminAuditLogs")
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id], onDelete: Cascade)
+  action     String // e.g. "user.create", "user.delete", "module.publish", "notification.broadcast"
+  targetType String // "user" | "module" | "lesson" | "notification"
+  targetId   String?
+  detail     String? // short human-readable note, e.g. the affected user's email
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 model LoginEvent {

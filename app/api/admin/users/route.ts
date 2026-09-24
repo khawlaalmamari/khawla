@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth/password";
 import { adminCreateUserSchema } from "@/lib/auth/schemas";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { logAdminAction } from "@/lib/auth/audit-log";
 
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin();
@@ -33,6 +34,14 @@ export async function POST(req: NextRequest) {
   // has already vouched for the student's identity directly.
   const user = await prisma.user.create({
     data: { fullName, username, email, passwordHash, role, emailVerified: true },
+  });
+
+  await logAdminAction({
+    adminId: admin.id,
+    action: "user.create",
+    targetType: "user",
+    targetId: user.id,
+    detail: user.email,
   });
 
   return NextResponse.json({

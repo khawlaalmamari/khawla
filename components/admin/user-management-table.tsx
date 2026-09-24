@@ -26,10 +26,18 @@ export function UserManagementTable({
   users,
   currentUserId,
   locale,
+  q,
+  status,
+  page,
+  totalPages,
 }: {
   users: AdminUser[];
   currentUserId: string;
   locale: "ar" | "en";
+  q: string;
+  status: string;
+  page: number;
+  totalPages: number;
 }) {
   const { dict } = useLocale();
   const router = useRouter();
@@ -40,6 +48,7 @@ export function UserManagementTable({
   const [addForm, setAddForm] = useState(emptyAddForm);
   const [sendingResetId, setSendingResetId] = useState<string | null>(null);
   const [resetSentId, setResetSentId] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState(q);
   const [editForm, setEditForm] = useState({
     fullName: "",
     username: "",
@@ -47,6 +56,29 @@ export function UserManagementTable({
     role: "student",
     emailVerified: true,
   });
+
+  function goToFilters(next: { q?: string; status?: string; page?: number }) {
+    const params = new URLSearchParams();
+    const nextQ = next.q ?? q;
+    const nextStatus = next.status ?? status;
+    const nextPage = next.page ?? 1;
+    if (nextQ) params.set("q", nextQ);
+    if (nextStatus && nextStatus !== "all") params.set("status", nextStatus);
+    if (nextPage > 1) params.set("page", String(nextPage));
+    router.push(`/admin?${params.toString()}`);
+  }
+
+  function onSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    goToFilters({ q: searchInput, page: 1 });
+  }
+
+  const exportUrl = (() => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (status && status !== "all") params.set("status", status);
+    return `/api/admin/users/export?${params.toString()}`;
+  })();
 
   function formatDate(date: Date) {
     return new Date(date).toLocaleDateString(locale === "ar" ? "ar" : "en-US", {
@@ -160,7 +192,34 @@ export function UserManagementTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <form onSubmit={onSearchSubmit} className="flex items-center gap-2">
+            <input
+              type="search"
+              placeholder={dict.admin.searchPlaceholder}
+              className={`${inputClass} w-56`}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <Button type="submit" variant="outline">
+              {dict.admin.search}
+            </Button>
+          </form>
+          <select
+            className={inputClass}
+            value={status}
+            onChange={(e) => goToFilters({ status: e.target.value, page: 1 })}
+          >
+            <option value="all">{dict.admin.filterAll}</option>
+            <option value="active">{dict.admin.accountActive}</option>
+            <option value="locked">{dict.admin.accountNeedsReset}</option>
+            <option value="unverified">{dict.admin.unverified}</option>
+          </select>
+          <a href={exportUrl} className="text-sm font-medium text-primary-700 hover:underline">
+            {dict.admin.exportCsv}
+          </a>
+        </div>
         <Button type="button" onClick={() => setShowAddForm((v) => !v)}>
           {dict.admin.addUser}
         </Button>
@@ -383,6 +442,30 @@ export function UserManagementTable({
           </table>
         )}
       </Card>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 text-sm">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={page <= 1}
+            onClick={() => goToFilters({ page: page - 1 })}
+          >
+            {dict.admin.previousPage}
+          </Button>
+          <span className="text-muted">
+            {dict.admin.pageOf.replace("{page}", String(page)).replace("{total}", String(totalPages))}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={page >= totalPages}
+            onClick={() => goToFilters({ page: page + 1 })}
+          >
+            {dict.admin.nextPage}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

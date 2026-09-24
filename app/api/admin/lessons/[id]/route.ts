@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { adminUpdateLessonSchema } from "@/lib/auth/schemas";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { logAdminAction } from "@/lib/auth/audit-log";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin();
@@ -26,6 +27,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       objectivesEn: JSON.stringify(objectivesEn),
       objectivesAr: JSON.stringify(objectivesAr),
     },
+  });
+
+  await logAdminAction({
+    adminId: admin.id,
+    action: "lesson.update",
+    targetType: "lesson",
+    targetId: lesson.id,
+    detail: lesson.titleEn,
   });
 
   return NextResponse.json({ lesson: { id: lesson.id } });
