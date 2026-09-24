@@ -5,6 +5,7 @@ import { createSession } from "@/lib/auth/session";
 import { loginSchema } from "@/lib/auth/schemas";
 import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
 import { sendEmail } from "@/lib/email/send";
+import { failedLoginAlertEmail, newDeviceLoginAlertEmail } from "@/lib/email/templates";
 import { sendPasswordResetEmail } from "@/lib/auth/send-reset-email";
 import {
   isCurrentlyLocked,
@@ -50,20 +51,14 @@ export async function POST(req: NextRequest) {
     const { lockedNow, email, fullName } = await recordFailedAttempt(user.id, ip);
 
     if (lockedNow) {
-      await sendPasswordResetEmail({ id: user.id, email, fullName }, req.nextUrl.origin);
+      await sendPasswordResetEmail({ id: user.id, email, fullName }, req.nextUrl.origin, "lockout");
     } else {
       try {
-        await sendEmail({
-          to: email,
-          subject: "Failed login attempt / محاولة تسجيل دخول فاشلة",
-          html: `
-            <p>Hi ${fullName},</p>
-            <p>Someone just tried to log into your E-nursing account with an incorrect password. If this wasn't you, consider changing your password.</p>
-            <hr />
-            <p dir="rtl">مرحبًا ${fullName}،</p>
-            <p dir="rtl">حاول أحدهم للتو تسجيل الدخول إلى حسابك في E-nursing بكلمة مرور غير صحيحة. إذا لم تكن أنت، ننصحك بتغيير كلمة المرور.</p>
-          `,
+        const { subject, html } = failedLoginAlertEmail({
+          fullName,
+          secureAccountUrl: `${req.nextUrl.origin}/forgot-password`,
         });
+        await sendEmail({ to: email, subject, html });
       } catch (err) {
         console.error("[email] Failed to send failed-login alert:", err);
       }
@@ -76,8 +71,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "emailNotVerified" }, { status: 403 });
   }
 
-  await recordSuccessfulLogin(user.id, ip);
+  const { isNewDevice } = await recordSuccessfulLogin(user.id, ip);
   await createSession(user.id);
+
+  if (isNewDevice) {
+    try {
+      const { subject, html } = newDeviceLoginAlertEmail({
+        fullName: user.fullName,
+        ip,
+        time: new Date().toLocaleString("ar-OM", { dateStyle: "medium", timeStyle: "short" }),
+        secureAccountUrl: `${req.nextUrl.origin}/forgot-password`,
+      });
+      await sendEmail({ to: user.email, subject, html });
+    } catch (err) {
+      console.error("[email] Failed to send new-device login alert:", err);
+    }
+  }
 
   return NextResponse.json({
     user: { id: user.id, fullName: user.fullName, username: user.username },

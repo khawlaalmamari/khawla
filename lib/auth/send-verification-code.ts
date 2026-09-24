@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email/send";
+import { verificationCodeEmail } from "@/lib/email/templates";
 
 const CODE_TTL_MINUTES = 10;
 
@@ -24,21 +25,12 @@ export async function sendVerificationCode(user: {
 
   let sent = false;
   try {
-    const result = await sendEmail({
-      to: user.email,
-      subject: "Your E-nursing verification code / رمز التفعيل الخاص بك",
-      html: `
-        <p>Hi ${user.fullName},</p>
-        <p>Your E-nursing verification code is:</p>
-        <p style="font-size:28px;font-weight:bold;letter-spacing:6px;">${code}</p>
-        <p>This code expires in ${CODE_TTL_MINUTES} minutes.</p>
-        <hr />
-        <p dir="rtl">مرحبًا ${user.fullName}،</p>
-        <p dir="rtl">رمز التفعيل الخاص بك في منصة E-nursing هو:</p>
-        <p dir="rtl" style="font-size:28px;font-weight:bold;letter-spacing:6px;">${code}</p>
-        <p dir="rtl">صلاحية الرمز ${CODE_TTL_MINUTES} دقائق.</p>
-      `,
+    const { subject, html } = verificationCodeEmail({
+      fullName: user.fullName,
+      code,
+      minutes: CODE_TTL_MINUTES,
     });
+    const result = await sendEmail({ to: user.email, subject, html });
     sent = result.sent;
   } catch (err) {
     console.error("[email] Failed to send verification code:", err);

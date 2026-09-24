@@ -58,7 +58,18 @@ export async function recordFailedAttempt(
   return { lockedNow, email: user.email, fullName: user.fullName };
 }
 
-export async function recordSuccessfulLogin(userId: string, ipAddress: string) {
+export async function recordSuccessfulLogin(
+  userId: string,
+  ipAddress: string,
+): Promise<{ isNewDevice: boolean }> {
+  const [priorSuccessCount, priorSuccessFromThisIp] = await Promise.all([
+    prisma.loginEvent.count({ where: { userId, success: true } }),
+    prisma.loginEvent.findFirst({ where: { userId, success: true, ipAddress } }),
+  ]);
+  // Only flag as a "new device" alert once the user has an established login
+  // history elsewhere — their very first login ever is expected, not suspicious.
+  const isNewDevice = priorSuccessCount > 0 && !priorSuccessFromThisIp;
+
   await prisma.user.update({
     where: { id: userId },
     data: { failedLoginCount: 0, lockedUntil: null, lastLoginAt: new Date() },
@@ -77,4 +88,6 @@ export async function recordSuccessfulLogin(userId: string, ipAddress: string) {
       bodyAr: `تم تسجيل دخول ناجح من العنوان ${ipAddress} في ${new Date().toLocaleString("ar")}.`,
     },
   });
+
+  return { isNewDevice };
 }

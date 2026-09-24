@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/auth/session";
 import { verifyCodeSchema } from "@/lib/auth/schemas";
 import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
+import { sendEmail } from "@/lib/email/send";
+import { welcomeEmail } from "@/lib/email/templates";
 
 const MAX_CODE_ATTEMPTS = 5;
 
@@ -61,6 +63,16 @@ export async function POST(req: NextRequest) {
   });
 
   await createSession(user.id);
+
+  try {
+    const { subject, html } = welcomeEmail({
+      fullName: user.fullName,
+      loginUrl: `${req.nextUrl.origin}/dashboard`,
+    });
+    await sendEmail({ to: user.email, subject, html });
+  } catch (err) {
+    console.error("[email] Failed to send welcome email:", err);
+  }
 
   return NextResponse.json({ ok: true });
 }
