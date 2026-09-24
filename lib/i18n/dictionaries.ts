@@ -223,7 +223,9 @@ export const ar = {
     doneManualHint: "يمكنك إلغاء هذا التحديد بالضغط على الزر مرة أخرى.",
     doneAuto: "تم إنجاز هذا الموديل تلقائيًا لأنك اجتزتِ اختباره بنجاح.",
     mindMapTitle: "الخريطة الذهنية التفاعلية",
-    mindMapHint: "اسحبي لتحريك الخريطة، وكبّري أو صغّري بعجلة الفأرة. اضغطي على أي درس لعرض أو إخفاء مصطلحاته.",
+    mindMapHint: "اضغطي على أي فرع ملوّن لعرض أو إخفاء مصطلحاته، ويمكنك تحميل الخريطة كاملة كملف PDF للمراجعة لاحقًا.",
+    mindMapDownloadPdf: "تصدير كـ PDF",
+    mindMapExporting: "جارٍ التجهيز...",
   },
   quiz: {
     question: "السؤال",
@@ -599,7 +601,9 @@ export const en: Dictionary = {
     doneManualHint: "You can undo this by clicking the button again.",
     doneAuto: "This module was automatically marked done because you passed its quiz.",
     mindMapTitle: "Interactive Mind Map",
-    mindMapHint: "Drag to pan, scroll to zoom. Click a lesson to show or hide its terms.",
+    mindMapHint: "Click a colored branch to show or hide its terms. You can download the full map as a PDF to review later.",
+    mindMapDownloadPdf: "Download PDF",
+    mindMapExporting: "Preparing...",
   },
   quiz: {
     question: "Question",
