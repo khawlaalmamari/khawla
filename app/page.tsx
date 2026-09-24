@@ -5,6 +5,8 @@ import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
 import { LogoIcon } from "@/components/logo";
+import { TypewriterWords } from "@/components/typewriter-words";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 export default async function LandingPage() {
   const locale = await getServerLocale();
@@ -20,23 +22,65 @@ export default async function LandingPage() {
         <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 to-background">
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
             <div>
-              <p className="mb-3 inline-block rounded-full bg-primary-100 px-4 py-1 text-sm font-semibold text-primary-800">
+              <p
+                className="animate-fade-in-up mb-3 inline-block rounded-full bg-primary-100 px-4 py-1 text-sm font-semibold text-primary-800"
+                style={{ animationDelay: "0ms" }}
+              >
                 {meta.tagline}
               </p>
-              <h1 className="text-3xl font-extrabold leading-tight text-primary-900 sm:text-4xl lg:text-5xl">
+              <h1
+                className="animate-fade-in-up text-3xl font-extrabold leading-tight text-primary-900 sm:text-4xl lg:text-5xl"
+                style={{ animationDelay: "100ms" }}
+              >
                 {meta.siteName}
               </h1>
-              <p className="mt-6 whitespace-pre-line text-base leading-8 text-foreground/90">
+              <p
+                className="animate-fade-in-up mt-3 text-lg font-semibold text-primary-700 sm:text-xl"
+                style={{ animationDelay: "180ms" }}
+              >
+                {landing.heroRotatingPrefix}{" "}
+                <span className="text-primary-900">
+                  <TypewriterWords words={landing.heroRotatingWords} />
+                </span>
+              </p>
+              <p
+                className="animate-fade-in-up mt-6 whitespace-pre-line text-base leading-8 text-foreground/90"
+                style={{ animationDelay: "260ms" }}
+              >
                 {landing.heroDescription}
               </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <ButtonLink href="/signup" variant="primary">
+              <div
+                className="animate-fade-in-up mt-8 flex flex-wrap gap-4"
+                style={{ animationDelay: "340ms" }}
+              >
+                <ButtonLink href="/signup" variant="primary" className="animate-cta-pulse">
                   {landing.ctaStart}
                 </ButtonLink>
               </div>
             </div>
 
             <div className="relative mx-auto aspect-square w-full max-w-md">
+              <span
+                className="animate-float absolute -start-2 top-4 hidden text-4xl opacity-70 sm:block"
+                style={{ animationDelay: "0s" }}
+                aria-hidden
+              >
+                📖
+              </span>
+              <span
+                className="animate-float absolute end-0 top-1/3 hidden text-3xl opacity-70 sm:block"
+                style={{ animationDelay: "1.2s" }}
+                aria-hidden
+              >
+                🎓
+              </span>
+              <span
+                className="animate-float absolute bottom-6 start-8 hidden text-3xl opacity-70 sm:block"
+                style={{ animationDelay: "2.1s" }}
+                aria-hidden
+              >
+                ✏️
+              </span>
               <HeroIllustration />
             </div>
           </div>
@@ -48,14 +92,16 @@ export default async function LandingPage() {
             {landing.discoverTitle}
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {landing.features.map((feature) => (
-              <Card key={feature.title} className="flex flex-col gap-3">
-                <span className="text-3xl" aria-hidden>
-                  {feature.icon}
-                </span>
-                <h3 className="text-lg font-bold">{feature.title}</h3>
-                <p className="text-sm leading-6 text-muted">{feature.body}</p>
-              </Card>
+            {landing.features.map((feature, i) => (
+              <ScrollReveal key={feature.title} delayMs={i * 80}>
+                <Card className="flex h-full flex-col gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                  <span className="text-3xl" aria-hidden>
+                    {feature.icon}
+                  </span>
+                  <h3 className="text-lg font-bold">{feature.title}</h3>
+                  <p className="text-sm leading-6 text-muted">{feature.body}</p>
+                </Card>
+              </ScrollReveal>
             ))}
           </div>
         </section>
@@ -68,11 +114,16 @@ export default async function LandingPage() {
             </h2>
             <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {landing.steps.map((step, i) => (
-                <li key={step} className="relative rounded-2xl bg-background p-6 shadow-sm">
-                  <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-lg font-bold text-white">
-                    {i + 1}
-                  </span>
-                  <p className="text-sm leading-6">{step}</p>
+                <li key={step} className="h-full">
+                  <ScrollReveal
+                    delayMs={i * 100}
+                    className="relative h-full rounded-2xl bg-background p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  >
+                    <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-lg font-bold text-white">
+                      {i + 1}
+                    </span>
+                    <p className="text-sm leading-6">{step}</p>
+                  </ScrollReveal>
                 </li>
               ))}
             </ol>
@@ -81,10 +132,14 @@ export default async function LandingPage() {
 
         {/* Closing CTA */}
         <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
-          <p className="text-lg font-semibold text-primary-800">{landing.heroShort}</p>
-          <div className="mt-6">
-            <ButtonLink href="/signup">{landing.ctaStart}</ButtonLink>
-          </div>
+          <ScrollReveal>
+            <p className="text-lg font-semibold text-primary-800">{landing.heroShort}</p>
+            <div className="mt-6">
+              <ButtonLink href="/signup" className="animate-cta-pulse">
+                {landing.ctaStart}
+              </ButtonLink>
+            </div>
+          </ScrollReveal>
         </section>
       </main>
 

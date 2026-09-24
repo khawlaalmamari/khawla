@@ -25,6 +25,8 @@ export const ar = {
       "مرحبًا بك في E-nursing، منصتك التعليمية الطبية الذكية المصممة خصيصًا لدعم طلاب التمريض في السنة الأولى بسلطنة عُمان.\n\nهنا، تتحول دراسة جسم الإنسان من مجرد معلومات للحفظ إلى رحلة تفاعلية لاكتشاف أسرار التشريح وفهم وظائف الأعضاء، من خلال شروحات علمية مبسطة، ومجسمات ثلاثية الأبعاد، واختبارات ذكية، وحالات سريرية تساعدك على ربط المعرفة الطبية بالتفكير السريري.\n\nمع E-nursing، يمكنك تنظيم مذاكرتك، والتدرّب على الأسئلة، واكتشاف نقاط قوتك، وتطوير مستواك الأكاديمي خطوة بخطوة، بمساعدة مدرّسك الذكي «اسأل نوفيا» الذي يرافقك في رحلة التعلّم ويبسّط لك المفاهيم الصعبة بالعربية والإنجليزية.\n\nلا تكتفِ بحفظ المعلومة، بل افهمها، واربطها، وتعلّم كيف تفكّر كممرض المستقبل.\nرحلتك نحو التميّز في التمريض تبدأ من هنا.",
     heroShort:
       "E-nursing — افهم جسم الإنسان، وطوّر تفكيرك السريري، واصنع مستقبلك في التمريض.",
+    heroRotatingPrefix: "في E-nursing تتعلّم",
+    heroRotatingWords: ["تشريح جسم الإنسان", "علم وظائف الأعضاء", "التفكير السريري", "أساسيات التمريض"],
     ctaStart: "ابدأ رحلتك التعليمية",
     discoverTitle: "اكتشف تجربة التعلّم",
     howItWorksTitle: "كيف تعمل المنصة؟",
@@ -304,6 +306,8 @@ export const en: Dictionary = {
       "Welcome to E-nursing, your smart medical learning platform built specifically to support first-year nursing students in the Sultanate of Oman.\n\nHere, studying the human body turns from rote memorization into an interactive journey of discovering the secrets of anatomy and understanding how organs function — through simplified scientific explanations, interactive 3D models, smart quizzes, and clinical cases that help you connect medical knowledge to clinical thinking.\n\nWith E-nursing, you can organize your study time, practice with questions, discover your strengths, and build your academic level step by step, guided by your smart tutor \"Ask Novia\", who walks with you through your learning journey and simplifies difficult concepts in both Arabic and English.\n\nDon't just memorize information — understand it, connect it, and learn how to think like the nurse of the future.\nYour journey toward excellence in nursing starts here.",
     heroShort:
       "E-nursing — Understand the human body, build your clinical thinking, and shape your future in nursing.",
+    heroRotatingPrefix: "With E-nursing, learn",
+    heroRotatingWords: ["Human Anatomy", "Physiology", "Clinical Thinking", "Nursing Fundamentals"],
     ctaStart: "Start Your Learning Journey",
     discoverTitle: "Discover the Learning Experience",
     howItWorksTitle: "How Does the Platform Work?",
