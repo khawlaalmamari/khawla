@@ -2,10 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
+import { checkRateLimit } from "@/lib/auth/rate-limit";
+
+// The only legitimate source of imageUrl is /api/messages/upload, which
+// always returns a Vercel Blob URL — never a client-typed one. Restricting
+// to that origin stops a message from embedding an arbitrary external URL
+// (a tracking pixel, or unrelated content) that a recipient's browser,
+// including an admin's, would silently fetch when they open the message.
+function isOwnBlobUrl(url: string): boolean {
+  try {
+    return new URL(url).hostname.endsWith(".public.blob.vercel-storage.com");
+  } catch {
+    return false;
+  }
+}
 
 const bodyFields = {
   body: z.string().trim().min(1).max(1000),
-  imageUrl: z.string().url().optional(),
+  imageUrl: z.string().url().refine(isOwnBlobUrl, "imageUrl must be this app's own uploaded file").optional(),
 };
 
 const schema = z.discriminatedUnion("recipientType", [
@@ -28,6 +42,11 @@ const schema = z.discriminatedUnion("recipientType", [
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const rl = checkRateLimit(`messages:${user.id}`, { limit: 20, windowMs: 15 * 60 * 1000 });
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "rateLimited" }, { status: 429 });
+  }
 
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {

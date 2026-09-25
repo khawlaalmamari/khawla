@@ -5,10 +5,16 @@ import { buildUserWhere, type UserStatusFilter } from "@/lib/admin/user-filters"
 import { isCurrentlyLocked } from "@/lib/auth/login-guard";
 
 function csvEscape(value: string): string {
-  if (/[",\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
+  // Neutralize formula injection: a user-controlled fullName/username
+  // starting with =, +, -, or @ would otherwise be evaluated as a live
+  // formula (e.g. =HYPERLINK(...)) when the admin opens this file in
+  // Excel/Sheets. Prefixing with a single quote forces it to be read as
+  // literal text everywhere without changing what the cell displays.
+  const safe = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  if (/[",\n]/.test(safe)) {
+    return `"${safe.replace(/"/g, '""')}"`;
   }
-  return value;
+  return safe;
 }
 
 export async function GET(req: NextRequest) {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email/send";
 import { studyReminderEmail, examReminderEmail, SITE_ORIGIN } from "@/lib/email/templates";
@@ -6,6 +7,17 @@ import { studyReminderEmail, examReminderEmail, SITE_ORIGIN } from "@/lib/email/
 const OMAN_UTC_OFFSET_HOURS = 4;
 const DAILY_MIN_GAP_MS = 20 * 60 * 60 * 1000; // 20h: allows next day, blocks re-fires same hour
 const WEEKLY_MIN_GAP_MS = 6.5 * 24 * 60 * 60 * 1000;
+
+// timingSafeEqual throws on mismatched lengths, so the length check must
+// come first — a plain `!==` here would compare the request's actual
+// authorization header byte-by-byte against the real secret otherwise,
+// letting the secret be recovered a character at a time from response
+// timing over enough requests.
+function isValidCronSecret(provided: string | null, expected: string): boolean {
+  const expectedHeader = `Bearer ${expected}`;
+  if (!provided || provided.length !== expectedHeader.length) return false;
+  return timingSafeEqual(Buffer.from(provided), Buffer.from(expectedHeader));
+}
 
 /**
  * Vercel Cron target: sends each student's chosen daily/weekly study-plan
@@ -24,7 +36,7 @@ export async function GET(req: NextRequest) {
   if (!secret) {
     return NextResponse.json({ error: "cronNotConfigured" }, { status: 503 });
   }
-  if (req.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!isValidCronSecret(req.headers.get("authorization"), secret)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

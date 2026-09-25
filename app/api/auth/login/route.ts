@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { verifyPassword } from "@/lib/auth/password";
+import { verifyPassword, wastePasswordVerifyTime } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
 import { loginSchema } from "@/lib/auth/schemas";
 import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
@@ -35,11 +35,20 @@ export async function POST(req: NextRequest) {
   });
 
   // Constant response shape whether or not the account exists, to avoid
-  // leaking which identifiers are registered.
+  // leaking which identifiers are registered. Skipping bcrypt entirely for
+  // a nonexistent identifier would otherwise make this path measurably
+  // faster than a wrong-password attempt on a real account, leaking the
+  // same thing through timing instead — so we still do an equivalent-cost
+  // dummy comparison here.
   if (!user) {
+    await wastePasswordVerifyTime();
     return NextResponse.json({ error: "invalidCredentials" }, { status: 401 });
   }
 
+  // Note: a locked account still gets its own distinct status below (real
+  // users need to know why they're blocked, since a lockout email was just
+  // sent to them) — that necessarily reveals the identifier is registered
+  // to anyone who trips it, which is an accepted, deliberate trade-off.
   if (isCurrentlyLocked(user)) {
     return NextResponse.json(
       { error: "accountLocked", minutes: minutesUntilUnlock(user) },
