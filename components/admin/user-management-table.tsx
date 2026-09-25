@@ -96,6 +96,8 @@ export function UserManagementTable({
         return dict.auth.errors.usernameTaken;
       case "invalidUsername":
         return dict.auth.errors.invalidUsername;
+      case "weakPassword":
+        return dict.auth.errors.weakPasswordRejected;
       case "cannotDeleteSelf":
         return dict.admin.cannotDeleteSelf;
       default:

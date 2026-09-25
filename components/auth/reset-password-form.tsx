@@ -7,6 +7,7 @@ import { useLocale } from "@/components/locale-provider";
 import { Field, inputClass } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { isStrongPassword } from "@/lib/auth/password-strength";
+import { PasswordRulesChecklist, PasswordMatchIndicator } from "@/components/auth/password-checklist";
 
 export function ResetPasswordForm({ token }: { token: string }) {
   const { dict } = useLocale();
@@ -16,6 +17,9 @@ export function ResetPasswordForm({ token }: { token: string }) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+
+  const passwordsReady =
+    isStrongPassword(password) && confirmPassword.length > 0 && password === confirmPassword;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,7 +42,9 @@ export function ResetPasswordForm({ token }: { token: string }) {
         body: JSON.stringify({ token, password, confirmPassword }),
       });
       if (!res.ok) {
-        setError(dict.auth.errors.genericError);
+        const data = await res.json().catch(() => null);
+        if (data?.error === "weakPassword") setError(dict.auth.errors.weakPasswordRejected);
+        else setError(dict.auth.errors.genericError);
         return;
       }
       setDone(true);
@@ -78,7 +84,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <p className="text-xs text-muted">{dict.auth.errors.weakPassword}</p>
+        <PasswordRulesChecklist password={password} />
       </Field>
       <Field label={dict.auth.confirmPasswordLabel} htmlFor="confirmPassword">
         <input
@@ -90,8 +96,9 @@ export function ResetPasswordForm({ token }: { token: string }) {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
+        <PasswordMatchIndicator password={password} confirmPassword={confirmPassword} />
       </Field>
-      <Button type="submit" disabled={submitting} className="w-full">
+      <Button type="submit" disabled={submitting || !passwordsReady} className="w-full">
         {dict.auth.sendResetLink}
       </Button>
     </form>

@@ -83,3 +83,14 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
     message: "passwordMismatch",
   });
+
+/**
+ * True if a failed parse is specifically about the password/confirmPassword
+ * fields (too weak, or mismatched) rather than some other field. Routes use
+ * this to answer a bypassed frontend with one fixed, generic message
+ * instead of echoing zod's internal issue details back to the client.
+ */
+export function isPasswordValidationError(error: z.ZodError): boolean {
+  const fieldErrors = error.flatten().fieldErrors as Record<string, unknown>;
+  return "password" in fieldErrors || "confirmPassword" in fieldErrors;
+}

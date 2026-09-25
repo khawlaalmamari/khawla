@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth/password";
-import { adminCreateUserSchema } from "@/lib/auth/schemas";
+import { adminCreateUserSchema, isPasswordValidationError } from "@/lib/auth/schemas";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { logAdminAction } from "@/lib/auth/audit-log";
 
@@ -14,6 +14,9 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const parsed = adminCreateUserSchema.safeParse(body);
   if (!parsed.success) {
+    if (isPasswordValidationError(parsed.error)) {
+      return NextResponse.json({ error: "weakPassword" }, { status: 400 });
+    }
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 

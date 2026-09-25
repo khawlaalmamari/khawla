@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth/password";
-import { signupSchema } from "@/lib/auth/schemas";
+import { signupSchema, isPasswordValidationError } from "@/lib/auth/schemas";
 import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
 import { sendVerificationCode } from "@/lib/auth/send-verification-code";
 
@@ -15,10 +15,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const parsed = signupSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "validation", issues: parsed.error.flatten() },
-      { status: 400 },
-    );
+    // A weak/mismatched password gets one fixed, generic message — this is
+    // the backend's own re-check, independent of (and reached whenever
+    // someone bypasses) the frontend's live checklist and disabled button.
+    if (isPasswordValidationError(parsed.error)) {
+      return NextResponse.json({ error: "weakPassword" }, { status: 400 });
+    }
+    return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 
   const { fullName, username, email, password, locale } = parsed.data;

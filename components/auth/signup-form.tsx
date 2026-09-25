@@ -6,6 +6,7 @@ import { useLocale } from "@/components/locale-provider";
 import { Field, inputClass } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { isStrongPassword } from "@/lib/auth/password-strength";
+import { PasswordRulesChecklist, PasswordMatchIndicator } from "@/components/auth/password-checklist";
 import { VerificationCodeForm } from "@/components/auth/verification-code-form";
 
 export function SignupForm() {
@@ -26,6 +27,11 @@ export function SignupForm() {
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
   }
+
+  const passwordsReady =
+    isStrongPassword(form.password) &&
+    form.confirmPassword.length > 0 &&
+    form.password === form.confirmPassword;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,6 +62,7 @@ export function SignupForm() {
       if (!res.ok) {
         if (data.error === "emailTaken") setError(dict.auth.errors.emailTaken);
         else if (data.error === "usernameTaken") setError(dict.auth.errors.usernameTaken);
+        else if (data.error === "weakPassword") setError(dict.auth.errors.weakPasswordRejected);
         else setError(dict.auth.errors.genericError);
         return;
       }
@@ -132,7 +139,7 @@ export function SignupForm() {
             {showPassword ? dict.auth.hidePassword : dict.auth.showPassword}
           </button>
         </div>
-        <p className="text-xs text-muted">{dict.auth.errors.weakPassword}</p>
+        <PasswordRulesChecklist password={form.password} />
       </Field>
 
       <Field label={dict.auth.confirmPasswordLabel} htmlFor="confirmPassword">
@@ -145,9 +152,10 @@ export function SignupForm() {
           value={form.confirmPassword}
           onChange={(e) => update("confirmPassword", e.target.value)}
         />
+        <PasswordMatchIndicator password={form.password} confirmPassword={form.confirmPassword} />
       </Field>
 
-      <Button type="submit" disabled={submitting} className="w-full">
+      <Button type="submit" disabled={submitting || !passwordsReady} className="w-full">
         {dict.auth.signupButton}
       </Button>
 

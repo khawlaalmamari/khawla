@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth/password";
-import { resetPasswordSchema } from "@/lib/auth/schemas";
+import { resetPasswordSchema, isPasswordValidationError } from "@/lib/auth/schemas";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const parsed = resetPasswordSchema.safeParse(body);
   if (!parsed.success) {
+    if (isPasswordValidationError(parsed.error)) {
+      return NextResponse.json({ error: "weakPassword" }, { status: 400 });
+    }
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 
