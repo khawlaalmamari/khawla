@@ -12,6 +12,7 @@ import { ProgressRing } from "@/components/dashboard/progress-ring";
 import { ScoreTrendChart } from "@/components/dashboard/score-trend-chart";
 import { ModuleBestScoresChart } from "@/components/dashboard/module-best-scores-chart";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { PracticeWithNoviaButton } from "@/components/dashboard/practice-with-novia-button";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -20,14 +21,26 @@ export default async function DashboardPage() {
   const locale = await getServerLocale();
   const dict = getDictionary(locale);
   const data = await getDashboardData(user.id);
+  // The built-in Novia widget (which "Practice with Novia" talks to via a
+  // window event) only renders when Tidio isn't configured — see
+  // app/layout.tsx. When Tidio is active there's no listener to receive
+  // the deep-link event, so skip offering the button in that case.
+  const noviaWidgetActive = !process.env.NEXT_PUBLIC_TIDIO_PUBLIC_KEY;
 
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-4 py-10 sm:px-6">
-        <h1 className="text-2xl font-bold">
-          {dict.dashboard.welcome.replace("{name}", user.fullName)}
-        </h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-bold">
+            {dict.dashboard.welcome.replace("{name}", user.fullName)}
+          </h1>
+          <Badge tone={data.learningStreak > 0 ? "accent" : "neutral"}>
+            {data.learningStreak > 0
+              ? dict.dashboard.learningStreakLabel.replace("{days}", String(data.learningStreak))
+              : dict.dashboard.noStreakYet}
+          </Badge>
+        </div>
 
         {/* Top stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -151,6 +164,82 @@ export default async function DashboardPage() {
             )}
           </Card>
         </div>
+
+        {/* Strong / weak areas */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <h2 className="text-lg font-bold">{dict.dashboard.strongAreas}</h2>
+            {data.strongModules.length === 0 ? (
+              <p className="mt-4 text-sm text-muted">{dict.dashboard.noStrongAreasYet}</p>
+            ) : (
+              <ul className="mt-4 space-y-2">
+                {data.strongModules.map((r) => (
+                  <li
+                    key={r.id}
+                    className="flex items-center justify-between rounded-lg bg-surface px-3 py-2 text-sm"
+                  >
+                    <span>{locale === "ar" ? r.module.titleAr : r.module.titleEn}</span>
+                    <Badge tone="success">{r.bestScorePercent}%</Badge>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+          <Card>
+            <h2 className="text-lg font-bold">{dict.dashboard.weakAreas}</h2>
+            {data.weakModules.length === 0 ? (
+              <p className="mt-4 text-sm text-muted">{dict.dashboard.noWeakAreasYet}</p>
+            ) : (
+              <ul className="mt-4 space-y-2">
+                {data.weakModules.map((r) => (
+                  <li
+                    key={r.id}
+                    className="flex items-center justify-between rounded-lg bg-surface px-3 py-2 text-sm"
+                  >
+                    <span>{locale === "ar" ? r.module.titleAr : r.module.titleEn}</span>
+                    <Badge tone="danger">{r.bestScorePercent}%</Badge>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </div>
+
+        {/* Recommended for you */}
+        {data.recommendedModule && (
+          <Card>
+            <h2 className="text-lg font-bold">{dict.dashboard.recommendedForYou}</h2>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-medium">
+                  {locale === "ar"
+                    ? data.recommendedModule.titleAr
+                    : data.recommendedModule.titleEn}
+                </p>
+                <p className="text-sm text-muted">
+                  {data.recommendedModule.reason === "continue"
+                    ? dict.dashboard.recommendedReasonContinue
+                    : dict.dashboard.recommendedReasonReview}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <ButtonLink
+                  href={`/${data.recommendedModule.courseSlug}/${data.recommendedModule.moduleSlug}`}
+                  variant="outline"
+                  className="!px-3 !py-1.5 text-xs"
+                >
+                  {dict.dashboard.goToLesson}
+                </ButtonLink>
+                {data.recommendedModule.reason === "review" && noviaWidgetActive && (
+                  <PracticeWithNoviaButton
+                    topicEn={data.recommendedModule.titleEn}
+                    topicAr={data.recommendedModule.titleAr}
+                  />
+                )}
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Study plan */}
         <Card>

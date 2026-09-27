@@ -19,12 +19,30 @@ export function NoviaWidget() {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [messages, loading]);
 
-  async function send() {
-    const text = input.trim();
+  // Keep a stable ref to the latest send() so the window listener below
+  // (subscribed once) never calls a stale closure over sessionId/loading.
+  const sendRef = useRef(send);
+  useEffect(() => {
+    sendRef.current = send;
+  });
+
+  useEffect(() => {
+    function onAsk(e: Event) {
+      const detail = (e as CustomEvent<string>).detail;
+      if (!detail) return;
+      setOpen(true);
+      sendRef.current(detail);
+    }
+    window.addEventListener("novia:ask", onAsk);
+    return () => window.removeEventListener("novia:ask", onAsk);
+  }, []);
+
+  async function send(overrideText?: string) {
+    const text = (overrideText ?? input).trim();
     if (!text || loading) return;
 
     setMessages((m) => [...m, { role: "user", content: text }]);
-    setInput("");
+    if (overrideText === undefined) setInput("");
     setLoading(true);
     setError(null);
 

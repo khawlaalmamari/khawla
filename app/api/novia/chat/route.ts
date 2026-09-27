@@ -4,6 +4,22 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getNoviaReply } from "@/lib/novia/reply";
 import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
+import { getWeakStrongModules } from "@/lib/dashboard/queries";
+
+function buildStudentContext(
+  strong: { titleEn: string; bestScorePercent: number }[],
+  weak: { titleEn: string; bestScorePercent: number }[],
+): string | undefined {
+  if (strong.length === 0 && weak.length === 0) return undefined;
+  const parts: string[] = [];
+  if (strong.length > 0) {
+    parts.push(`Strong: ${strong.map((m) => `${m.titleEn} (${m.bestScorePercent}%)`).join(", ")}.`);
+  }
+  if (weak.length > 0) {
+    parts.push(`Weak: ${weak.map((m) => `${m.titleEn} (${m.bestScorePercent}%)`).join(", ")}.`);
+  }
+  return parts.join(" ");
+}
 
 const schema = z.object({
   message: z.string().trim().min(1).max(2000),
@@ -53,7 +69,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const result = await getNoviaReply(message, history);
+    let studentContext: string | undefined;
+    if (user) {
+      const { strong, weak } = await getWeakStrongModules(user.id);
+      studentContext = buildStudentContext(strong, weak);
+    }
+    const result = await getNoviaReply(message, history, studentContext);
 
     if (!result.configured) {
       return NextResponse.json({ configured: false, sessionId });
