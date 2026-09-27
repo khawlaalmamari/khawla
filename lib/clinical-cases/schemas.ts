@@ -47,3 +47,20 @@ export const updateAttemptSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("saveNotes"), notes: z.string().max(5000) }),
   z.object({ action: z.literal("endInterview") }),
 ]);
+
+// Phase 2C — Step 5/14: the only client input for an assessment request
+// is which type to request; the server looks up the actual result from
+// the case's own data, never from the request body.
+export const assessmentTypeSchema = z.enum([
+  "VITAL_SIGNS",
+  "GENERAL_INSPECTION",
+  "RESPIRATORY",
+  "CARDIOVASCULAR",
+  "PAIN",
+  "PALPATION",
+  "AUSCULTATION",
+]);
+
+export const requestAssessmentSchema = z.object({
+  type: assessmentTypeSchema,
+});

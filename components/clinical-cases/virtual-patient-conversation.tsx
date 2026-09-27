@@ -4,8 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import type { AttemptView } from "@/lib/clinical-cases/queries";
-import type { ConversationMessageDTO, InterviewSummary, QuestionCategory } from "@/lib/clinical-cases/types";
-import { QUESTION_CATEGORIES } from "@/lib/clinical-cases/types";
+import type {
+  AssessmentType,
+  ConversationMessageDTO,
+  InterviewSummary,
+  QuestionCategory,
+} from "@/lib/clinical-cases/types";
+import { ASSESSMENT_TYPES, QUESTION_CATEGORIES } from "@/lib/clinical-cases/types";
+import { assessmentTypeLabel } from "@/lib/clinical-cases/labels";
+import { parseVitalSigns } from "@/lib/clinical-cases/assessment-format";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,6 +68,54 @@ function emotionalStateLabel(dict: Dictionary, state: EmotionalState): string {
   return dict.clinicalCases.emotionalStateCalm;
 }
 
+function isAssessmentType(category: string | null): category is AssessmentType {
+  return !!category && (ASSESSMENT_TYPES as readonly string[]).includes(category);
+}
+
+/** Structured rows for a VITAL_SIGNS result — plain findings, no
+ * interpretation (Step 7/10). */
+function VitalSignsResult({ dict, message }: { dict: Dictionary; message: string }) {
+  const vitals = parseVitalSigns(message);
+  if (!vitals) return <p className="text-sm">{message}</p>;
+
+  return (
+    <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
+      <div>
+        <dt className="text-xs text-muted">{dict.clinicalCases.temperatureLabel}</dt>
+        <dd className="font-semibold">
+          {dict.clinicalCases.temperatureUnit.replace("{value}", String(vitals.temperatureCelsius))}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-xs text-muted">{dict.clinicalCases.heartRateLabel}</dt>
+        <dd className="font-semibold">
+          {dict.clinicalCases.heartRateUnit.replace("{value}", String(vitals.heartRate))}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-xs text-muted">{dict.clinicalCases.bloodPressureLabel}</dt>
+        <dd className="font-semibold">
+          {dict.clinicalCases.bloodPressureUnit
+            .replace("{systolic}", String(vitals.bloodPressureSystolic))
+            .replace("{diastolic}", String(vitals.bloodPressureDiastolic))}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-xs text-muted">{dict.clinicalCases.respiratoryRateLabel}</dt>
+        <dd className="font-semibold">
+          {dict.clinicalCases.respiratoryRateUnit.replace("{value}", String(vitals.respiratoryRate))}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-xs text-muted">{dict.clinicalCases.oxygenSaturationLabel}</dt>
+        <dd className="font-semibold">
+          {dict.clinicalCases.oxygenSaturationUnit.replace("{value}", String(vitals.oxygenSaturation))}
+        </dd>
+      </div>
+    </dl>
+  );
+}
+
 export function VirtualPatientConversation({
   attempt,
   locale,
@@ -80,6 +135,7 @@ export function VirtualPatientConversation({
   const [status, setStatus] = useState(attempt.status);
   const [summary, setSummary] = useState<InterviewSummary | null>(null);
   const [ending, setEnding] = useState(false);
+  const [assessmentLoading, setAssessmentLoading] = useState<AssessmentType | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   const patient = attempt.visibleData.patientProfile;
@@ -125,6 +181,23 @@ export function VirtualPatientConversation({
     }
   }
 
+  async function requestAssessment(type: AssessmentType) {
+    if (status !== "IN_PROGRESS" || assessmentLoading) return;
+    setAssessmentLoading(type);
+    try {
+      const res = await fetch(`/api/clinical-case-attempts/${attempt.id}/assessments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setMessages((m) => [...m, data.studentMessage, data.resultMessage]);
+    } finally {
+      setAssessmentLoading(null);
+    }
+  }
+
   async function saveNotes() {
     setNotesSaving(true);
     setNotesSaved(false);
@@ -157,6 +230,9 @@ export function VirtualPatientConversation({
     }
   }
 
+  const conversationMessages = messages.filter((m) => !isAssessmentType(m.category));
+  const assessmentMessages = messages.filter((m) => m.role === "SYSTEM" && isAssessmentType(m.category));
+
   return (
     <div className="space-y-6">
       {/* Virtual Patient */}
@@ -167,6 +243,7 @@ export function VirtualPatientConversation({
             {dict.clinicalCases.emotionalStateLabel}: {emotionalStateLabel(dict, emotionalState)}
           </Badge>
         </div>
+        <p className="mt-1 text-xs text-muted">{dict.clinicalCases.fictionalDisclaimer}</p>
         <p className="mt-2 text-xl font-semibold">
           {locale === "ar" ? patient.name.ar : patient.name.en}
         </p>
@@ -200,10 +277,10 @@ export function VirtualPatientConversation({
           aria-label={dict.clinicalCases.conversationTitle}
           className="mt-4 max-h-96 space-y-3 overflow-y-auto"
         >
-          {messages.length === 0 && (
+          {conversationMessages.length === 0 && (
             <p className="text-sm text-muted">{dict.clinicalCases.conversationEmpty}</p>
           )}
-          {messages.map((m) => {
+          {conversationMessages.map((m) => {
             const isStudent = m.role === "STUDENT";
             return (
               <div
@@ -270,6 +347,45 @@ export function VirtualPatientConversation({
         </form>
       </Card>
 
+      {/* Clinical Assessment */}
+      <Card>
+        <h2 className="text-lg font-bold">{dict.clinicalCases.clinicalAssessmentTitle}</h2>
+        <p className="mt-1 text-sm text-muted">{dict.clinicalCases.requestAssessmentHint}</p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {attempt.availableAssessments.map((type) => {
+            const alreadyPerformed = assessmentMessages.some((m) => m.category === type);
+            return (
+              <button
+                key={type}
+                type="button"
+                onClick={() => requestAssessment(type)}
+                disabled={status !== "IN_PROGRESS" || assessmentLoading !== null}
+                className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-50"
+              >
+                {alreadyPerformed && "✓ "}
+                {assessmentTypeLabel(dict, type)}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {assessmentMessages.map((m) => (
+            <div key={m.id} className="rounded-lg bg-surface p-3">
+              <p className="mb-2 text-xs font-semibold text-muted">
+                {assessmentTypeLabel(dict, m.category as AssessmentType)}
+              </p>
+              {m.category === "VITAL_SIGNS" ? (
+                <VitalSignsResult dict={dict} message={m.message} />
+              ) : (
+                <p className="text-sm">{m.message}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </Card>
+
       {/* Clinical Notes */}
       <Card>
         <h2 className="text-lg font-bold">{dict.clinicalCases.clinicalNotesTitle}</h2>
@@ -331,6 +447,20 @@ export function VirtualPatientConversation({
                     {summary.informationDiscovered.map((category) => (
                       <Badge key={category} tone="success">
                         {chipLabel(dict, category)}
+                      </Badge>
+                    ))}
+                  </dd>
+                )}
+              </div>
+              <div className="sm:col-span-2">
+                <dt className="text-xs text-muted">{dict.clinicalCases.assessmentsPerformedLabel}</dt>
+                {summary.assessmentsPerformed.length === 0 ? (
+                  <dd className="mt-1 text-sm text-muted">{dict.clinicalCases.noAssessmentsPerformedYet}</dd>
+                ) : (
+                  <dd className="mt-2 flex flex-wrap gap-2">
+                    {summary.assessmentsPerformed.map((type) => (
+                      <Badge key={type} tone="success">
+                        {assessmentTypeLabel(dict, type)}
                       </Badge>
                     ))}
                   </dd>

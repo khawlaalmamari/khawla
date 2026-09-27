@@ -4,8 +4,9 @@
 // every response is either a scripted line from the case's own
 // hiddenData/visibleData, or the fixed "not sure" fallback below.
 
-import type { Bilingual, HiddenCaseData, QuestionCategory, VisibleCaseData } from "./types";
-import { QUESTION_CATEGORIES } from "./types";
+import type { AssessmentType, Bilingual, HiddenCaseData, QuestionCategory, VisibleCaseData } from "./types";
+import { ASSESSMENT_TYPES, QUESTION_CATEGORIES } from "./types";
+import { encodeVitalSigns } from "./assessment-format";
 
 const NOT_SURE: Bilingual = {
   en: "I'm not sure about that.",
@@ -110,4 +111,60 @@ export function nextEmotionalState(
     return "ANXIOUS";
   }
   return current;
+}
+
+// ---------------------------------------------------------------------
+// Phase 2C — Vital Signs + Physical Examination (Step 4-8)
+// ---------------------------------------------------------------------
+
+// Fixed, generic action phrasing for the student's side of an assessment
+// request (Step 8's example transcript pairs a "Student:" line with a
+// "System:" result line, same as the interview turns above). Not
+// case-specific — every case uses the same action wording; only the
+// finding that follows is case-specific.
+export const ASSESSMENT_ACTION_LABELS: Record<AssessmentType, Bilingual> = {
+  VITAL_SIGNS: { en: "Please measure the vital signs.", ar: "من فضلك، قِس العلامات الحيوية." },
+  GENERAL_INSPECTION: { en: "Let me perform a general inspection.", ar: "دعني أقوم بفحص عام للمريض." },
+  RESPIRATORY: { en: "Let me perform a respiratory assessment.", ar: "دعني أقوم بتقييم الجهاز التنفسي." },
+  CARDIOVASCULAR: { en: "Let me perform a cardiovascular assessment.", ar: "دعني أقوم بتقييم القلب والأوعية الدموية." },
+  PAIN: { en: "Let me assess the pain.", ar: "دعني أقيّم الألم." },
+  PALPATION: { en: "Let me palpate the area.", ar: "دعني أفحص المنطقة بالجس." },
+  AUSCULTATION: { en: "Let me listen with a stethoscope.", ar: "دعني أستمع بواسطة السماعة الطبية." },
+};
+
+/** Step 6/14 — an assessment type is only "supported" if this specific
+ * case's own hiddenData actually defines a result for it. Never assume
+ * every case supports every type. */
+export function isAssessmentSupported(hiddenData: HiddenCaseData, type: AssessmentType): boolean {
+  if (type === "VITAL_SIGNS") return !!hiddenData.assessments.vitalSigns;
+  return !!hiddenData.assessments.physicalExaminations[type];
+}
+
+/** Which assessment buttons a case's own data actually supports — for the
+ * UI to only ever show valid actions (Step 6), never a fixed list. */
+export function getAvailableAssessments(hiddenData: HiddenCaseData): AssessmentType[] {
+  return ASSESSMENT_TYPES.filter((type) => isAssessmentSupported(hiddenData, type));
+}
+
+/**
+ * Builds the locale-resolved result text for a supported assessment,
+ * using ONLY this case's own data — a plain finding, never a diagnosis or
+ * interpretation (Step 7). Vital signs are encoded as JSON so the exact
+ * numbers survive a reload; physical-exam findings are plain resolved
+ * text, same as an interview response. Returns null if unsupported —
+ * callers must check isAssessmentSupported first and never call this as a
+ * substitute for that check.
+ */
+export function buildAssessmentResult(
+  hiddenData: HiddenCaseData,
+  type: AssessmentType,
+  locale: "ar" | "en",
+): string | null {
+  if (type === "VITAL_SIGNS") {
+    const vitals = hiddenData.assessments.vitalSigns;
+    return vitals ? encodeVitalSigns(vitals) : null;
+  }
+  const finding = hiddenData.assessments.physicalExaminations[type];
+  if (!finding) return null;
+  return locale === "ar" ? finding.ar : finding.en;
 }

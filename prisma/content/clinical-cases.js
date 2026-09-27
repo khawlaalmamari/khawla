@@ -40,14 +40,6 @@ const clinicalCases = [
         { en: "Sweating (diaphoresis)", ar: "تعرّق شديد" },
         { en: "Mild nausea", ar: "غثيان خفيف" },
       ],
-      baselineVitals: {
-        heartRate: 102,
-        bloodPressureSystolic: 148,
-        bloodPressureDiastolic: 92,
-        respiratoryRate: 22,
-        temperatureCelsius: 37.1,
-        oxygenSaturation: 95,
-      },
       learningObjectives: [
         {
           en: "Take a structured, symptom-focused history for a patient with chest pain.",
@@ -118,6 +110,48 @@ const clinicalCases = [
         AGGRAVATING_FACTORS: { en: "It gets worse when I walk or move around.", ar: "يزداد سوءًا عندما أمشي أو أتحرك." },
         RELIEVING_FACTORS: { en: "Resting a bit seems to help slightly, but it doesn't go away.", ar: "الراحة قليلاً تساعد بعض الشيء، لكنه لا يختفي." },
         CHIEF_COMPLAINT: { en: "I've had this crushing pain in my chest for the last hour.", ar: "أشعر بألم ضاغط في صدري منذ ساعة تقريبًا." },
+      },
+      // Phase 2C — hidden until explicitly requested via "Measure Vital
+      // Signs" / a physical-examination action (Step 2/3/6/7). Values are
+      // fixed and clinically consistent with this case's narrative
+      // (tachycardic, hypertensive, mildly tachypneic, mildly low SpO2,
+      // no fever) — never randomized, never client-supplied. Findings are
+      // plain observations only, with no diagnosis or interpretation.
+      assessments: {
+        vitalSigns: {
+          temperatureCelsius: 37.1,
+          heartRate: 102,
+          bloodPressureSystolic: 148,
+          bloodPressureDiastolic: 92,
+          respiratoryRate: 22,
+          oxygenSaturation: 95,
+        },
+        physicalExaminations: {
+          GENERAL_INSPECTION: {
+            en: "The patient appears anxious and diaphoretic, holding a hand over the center of his chest.",
+            ar: "يبدو على المريض القلق والتعرّق، ويضع يده على وسط صدره.",
+          },
+          RESPIRATORY: {
+            en: "Crackles heard in the lower lung fields. Respiratory effort is otherwise normal.",
+            ar: "سُمعت أصوات فرقعة (Crackles) في قاعدتي الرئتين. الجهد التنفسي طبيعي فيما عدا ذلك.",
+          },
+          CARDIOVASCULAR: {
+            en: "Heart rate is elevated. Peripheral pulses are strong and equal. No visible jugular venous distension.",
+            ar: "معدل ضربات القلب مرتفع. النبضات المحيطية قوية ومتساوية. لا يوجد احتقان وريدي وداجي ظاهر.",
+          },
+          PAIN: {
+            en: "The patient continues to rate the pain as severe (7 out of 10), unrelieved by rest or position change.",
+            ar: "لا يزال المريض يصف الألم بأنه شديد (7 من 10)، ولم يتحسّن بالراحة أو تغيير الوضعية.",
+          },
+          PALPATION: {
+            en: "No chest wall tenderness, swelling, or masses on palpation.",
+            ar: "لا يوجد ألم عند الجس، ولا تورّم أو كتل في جدار الصدر.",
+          },
+          AUSCULTATION: {
+            en: "Heart sounds S1 and S2 are normal, with no murmurs, rubs, or gallops.",
+            ar: "صوتا القلب S1 و S2 طبيعيان، دون أي لغط أو أصوات احتكاك أو أصوات إضافية.",
+          },
+        },
       },
     },
   },

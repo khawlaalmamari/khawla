@@ -22,3 +22,22 @@ export function categoryLabel(dict: Dictionary, category: string): string {
       return dict.clinicalCases.categoryGeneral;
   }
 }
+
+export function assessmentTypeLabel(dict: Dictionary, type: string): string {
+  switch (type) {
+    case "VITAL_SIGNS":
+      return dict.clinicalCases.assessmentVitalSigns;
+    case "GENERAL_INSPECTION":
+      return dict.clinicalCases.assessmentGeneralInspection;
+    case "RESPIRATORY":
+      return dict.clinicalCases.assessmentRespiratory;
+    case "CARDIOVASCULAR":
+      return dict.clinicalCases.assessmentCardiovascular;
+    case "PAIN":
+      return dict.clinicalCases.assessmentPain;
+    case "PALPATION":
+      return dict.clinicalCases.assessmentPalpation;
+    default:
+      return dict.clinicalCases.assessmentAuscultation;
+  }
+}

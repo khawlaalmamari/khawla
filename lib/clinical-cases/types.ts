@@ -22,16 +22,47 @@ export type VisibleCaseData = {
   };
   chiefComplaint: Bilingual;
   presentingSymptoms: Bilingual[];
-  baselineVitals: {
-    heartRate: number;
-    bloodPressureSystolic: number;
-    bloodPressureDiastolic: number;
-    respiratoryRate: number;
-    temperatureCelsius: number;
-    oxygenSaturation: number;
-  };
   learningObjectives: Bilingual[];
 };
+
+/**
+ * Phase 2C — a case's exact vital-sign values. Lives in hiddenData (not
+ * visible), because Step 3 requires them hidden until the student
+ * explicitly requests them ("Measure Vital Signs"), unlike the
+ * always-visible fields above. Always server-defined for a specific case
+ * — never randomized, never client-supplied.
+ */
+export type VitalSigns = {
+  temperatureCelsius: number;
+  heartRate: number;
+  bloodPressureSystolic: number;
+  bloodPressureDiastolic: number;
+  respiratoryRate: number;
+  oxygenSaturation: number;
+};
+
+/**
+ * The fixed set of physical-examination types the UI can offer (Step 6).
+ * Which ones are actually offered for a given case is determined by which
+ * keys that case's hiddenData.assessments.physicalExaminations defines —
+ * not every case needs to support all of them.
+ */
+export const PHYSICAL_EXAM_TYPES = [
+  "GENERAL_INSPECTION",
+  "RESPIRATORY",
+  "CARDIOVASCULAR",
+  "PAIN",
+  "PALPATION",
+  "AUSCULTATION",
+] as const;
+
+export type PhysicalExamType = (typeof PHYSICAL_EXAM_TYPES)[number];
+
+/** Vital signs plus every physical-exam type — one unified "request an
+ * assessment" action set (Step 5/6 share one mechanism). */
+export const ASSESSMENT_TYPES = ["VITAL_SIGNS", ...PHYSICAL_EXAM_TYPES] as const;
+
+export type AssessmentType = (typeof ASSESSMENT_TYPES)[number];
 
 /**
  * The fixed set of structured clinical-interview categories the
@@ -83,6 +114,14 @@ export type HiddenCaseData = {
   // SOCIAL_HISTORY are usually derived from the arrays above instead of
   // needing an entry here — see lib/clinical-cases/patient-engine.ts.
   interviewResponses: Partial<Record<QuestionCategory, Bilingual>>;
+  // Phase 2C — Vital Signs + Physical Examination (Step 2/6/7). Findings
+  // are plain observations, never a diagnosis or interpretation (Step 7).
+  // vitalSigns/each exam entry is optional: only the ones a case defines
+  // are "supported by the case" and offered to the student.
+  assessments: {
+    vitalSigns?: VitalSigns;
+    physicalExaminations: Partial<Record<PhysicalExamType, Bilingual>>;
+  };
 };
 
 /** One logged event during a future simulation attempt. Shape is
@@ -101,13 +140,16 @@ export type CaseFinalDecision = {
   feedback: Bilingual;
 };
 
-/** A single conversation turn as sent to the client — never includes
- * hiddenData, only what was actually said. */
+/** A single conversation or assessment turn as sent to the client — never
+ * includes hiddenData, only what was actually said/found. A STUDENT/
+ * PATIENT pair with a QuestionCategory is an interview turn (Phase 2B); a
+ * STUDENT/SYSTEM pair with an AssessmentType is an assessment request
+ * (Phase 2C) — see lib/clinical-cases/queries.ts. */
 export type ConversationMessageDTO = {
   id: string;
   role: "STUDENT" | "PATIENT" | "SYSTEM";
   message: string;
-  category: QuestionCategory | null;
+  category: QuestionCategory | AssessmentType | null;
   sequence: number;
   createdAt: string;
 };
@@ -117,6 +159,7 @@ export type ConversationMessageDTO = {
 export type InterviewSummary = {
   questionsAsked: number;
   informationDiscovered: QuestionCategory[];
+  assessmentsPerformed: AssessmentType[];
   durationSeconds: number | null;
   completionStatus: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
 };

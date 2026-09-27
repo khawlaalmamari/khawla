@@ -1,13 +1,23 @@
 import { prisma } from "@/lib/db";
 import type { CaseCategory, CaseDifficulty, ConversationRole } from "@prisma/client";
 import type {
+  AssessmentType,
   ConversationMessageDTO,
   HiddenCaseData,
   InterviewSummary,
   QuestionCategory,
   VisibleCaseData,
 } from "./types";
-import { buildPatientResponse, classifyQuestion, nextEmotionalState } from "./patient-engine";
+import { ASSESSMENT_TYPES, QUESTION_CATEGORIES } from "./types";
+import {
+  ASSESSMENT_ACTION_LABELS,
+  buildAssessmentResult,
+  buildPatientResponse,
+  classifyQuestion,
+  getAvailableAssessments,
+  isAssessmentSupported,
+  nextEmotionalState,
+} from "./patient-engine";
 
 /** Listing-safe fields only — never includes hiddenDataJson. */
 const metadataSelect = {
@@ -129,7 +139,7 @@ function toMessageDTO(m: {
     id: m.id,
     role: m.role,
     message: m.message,
-    category: (m.category as QuestionCategory | null) ?? null,
+    category: (m.category as QuestionCategory | AssessmentType | null) ?? null,
     sequence: m.sequence,
     createdAt: m.createdAt.toISOString(),
   };
@@ -145,6 +155,10 @@ export type AttemptView = {
   completedAt: string | null;
   visibleData: VisibleCaseData;
   messages: ConversationMessageDTO[];
+  // Phase 2C — which assessment buttons this case actually supports
+  // (Step 6). Never includes the findings themselves, only which types
+  // are askable — the values stay hidden until requested.
+  availableAssessments: AssessmentType[];
 };
 
 /**
@@ -182,6 +196,11 @@ export async function getAttemptView(attemptId: string, userId: string): Promise
   });
   if (!attempt) return null;
 
+  // hiddenDataJson is parsed only to compute which assessment buttons are
+  // valid for this case (Step 6) — the parsed object itself, and its
+  // findings, are never included in the returned AttemptView.
+  const hiddenData = JSON.parse(attempt.case.hiddenDataJson) as HiddenCaseData;
+
   return {
     id: attempt.id,
     caseSlug: attempt.case.slug,
@@ -192,6 +211,7 @@ export async function getAttemptView(attemptId: string, userId: string): Promise
     completedAt: attempt.completedAt ? attempt.completedAt.toISOString() : null,
     visibleData: JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData,
     messages: attempt.messages.map(toMessageDTO),
+    availableAssessments: getAvailableAssessments(hiddenData),
   };
 }
 
@@ -247,6 +267,56 @@ export async function addConversationTurn(
   };
 }
 
+/**
+ * Phase 2C — requests a vital-signs or physical-examination assessment.
+ * Enforces, in order (Step 14): authenticated user (caller's job, via
+ * userId), attempt exists + belongs to this user + is active (the
+ * findFirst filter below), and the assessment type is supported by this
+ * specific case's own data (isAssessmentSupported) — never assumed valid
+ * just because it's a recognized enum value. The result text comes only
+ * from the case's own hiddenData; nothing here is client-supplied,
+ * AI-generated, or randomized.
+ */
+export async function requestAssessment(
+  attemptId: string,
+  userId: string,
+  type: AssessmentType,
+  locale: "ar" | "en",
+): Promise<
+  | { error: "notFound" }
+  | { error: "notSupported" }
+  | { studentMessage: ConversationMessageDTO; resultMessage: ConversationMessageDTO }
+> {
+  const attempt = await prisma.clinicalCaseAttempt.findFirst({
+    where: { id: attemptId, userId, status: "IN_PROGRESS" },
+    include: { case: true },
+  });
+  if (!attempt) return { error: "notFound" };
+
+  const hiddenData = JSON.parse(attempt.case.hiddenDataJson) as HiddenCaseData;
+  if (!isAssessmentSupported(hiddenData, type)) return { error: "notSupported" };
+
+  const resultText = buildAssessmentResult(hiddenData, type, locale);
+  if (resultText === null) return { error: "notSupported" };
+
+  const requestText = ASSESSMENT_ACTION_LABELS[type][locale];
+  const priorCount = await prisma.clinicalCaseConversationMessage.count({ where: { attemptId } });
+
+  const [studentMessage, resultMessage] = await prisma.$transaction([
+    prisma.clinicalCaseConversationMessage.create({
+      data: { attemptId, role: "STUDENT", message: requestText, category: type, sequence: priorCount + 1 },
+    }),
+    prisma.clinicalCaseConversationMessage.create({
+      data: { attemptId, role: "SYSTEM", message: resultText, category: type, sequence: priorCount + 2 },
+    }),
+  ]);
+
+  return {
+    studentMessage: toMessageDTO(studentMessage),
+    resultMessage: toMessageDTO(resultMessage),
+  };
+}
+
 /** Ownership enforced via the userId filter in the update itself — a
  * foreign attemptId simply updates zero rows. */
 export async function updateAttemptNotes(
@@ -272,10 +342,23 @@ export async function getInterviewSummary(
   if (!attempt) return null;
 
   const discovered = new Set<QuestionCategory>();
+  const assessmentsPerformed = new Set<AssessmentType>();
   let questionsAsked = 0;
   for (const m of attempt.messages) {
+    if (!m.category) continue;
+    // Phase 2C reuses this same message table for assessment requests
+    // (role SYSTEM, category an AssessmentType) — keep those out of the
+    // Phase 2B interview-category count, and STUDENT-role assessment
+    // "requests" out of questionsAsked, so this summary's existing
+    // contract is unchanged for interview turns.
+    if ((ASSESSMENT_TYPES as readonly string[]).includes(m.category)) {
+      assessmentsPerformed.add(m.category as AssessmentType);
+      continue;
+    }
     if (m.role === "STUDENT") questionsAsked += 1;
-    if (m.category) discovered.add(m.category as QuestionCategory);
+    if ((QUESTION_CATEGORIES as readonly string[]).includes(m.category)) {
+      discovered.add(m.category as QuestionCategory);
+    }
   }
 
   const durationSeconds = attempt.completedAt
@@ -285,6 +368,7 @@ export async function getInterviewSummary(
   return {
     questionsAsked,
     informationDiscovered: Array.from(discovered),
+    assessmentsPerformed: Array.from(assessmentsPerformed),
     durationSeconds,
     completionStatus: attempt.status,
   };
