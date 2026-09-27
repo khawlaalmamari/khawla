@@ -63,6 +63,18 @@ enum CaseAttemptStatus {
   ABANDONED
 }
 
+enum ConversationRole {
+  STUDENT
+  PATIENT
+  SYSTEM
+}
+
+enum CaseEmotionalState {
+  CALM
+  ANXIOUS
+  UNCOMFORTABLE
+}
+
 model User {
   id                       String    @id @default(cuid())
   email                    String    @unique
@@ -82,16 +94,16 @@ model User {
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 
-  resetTokens        PasswordResetToken[]
-  quizAttempts       QuizAttempt[]
-  progress           ProgressRecord[]
-  studyPlans         StudyPlan[]
-  notifications      Notification[]
-  sentNotifications  Notification[] @relation("SentNotifications")
-  chatSessions       ChatSession[]
-  loginEvents        LoginEvent[]
-  auditLogs          AdminAuditLog[] @relation("AdminAuditLogs")
-  caseAttempts       ClinicalCaseAttempt[]
+  resetTokens       PasswordResetToken[]
+  quizAttempts      QuizAttempt[]
+  progress          ProgressRecord[]
+  studyPlans        StudyPlan[]
+  notifications     Notification[]
+  sentNotifications Notification[]        @relation("SentNotifications")
+  chatSessions      ChatSession[]
+  loginEvents       LoginEvent[]
+  auditLogs         AdminAuditLog[]       @relation("AdminAuditLogs")
+  caseAttempts      ClinicalCaseAttempt[]
 }
 
 model AdminAuditLog {
@@ -367,9 +379,9 @@ model ClinicalCase {
 // data (cases are fictional); the only personal reference is userId, under
 // the same cascade-delete convention as every other per-user model here.
 model ClinicalCaseAttempt {
-  id     String @id @default(cuid())
+  id     String       @id @default(cuid())
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   caseId String
   case   ClinicalCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
@@ -378,6 +390,15 @@ model ClinicalCaseAttempt {
   startedAt    DateTime          @default(now())
   completedAt  DateTime?
 
+  // Phase 2B: the patient's current emotional state (seeded from the
+  // case's persona at attempt start, lightly nudged as the conversation
+  // progresses — see lib/clinical-cases/patient-engine.ts). Text-only,
+  // no avatar/animation.
+  emotionalState CaseEmotionalState @default(CALM)
+  // Phase 2B: free-text clinical notes the student takes while
+  // interviewing the patient. Not analyzed or scored this phase.
+  notes          String?
+
   // JSON array of free-form events (questions asked, clues discovered,
   // assessments requested, decisions made, reasoning responses) — shape
   // intentionally left flexible until a real interaction UI exists.
@@ -385,6 +406,28 @@ model ClinicalCaseAttempt {
   // JSON: final diagnosis/decision + mistakes + feedback, set on completion.
   finalDecisionJson  String?
 
+  messages ClinicalCaseConversationMessage[]
+
   @@index([userId])
   @@index([caseId])
+}
+
+// One turn of the structured interview. `category` tags which clinical
+// interview category (see lib/clinical-cases/types.ts QuestionCategory)
+// the deterministic patient-response engine matched a STUDENT message to
+// — null for SYSTEM messages or an unmatched student question. Discovered
+// information for the interview summary is derived from these categories,
+// not stored redundantly elsewhere. No real patient data — content is
+// generated only from the fictional case's own bilingual data.
+model ClinicalCaseConversationMessage {
+  id        String              @id @default(cuid())
+  attemptId String
+  attempt   ClinicalCaseAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  role      ConversationRole
+  message   String
+  category  String?
+  sequence  Int
+  createdAt DateTime            @default(now())
+
+  @@index([attemptId, sequence])
 }

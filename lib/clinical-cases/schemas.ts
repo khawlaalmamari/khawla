@@ -31,7 +31,19 @@ export const adminUpdateCaseSchema = adminCreateCaseSchema.partial().extend({
   isPublished: z.boolean().optional(),
 });
 
-// For the future "start a case attempt" endpoint (not created this phase).
-export const createCaseAttemptSchema = z.object({
-  caseId: caseIdSchema,
+export const attemptIdSchema = z.string().trim().min(1);
+
+// Body for POST /api/clinical-case-attempts/[attemptId]/messages — the
+// student's raw question text (Step 14: length + content validated here,
+// never trusted from a client-provided category/role).
+export const sendPatientMessageSchema = z.object({
+  text: z.string().trim().min(1).max(500),
 });
+
+// Body for PATCH /api/clinical-case-attempts/[attemptId] — a discriminated
+// union so "save notes" and "end interview" stay independently validated
+// on one small route (Step 15) instead of two near-identical routes.
+export const updateAttemptSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("saveNotes"), notes: z.string().max(5000) }),
+  z.object({ action: z.literal("endInterview") }),
+]);

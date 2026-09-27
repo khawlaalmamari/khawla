@@ -4,12 +4,21 @@
 
 export type Bilingual = { en: string; ar: string };
 
+export type InitialEmotionalState = "CALM" | "ANXIOUS" | "UNCOMFORTABLE";
+
 /** Safe to show a student before/at case start. */
 export type VisibleCaseData = {
   patientProfile: {
     age: number;
     gender: "male" | "female";
     setting: Bilingual; // e.g. "Emergency department"
+    // Phase 2B — Virtual Patient persona (Step 3). Kept inside the same
+    // visible JSON blob rather than new columns, since it's exactly the
+    // kind of flexible, display-only content that blob already holds.
+    name: Bilingual;
+    personality: Bilingual; // short descriptor, e.g. "Cooperative but worried"
+    communicationStyle: Bilingual; // e.g. "Direct, short answers"
+    initialEmotionalState: InitialEmotionalState;
   };
   chiefComplaint: Bilingual;
   presentingSymptoms: Bilingual[];
@@ -23,6 +32,32 @@ export type VisibleCaseData = {
   };
   learningObjectives: Bilingual[];
 };
+
+/**
+ * The fixed set of structured clinical-interview categories the
+ * deterministic patient-response engine recognizes (Step 6). Not a
+ * general-purpose NLP intent set — just enough to run the sample case's
+ * scripted interview.
+ */
+export const QUESTION_CATEGORIES = [
+  "CHIEF_COMPLAINT",
+  "ONSET",
+  "LOCATION",
+  "DURATION",
+  "CHARACTER",
+  "SEVERITY",
+  "TIMING",
+  "AGGRAVATING_FACTORS",
+  "RELIEVING_FACTORS",
+  "ASSOCIATED_SYMPTOMS",
+  "MEDICAL_HISTORY",
+  "MEDICATION_HISTORY",
+  "ALLERGIES",
+  "FAMILY_HISTORY",
+  "SOCIAL_HISTORY",
+] as const;
+
+export type QuestionCategory = (typeof QUESTION_CATEGORIES)[number];
 
 /**
  * Server-only until a future simulation phase reveals it progressively.
@@ -40,6 +75,14 @@ export type HiddenCaseData = {
   possibleDiagnoses: Bilingual[];
   expectedQuestions: Bilingual[];
   debriefing: Bilingual;
+  // Phase 2B — scripted, in-character answers the deterministic patient
+  // engine returns for a matched QuestionCategory (Step 4/5/6). Categories
+  // with no entry here fall back to the engine's generic "not sure"
+  // response rather than inventing an answer. Categories like
+  // MEDICAL_HISTORY/MEDICATION_HISTORY/ALLERGIES/FAMILY_HISTORY/
+  // SOCIAL_HISTORY are usually derived from the arrays above instead of
+  // needing an entry here — see lib/clinical-cases/patient-engine.ts.
+  interviewResponses: Partial<Record<QuestionCategory, Bilingual>>;
 };
 
 /** One logged event during a future simulation attempt. Shape is
@@ -56,4 +99,24 @@ export type CaseFinalDecision = {
   reasoning: string;
   mistakes: string[];
   feedback: Bilingual;
+};
+
+/** A single conversation turn as sent to the client — never includes
+ * hiddenData, only what was actually said. */
+export type ConversationMessageDTO = {
+  id: string;
+  role: "STUDENT" | "PATIENT" | "SYSTEM";
+  message: string;
+  category: QuestionCategory | null;
+  sequence: number;
+  createdAt: string;
+};
+
+/** Step 10 — shown when the student ends the interview. No scoring or
+ * diagnosis correctness here; that's Phase 2D. */
+export type InterviewSummary = {
+  questionsAsked: number;
+  informationDiscovered: QuestionCategory[];
+  durationSeconds: number | null;
+  completionStatus: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
 };

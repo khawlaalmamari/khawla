@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/db";
-import type { CaseCategory, CaseDifficulty } from "@prisma/client";
-import type { VisibleCaseData, HiddenCaseData } from "./types";
+import type { CaseCategory, CaseDifficulty, ConversationRole } from "@prisma/client";
+import type {
+  ConversationMessageDTO,
+  HiddenCaseData,
+  InterviewSummary,
+  QuestionCategory,
+  VisibleCaseData,
+} from "./types";
+import { buildPatientResponse, classifyQuestion, nextEmotionalState } from "./patient-engine";
 
 /** Listing-safe fields only — never includes hiddenDataJson. */
 const metadataSelect = {
@@ -72,6 +79,22 @@ export async function getCaseMetadataById(
   return { ...rest, visibleData: JSON.parse(visibleDataJson) as VisibleCaseData };
 }
 
+/** Same as getCaseMetadataById, but by slug — for the case-detail page route. */
+export async function getCaseMetadataBySlug(
+  slug: string,
+  opts: { isAdmin: boolean },
+): Promise<(CaseMetadata & { isPublished: boolean; visibleData: VisibleCaseData }) | null> {
+  const found = await prisma.clinicalCase.findUnique({
+    where: { slug },
+    select: { ...metadataSelect, isPublished: true, visibleDataJson: true },
+  });
+  if (!found) return null;
+  if (!found.isPublished && !opts.isAdmin) return null;
+
+  const { visibleDataJson, ...rest } = found;
+  return { ...rest, visibleData: JSON.parse(visibleDataJson) as VisibleCaseData };
+}
+
 /**
  * Full case row, including hiddenDataJson — for future authorized
  * simulation logic only. Callers must perform their own auth check before
@@ -90,13 +113,192 @@ export async function getCaseForSimulation(id: string) {
   };
 }
 
+// ---------------------------------------------------------------------
+// Phase 2B — Virtual Patient Conversation
+// ---------------------------------------------------------------------
+
+function toMessageDTO(m: {
+  id: string;
+  role: ConversationRole;
+  message: string;
+  category: string | null;
+  sequence: number;
+  createdAt: Date;
+}): ConversationMessageDTO {
+  return {
+    id: m.id,
+    role: m.role,
+    message: m.message,
+    category: (m.category as QuestionCategory | null) ?? null,
+    sequence: m.sequence,
+    createdAt: m.createdAt.toISOString(),
+  };
+}
+
+export type AttemptView = {
+  id: string;
+  caseSlug: string;
+  status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  emotionalState: "CALM" | "ANXIOUS" | "UNCOMFORTABLE";
+  notes: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  visibleData: VisibleCaseData;
+  messages: ConversationMessageDTO[];
+};
+
 /**
- * Minimal persistence foundation for a future case-attempt flow (Step 3).
- * Not wired to any route yet — no route calls this until a real
- * simulation UI exists to start from.
+ * Starts a new attempt for a published case, seeding the patient's
+ * emotional state from the case's own persona data. Returns null if the
+ * case doesn't exist or isn't published — never trusts a caller-provided
+ * case id, only the slug looked up server-side.
  */
-export async function createCaseAttempt(userId: string, caseId: string) {
+export async function startCaseAttempt(userId: string, slug: string) {
+  const found = await prisma.clinicalCase.findUnique({ where: { slug } });
+  if (!found || !found.isPublished) return null;
+
+  const visibleData = JSON.parse(found.visibleDataJson) as VisibleCaseData;
+
   return prisma.clinicalCaseAttempt.create({
-    data: { userId, caseId },
+    data: {
+      userId,
+      caseId: found.id,
+      emotionalState: visibleData.patientProfile.initialEmotionalState,
+    },
   });
+}
+
+/**
+ * Ownership-checked read of an attempt for the conversation UI — never
+ * includes hiddenData. Returns null if the attempt doesn't exist or
+ * doesn't belong to this user (Step 14: a student must never be able to
+ * access another student's attempt), never distinguishing the two cases
+ * in the response so existence can't be probed.
+ */
+export async function getAttemptView(attemptId: string, userId: string): Promise<AttemptView | null> {
+  const attempt = await prisma.clinicalCaseAttempt.findFirst({
+    where: { id: attemptId, userId },
+    include: { case: true, messages: { orderBy: [{ sequence: "asc" }, { createdAt: "asc" }] } },
+  });
+  if (!attempt) return null;
+
+  return {
+    id: attempt.id,
+    caseSlug: attempt.case.slug,
+    status: attempt.status,
+    emotionalState: attempt.emotionalState,
+    notes: attempt.notes,
+    startedAt: attempt.startedAt.toISOString(),
+    completedAt: attempt.completedAt ? attempt.completedAt.toISOString() : null,
+    visibleData: JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData,
+    messages: attempt.messages.map(toMessageDTO),
+  };
+}
+
+/**
+ * Classifies the student's question, generates the patient's deterministic
+ * reply from the case's own data (see patient-engine.ts), persists both
+ * turns, and nudges the attempt's emotional state. Ownership-checked via
+ * the userId filter on the initial lookup; returns null for a
+ * nonexistent/foreign/already-ended attempt.
+ */
+export async function addConversationTurn(
+  attemptId: string,
+  userId: string,
+  studentText: string,
+  locale: "ar" | "en",
+) {
+  const attempt = await prisma.clinicalCaseAttempt.findFirst({
+    where: { id: attemptId, userId, status: "IN_PROGRESS" },
+    include: { case: true },
+  });
+  if (!attempt) return null;
+
+  const visibleData = JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData;
+  const hiddenData = JSON.parse(attempt.case.hiddenDataJson) as HiddenCaseData;
+
+  const category = classifyQuestion(studentText);
+  const responseBilingual = buildPatientResponse(visibleData, hiddenData, category);
+  const patientText = locale === "ar" ? responseBilingual.ar : responseBilingual.en;
+  const newEmotionalState = nextEmotionalState(attempt.emotionalState, category);
+
+  const priorCount = await prisma.clinicalCaseConversationMessage.count({ where: { attemptId } });
+
+  const [studentMessage, patientMessage] = await prisma.$transaction([
+    prisma.clinicalCaseConversationMessage.create({
+      data: { attemptId, role: "STUDENT", message: studentText, category, sequence: priorCount + 1 },
+    }),
+    prisma.clinicalCaseConversationMessage.create({
+      data: { attemptId, role: "PATIENT", message: patientText, category, sequence: priorCount + 2 },
+    }),
+  ]);
+
+  if (newEmotionalState !== attempt.emotionalState) {
+    await prisma.clinicalCaseAttempt.update({
+      where: { id: attemptId },
+      data: { emotionalState: newEmotionalState },
+    });
+  }
+
+  return {
+    studentMessage: toMessageDTO(studentMessage),
+    patientMessage: toMessageDTO(patientMessage),
+    emotionalState: newEmotionalState,
+  };
+}
+
+/** Ownership enforced via the userId filter in the update itself — a
+ * foreign attemptId simply updates zero rows. */
+export async function updateAttemptNotes(
+  attemptId: string,
+  userId: string,
+  notes: string,
+): Promise<boolean> {
+  const result = await prisma.clinicalCaseAttempt.updateMany({
+    where: { id: attemptId, userId },
+    data: { notes },
+  });
+  return result.count > 0;
+}
+
+export async function getInterviewSummary(
+  attemptId: string,
+  userId: string,
+): Promise<InterviewSummary | null> {
+  const attempt = await prisma.clinicalCaseAttempt.findFirst({
+    where: { id: attemptId, userId },
+    include: { messages: true },
+  });
+  if (!attempt) return null;
+
+  const discovered = new Set<QuestionCategory>();
+  let questionsAsked = 0;
+  for (const m of attempt.messages) {
+    if (m.role === "STUDENT") questionsAsked += 1;
+    if (m.category) discovered.add(m.category as QuestionCategory);
+  }
+
+  const durationSeconds = attempt.completedAt
+    ? Math.round((attempt.completedAt.getTime() - attempt.startedAt.getTime()) / 1000)
+    : null;
+
+  return {
+    questionsAsked,
+    informationDiscovered: Array.from(discovered),
+    durationSeconds,
+    completionStatus: attempt.status,
+  };
+}
+
+/** Ends the interview (idempotent) and returns its summary. Ownership
+ * enforced the same way as updateAttemptNotes. */
+export async function endInterview(
+  attemptId: string,
+  userId: string,
+): Promise<InterviewSummary | null> {
+  await prisma.clinicalCaseAttempt.updateMany({
+    where: { id: attemptId, userId, status: { not: "COMPLETED" } },
+    data: { status: "COMPLETED", completedAt: new Date() },
+  });
+  return getInterviewSummary(attemptId, userId);
 }

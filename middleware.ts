@@ -17,5 +17,12 @@ export function middleware() {
 }
 
 export const config = {
-  matcher: ["/dashboard", "/admin", "/study-planner", "/anatomy/:path*", "/physiology/:path*"],
+  matcher: [
+    "/dashboard",
+    "/admin",
+    "/study-planner",
+    "/anatomy/:path*",
+    "/physiology/:path*",
+    "/clinical-cases/:path*",
+  ],
 };

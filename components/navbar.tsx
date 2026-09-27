@@ -45,6 +45,9 @@ export async function Navbar() {
               <Link href="/dashboard" className="hover:text-primary-700">
                 {dict.nav.dashboard}
               </Link>
+              <Link href="/clinical-cases" className="hover:text-primary-700">
+                {dict.nav.clinicalCases}
+              </Link>
             </>
           )}
           {user?.role === "admin" && (

@@ -24,6 +24,10 @@ const clinicalCases = [
         age: 58,
         gender: "male",
         setting: { en: "Emergency department", ar: "قسم الطوارئ" },
+        name: { en: "Ahmed", ar: "أحمد" },
+        personality: { en: "Cooperative but worried", ar: "متعاون لكنه قلق" },
+        communicationStyle: { en: "Direct, gives short answers", ar: "مباشر، يعطي إجابات قصيرة" },
+        initialEmotionalState: "ANXIOUS",
       },
       chiefComplaint: {
         en: "\"I've had this crushing pain in my chest for the last hour.\"",
@@ -98,6 +102,22 @@ const clinicalCases = [
       debriefing: {
         en: "This presentation — exertional onset, radiation to the arm, diaphoresis, and cardiac risk factors (smoking, hypertension, diabetes, family history) — should raise strong suspicion for acute coronary syndrome and prompt urgent escalation rather than reassurance. This is a fictional educational scenario, not medical guidance for a real patient.",
         ar: "هذا العرض — بدء الألم مع الجهد، وانتشاره إلى الذراع، والتعرّق، وعوامل الخطر القلبية (التدخين، ارتفاع الضغط، السكري، التاريخ العائلي) — يجب أن يرفع الشك بقوة تجاه متلازمة الشريان التاجي الحادة، ويستدعي تصعيدًا عاجلاً لا طمأنة المريض. هذا سيناريو تعليمي افتراضي، وليس توجيهًا طبيًا لحالة مريض حقيقي.",
+      },
+      // Phase 2B — scripted, in-character answers for the deterministic
+      // patient engine (Step 4/5/6). Only categories with a distinct
+      // scripted line beyond the raw data arrays above need an entry
+      // here; history-type categories are derived automatically instead
+      // (see lib/clinical-cases/patient-engine.ts).
+      interviewResponses: {
+        ONSET: { en: "It started this morning, while I was walking.", ar: "بدأ هذا الصباح وأنا أمشي." },
+        LOCATION: { en: "It is in the center of my chest.", ar: "هو في وسط صدري." },
+        DURATION: { en: "It's been about an hour now, it hasn't gone away.", ar: "منذ حوالي ساعة الآن، ولم يختفِ." },
+        CHARACTER: { en: "It feels like something heavy is pressing on my chest.", ar: "أشعر كأن شيئًا ثقيلًا يضغط على صدري." },
+        SEVERITY: { en: "It's quite bad — I'd say around 7 out of 10.", ar: "إنه شديد إلى حد ما — أقول حوالي 7 من 10." },
+        TIMING: { en: "It's been constant since it started, not coming and going.", ar: "مستمر منذ أن بدأ، لا يجي ويروح." },
+        AGGRAVATING_FACTORS: { en: "It gets worse when I walk or move around.", ar: "يزداد سوءًا عندما أمشي أو أتحرك." },
+        RELIEVING_FACTORS: { en: "Resting a bit seems to help slightly, but it doesn't go away.", ar: "الراحة قليلاً تساعد بعض الشيء، لكنه لا يختفي." },
+        CHIEF_COMPLAINT: { en: "I've had this crushing pain in my chest for the last hour.", ar: "أشعر بألم ضاغط في صدري منذ ساعة تقريبًا." },
       },
     },
   },
