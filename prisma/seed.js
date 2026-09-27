@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const { anatomyModules, physiologyModules, slugify } = require("./content/course-outline");
 const skeletalSystem = require("./content/skeletal-system");
 const introAnatomy = require("./content/intro-anatomy");
+const { clinicalCases } = require("./content/clinical-cases");
 
 const prisma = new PrismaClient();
 
@@ -178,11 +179,43 @@ async function main() {
     totalQuestions += mod.questions.length;
   }
 
+  for (const c of clinicalCases) {
+    await prisma.clinicalCase.upsert({
+      where: { slug: c.slug },
+      update: {
+        titleEn: c.titleEn,
+        titleAr: c.titleAr,
+        descriptionEn: c.descriptionEn,
+        descriptionAr: c.descriptionAr,
+        difficulty: c.difficulty,
+        category: c.category,
+        order: c.order,
+        isPublished: true,
+        visibleDataJson: JSON.stringify(c.visibleData),
+        hiddenDataJson: JSON.stringify(c.hiddenData),
+      },
+      create: {
+        slug: c.slug,
+        titleEn: c.titleEn,
+        titleAr: c.titleAr,
+        descriptionEn: c.descriptionEn,
+        descriptionAr: c.descriptionAr,
+        difficulty: c.difficulty,
+        category: c.category,
+        order: c.order,
+        isPublished: true,
+        visibleDataJson: JSON.stringify(c.visibleData),
+        hiddenDataJson: JSON.stringify(c.hiddenData),
+      },
+    });
+  }
+
   console.log("Seed complete:");
   console.log(`  Courses: anatomy, physiology`);
   console.log(`  Anatomy modules: ${anatomyModules.length}, Physiology modules: ${physiologyModules.length}`);
   console.log(`  Full-content modules: ${FULL_CONTENT_MODULES.length}`);
   console.log(`  Total lessons: ${totalLessons}, total questions: ${totalQuestions}`);
+  console.log(`  Clinical cases: ${clinicalCases.length}`);
 }
 
 main()

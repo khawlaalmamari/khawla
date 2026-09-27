@@ -38,6 +38,31 @@ enum ChatRole {
   SYSTEM
 }
 
+enum CaseDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+// Body system / presenting complaint the case is organized around — kept as
+// a small closed set (like Subject/QuestionType above) and extended via
+// migration as new case categories are authored, rather than a free-text
+// field nothing can reliably filter or index on.
+enum CaseCategory {
+  CARDIOVASCULAR
+  RESPIRATORY
+  GASTROINTESTINAL
+  NEUROLOGICAL
+  INFECTIOUS
+  GENERAL
+}
+
+enum CaseAttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
 model User {
   id                       String    @id @default(cuid())
   email                    String    @unique
@@ -66,6 +91,7 @@ model User {
   chatSessions       ChatSession[]
   loginEvents        LoginEvent[]
   auditLogs          AdminAuditLog[] @relation("AdminAuditLogs")
+  caseAttempts       ClinicalCaseAttempt[]
 }
 
 model AdminAuditLog {
@@ -293,4 +319,72 @@ model ChatMessage {
   role          ChatRole
   content       String
   createdAt     DateTime    @default(now())
+}
+
+// Foundation for future clinical-case simulations (Virtual Patient, OSCE,
+// etc. — not implemented yet). Content is fictional and educational only.
+//
+// Only fields that need filtering/indexing or are safe to list without a
+// simulation-authorization check are real columns. Everything else is
+// split into two JSON blobs (same convention as Lesson.termsJson /
+// Question.choicesJson) so the shape can evolve without a migration per
+// field, while still enforcing the required visible/hidden separation:
+//   - visibleDataJson: safe to show a student before/at case start
+//     (patient profile, chief complaint, presenting symptoms, baseline
+//     vitals, learning objectives).
+//   - hiddenDataJson: server-only until a future simulation phase reveals
+//     it progressively (history, medications, allergies, family/social
+//     history, clues, red flags, differential diagnoses, expected
+//     questions, debriefing/feedback). Never sent to an unauthorized
+//     client — see lib/clinical-cases/queries.ts.
+model ClinicalCase {
+  id            String         @id @default(cuid())
+  slug          String         @unique
+  titleEn       String
+  titleAr       String
+  descriptionEn String
+  descriptionAr String
+  difficulty    CaseDifficulty
+  category      CaseCategory
+  isPublished   Boolean        @default(false)
+  order         Int            @default(0)
+
+  visibleDataJson String // JSON: bilingual visible case content (see lib/clinical-cases/types.ts)
+  hiddenDataJson  String // JSON: bilingual hidden/discoverable case content — server-only
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attempts ClinicalCaseAttempt[]
+
+  @@index([isPublished, order])
+  @@index([category, difficulty])
+}
+
+// One student's interaction with a case. This phase only persists
+// start/completion and free-form logs for future phases to populate — no
+// simulation, scoring, or interaction UI exists yet. Holds no real patient
+// data (cases are fictional); the only personal reference is userId, under
+// the same cascade-delete convention as every other per-user model here.
+model ClinicalCaseAttempt {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  caseId String
+  case   ClinicalCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  status       CaseAttemptStatus @default(IN_PROGRESS)
+  scorePercent Int?
+  startedAt    DateTime          @default(now())
+  completedAt  DateTime?
+
+  // JSON array of free-form events (questions asked, clues discovered,
+  // assessments requested, decisions made, reasoning responses) — shape
+  // intentionally left flexible until a real interaction UI exists.
+  interactionLogJson String? // JSON: CaseInteractionEvent[]
+  // JSON: final diagnosis/decision + mistakes + feedback, set on completion.
+  finalDecisionJson  String?
+
+  @@index([userId])
+  @@index([caseId])
 }
