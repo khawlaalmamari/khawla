@@ -1,6 +1,7 @@
 // Shapes for ClinicalCase.visibleDataJson / hiddenDataJson and
-// ClinicalCaseAttempt.interactionLogJson / finalDecisionJson. All patient
-// content is fictional and educational — see prisma/content/clinical-cases.js.
+// ClinicalCaseAttempt.interactionLogJson / finalDecisionJson (the
+// student's Phase 2D clinical-reasoning notes). All patient content is
+// fictional and educational — see prisma/content/clinical-cases.js.
 
 export type Bilingual = { en: string; ar: string };
 
@@ -133,11 +134,21 @@ export type CaseInteractionEvent = {
   data: unknown;
 };
 
-export type CaseFinalDecision = {
-  diagnosis: string;
-  reasoning: string;
-  mistakes: string[];
-  feedback: Bilingual;
+/**
+ * Phase 2D — the student's own structured clinical-reasoning notes,
+ * organized from the evidence they personally discovered (interview
+ * answers + assessment findings). Free-text and entirely student-authored
+ * — the server never fills these in, scores them, or reveals whether they
+ * match hiddenData.possibleDiagnoses. Persisted in the (previously
+ * unused) ClinicalCaseAttempt.finalDecisionJson column.
+ */
+export type ClinicalReasoningResponse = {
+  keyFindings: string;
+  hypotheses: string;
+  supportingEvidence: string;
+  missingInformation: string;
+  recommendedNextAction: string;
+  updatedAt: string;
 };
 
 /** A single conversation or assessment turn as sent to the client — never

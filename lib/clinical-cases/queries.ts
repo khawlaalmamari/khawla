@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import type { CaseCategory, CaseDifficulty, ConversationRole } from "@prisma/client";
 import type {
   AssessmentType,
+  ClinicalReasoningResponse,
   ConversationMessageDTO,
   HiddenCaseData,
   InterviewSummary,
@@ -159,6 +160,10 @@ export type AttemptView = {
   // (Step 6). Never includes the findings themselves, only which types
   // are askable — the values stay hidden until requested.
   availableAssessments: AssessmentType[];
+  // Phase 2D — the student's own saved reasoning notes, if any. Purely
+  // student-authored (see ClinicalReasoningResponse) — never derived from
+  // or checked against hiddenData.
+  reasoning: ClinicalReasoningResponse | null;
 };
 
 /**
@@ -212,6 +217,9 @@ export async function getAttemptView(attemptId: string, userId: string): Promise
     visibleData: JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData,
     messages: attempt.messages.map(toMessageDTO),
     availableAssessments: getAvailableAssessments(hiddenData),
+    reasoning: attempt.finalDecisionJson
+      ? (JSON.parse(attempt.finalDecisionJson) as ClinicalReasoningResponse)
+      : null,
   };
 }
 
@@ -327,6 +335,26 @@ export async function updateAttemptNotes(
   const result = await prisma.clinicalCaseAttempt.updateMany({
     where: { id: attemptId, userId },
     data: { notes },
+  });
+  return result.count > 0;
+}
+
+/**
+ * Phase 2D — saves the student's structured reasoning notes. Ownership
+ * and "not yet completed" are enforced atomically by the updateMany
+ * filter (Step 10/12): a foreign, nonexistent, or already-completed
+ * attempt simply matches zero rows and this returns false, with no way
+ * for the caller to tell which of those it was.
+ */
+export async function saveClinicalReasoning(
+  attemptId: string,
+  userId: string,
+  data: Omit<ClinicalReasoningResponse, "updatedAt">,
+): Promise<boolean> {
+  const reasoning: ClinicalReasoningResponse = { ...data, updatedAt: new Date().toISOString() };
+  const result = await prisma.clinicalCaseAttempt.updateMany({
+    where: { id: attemptId, userId, status: "IN_PROGRESS" },
+    data: { finalDecisionJson: JSON.stringify(reasoning) },
   });
   return result.count > 0;
 }

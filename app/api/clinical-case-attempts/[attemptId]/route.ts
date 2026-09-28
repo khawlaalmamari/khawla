@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
-import { endInterview, updateAttemptNotes } from "@/lib/clinical-cases/queries";
+import {
+  endInterview,
+  saveClinicalReasoning,
+  updateAttemptNotes,
+} from "@/lib/clinical-cases/queries";
 import { updateAttemptSchema } from "@/lib/clinical-cases/schemas";
 
-/** Saves clinical notes, or ends the interview and returns its summary.
- * Ownership is enforced in both query functions via the session user's id. */
+/** Saves clinical notes, saves clinical-reasoning notes, or ends the
+ * interview and returns its summary. Ownership is enforced in every
+ * query function via the session user's id. */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ attemptId: string }> },
@@ -21,6 +26,20 @@ export async function PATCH(
 
   if (parsed.data.action === "saveNotes") {
     const ok = await updateAttemptNotes(attemptId, user.id, parsed.data.notes);
+    if (!ok) return NextResponse.json({ error: "notFound" }, { status: 404 });
+    return NextResponse.json({ saved: true });
+  }
+
+  if (parsed.data.action === "saveReasoning") {
+    const { keyFindings, hypotheses, supportingEvidence, missingInformation, recommendedNextAction } =
+      parsed.data;
+    const ok = await saveClinicalReasoning(attemptId, user.id, {
+      keyFindings,
+      hypotheses,
+      supportingEvidence,
+      missingInformation,
+      recommendedNextAction,
+    });
     if (!ok) return NextResponse.json({ error: "notFound" }, { status: 404 });
     return NextResponse.json({ saved: true });
   }

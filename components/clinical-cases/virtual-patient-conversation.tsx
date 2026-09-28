@@ -6,6 +6,7 @@ import type { Locale } from "@/lib/i18n/config";
 import type { AttemptView } from "@/lib/clinical-cases/queries";
 import type {
   AssessmentType,
+  ClinicalReasoningResponse,
   ConversationMessageDTO,
   InterviewSummary,
   QuestionCategory,
@@ -116,6 +117,36 @@ function VitalSignsResult({ dict, message }: { dict: Dictionary; message: string
   );
 }
 
+type ReasoningFields = Omit<ClinicalReasoningResponse, "updatedAt">;
+
+const EMPTY_REASONING: ReasoningFields = {
+  keyFindings: "",
+  hypotheses: "",
+  supportingEvidence: "",
+  missingInformation: "",
+  recommendedNextAction: "",
+};
+
+// Field order + which dict keys back each one — keeps the reasoning form
+// (Step 7/8: structured fields, clearly separate from the read-only
+// evidence above it) driven by one small table instead of five near-
+// identical blocks.
+const REASONING_FIELDS: {
+  key: keyof ReasoningFields;
+  label: keyof Dictionary["clinicalCases"];
+  placeholder: keyof Dictionary["clinicalCases"];
+}[] = [
+  { key: "keyFindings", label: "keyFindingsLabel", placeholder: "keyFindingsPlaceholder" },
+  { key: "hypotheses", label: "hypothesesLabel", placeholder: "hypothesesPlaceholder" },
+  { key: "supportingEvidence", label: "supportingEvidenceLabel", placeholder: "supportingEvidencePlaceholder" },
+  { key: "missingInformation", label: "missingInformationLabel", placeholder: "missingInformationPlaceholder" },
+  {
+    key: "recommendedNextAction",
+    label: "recommendedNextActionLabel",
+    placeholder: "recommendedNextActionPlaceholder",
+  },
+];
+
 export function VirtualPatientConversation({
   attempt,
   locale,
@@ -136,6 +167,9 @@ export function VirtualPatientConversation({
   const [summary, setSummary] = useState<InterviewSummary | null>(null);
   const [ending, setEnding] = useState(false);
   const [assessmentLoading, setAssessmentLoading] = useState<AssessmentType | null>(null);
+  const [reasoning, setReasoning] = useState<ReasoningFields>(attempt.reasoning ?? EMPTY_REASONING);
+  const [reasoningSaving, setReasoningSaving] = useState(false);
+  const [reasoningSaved, setReasoningSaved] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
   const patient = attempt.visibleData.patientProfile;
@@ -213,6 +247,21 @@ export function VirtualPatientConversation({
     }
   }
 
+  async function saveReasoning() {
+    setReasoningSaving(true);
+    setReasoningSaved(false);
+    try {
+      const res = await fetch(`/api/clinical-case-attempts/${attempt.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "saveReasoning", ...reasoning }),
+      });
+      if (res.ok) setReasoningSaved(true);
+    } finally {
+      setReasoningSaving(false);
+    }
+  }
+
   async function endInterview() {
     setEnding(true);
     try {
@@ -232,6 +281,12 @@ export function VirtualPatientConversation({
 
   const conversationMessages = messages.filter((m) => !isAssessmentType(m.category));
   const assessmentMessages = messages.filter((m) => m.role === "SYSTEM" && isAssessmentType(m.category));
+  // Phase 2D — the facts available for reasoning: the patient's answers
+  // (not the student's own questions) plus assessment findings. Built
+  // entirely from data already in `messages` — no separate fetch, and
+  // never anything from hiddenData that wasn't actually discovered.
+  const interviewEvidence = messages.filter((m) => m.role === "PATIENT" && m.category);
+  const hasEvidence = interviewEvidence.length > 0 || assessmentMessages.length > 0;
 
   return (
     <div className="space-y-6">
@@ -384,6 +439,73 @@ export function VirtualPatientConversation({
             </div>
           ))}
         </div>
+      </Card>
+
+      {/* Clinical Reasoning */}
+      <Card>
+        <h2 className="text-lg font-bold">{dict.clinicalCases.clinicalReasoningTitle}</h2>
+
+        <h3 className="mt-4 text-sm font-semibold">{dict.clinicalCases.evidenceTitle}</h3>
+        <p className="mt-1 text-xs text-muted">{dict.clinicalCases.evidenceHint}</p>
+        {!hasEvidence ? (
+          <p className="mt-2 text-sm text-muted">{dict.clinicalCases.evidenceEmpty}</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {interviewEvidence.map((m) => (
+              <li key={m.id} className="rounded-lg bg-surface p-2 text-sm">
+                <Badge tone="neutral">{chipLabel(dict, m.category as QuestionCategory)}</Badge>{" "}
+                {m.message}
+              </li>
+            ))}
+            {assessmentMessages.map((m) => (
+              <li key={m.id} className="rounded-lg bg-surface p-2 text-sm">
+                <Badge tone="neutral">{assessmentTypeLabel(dict, m.category as AssessmentType)}</Badge>{" "}
+                {m.category === "VITAL_SIGNS" ? (
+                  <span className="mt-1 block">
+                    <VitalSignsResult dict={dict} message={m.message} />
+                  </span>
+                ) : (
+                  m.message
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p className="mt-6 text-xs text-muted">{dict.clinicalCases.reasoningHint}</p>
+
+        <div className="mt-3 space-y-4">
+          {REASONING_FIELDS.map((field) => (
+            <div key={field.key}>
+              <label htmlFor={`reasoning-${field.key}`} className="text-sm font-medium">
+                {dict.clinicalCases[field.label]}
+              </label>
+              <textarea
+                id={`reasoning-${field.key}`}
+                value={reasoning[field.key]}
+                onChange={(e) => {
+                  setReasoning((r) => ({ ...r, [field.key]: e.target.value }));
+                  setReasoningSaved(false);
+                }}
+                placeholder={dict.clinicalCases[field.placeholder]}
+                disabled={status !== "IN_PROGRESS"}
+                rows={3}
+                className="mt-1 w-full rounded-lg border border-border bg-surface p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-50"
+              />
+            </div>
+          ))}
+        </div>
+
+        {status !== "IN_PROGRESS" ? (
+          <p className="mt-3 text-sm text-muted">{dict.clinicalCases.reasoningLockedNotice}</p>
+        ) : (
+          <div className="mt-3 flex items-center gap-3">
+            <Button variant="outline" onClick={saveReasoning} disabled={reasoningSaving}>
+              {dict.clinicalCases.saveReasoningButton}
+            </Button>
+            {reasoningSaved && <span className="text-sm text-success">{dict.clinicalCases.reasoningSaved}</span>}
+          </div>
+        )}
       </Card>
 
       {/* Clinical Notes */}
