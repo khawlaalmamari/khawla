@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import type { AnatomicalStructure, BodySystem } from "@/lib/anatomy-3d/types";
-import { getStructuresBySystem } from "@/lib/anatomy-3d/structures";
+import { getStructureById, getStructuresBySystem } from "@/lib/anatomy-3d/structures";
 import { BodySystemSelector } from "./body-system-selector";
 import { StructureInfoPanel } from "./structure-info-panel";
 import { Card } from "@/components/ui/card";
@@ -40,10 +40,23 @@ export function AnatomyExplorer({ dict, locale }: { dict: Dictionary; locale: Lo
     setSelectedStructure(structures[0] ?? null);
   }
 
+  // Selecting a structure directly on the 3D model (Phase 3B-1.7): keep the
+  // existing system/structure list in sync with whatever was clicked.
+  function selectStructureById(structureId: string) {
+    const structure = getStructureById(structureId);
+    if (!structure) return;
+    setSelectedSystem(structure.system);
+    setSelectedStructure(structure);
+  }
+
   return (
     <div className="space-y-6">
       <Card>
-        <AnatomyViewer dict={dict} />
+        <AnatomyViewer
+          dict={dict}
+          selectedStructureId={selectedStructure?.id ?? null}
+          onSelectStructure={selectStructureById}
+        />
       </Card>
 
       <Card>

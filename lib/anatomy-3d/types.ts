@@ -25,4 +25,9 @@ export type AnatomicalStructure = {
   descriptionAr: string;
   nursingRelevanceEn: string;
   nursingRelevanceAr: string;
+  /** Name of the corresponding node in the curated 3D model (see
+   * public/models/anatomy/human-body.glb), for click-to-select and
+   * highlighting in AnatomyViewer. Left undefined when no matching model
+   * geometry exists yet — never a fake/approximate mapping. */
+  modelNodeName?: string;
 };

@@ -1,17 +1,17 @@
-// Phase 3A — 3D Anatomy Foundation.
+// Phase 3B-1.7 — 3D Anatomy: real curated model in place.
 //
-// PRODUCTION MODEL PLACEMENT:
-// To add a real human-body model later, place a single .glb (binary
-// glTF) file at:
+// public/models/anatomy/human-body.glb is a curated subset of BodyParts3D
+// 4.0 (via github.com/ashemag/human-atlas), built and validated outside
+// this repository by the Phase 3B-1.6 conversion script. It contains 11
+// top-level named nodes — heart, aorta, lungs, trachea, brain, stomach,
+// liver, small_intestine, kidneys, urinary_bladder, spine — mapped to
+// educational content in lib/anatomy-3d/structures.ts via each entry's
+// `modelNodeName`. See public/models/anatomy/ATTRIBUTION.md for the
+// required license attribution.
 //
-//     public/models/anatomy/human-body.glb
-//
-// and it will be picked up automatically — no other code changes are
-// required. AnatomyViewer (components/anatomy-3d/anatomy-viewer.tsx)
-// already attempts to load exactly this path via three.js's GLTFLoader;
-// today the file does not exist, so the viewer's existing error/fallback
-// path renders a clearly-labeled procedural placeholder body instead of
-// crashing. Use a properly licensed or original educational model
-// (e.g. CC0/CC-BY assets, or a model your institution has rights to) —
-// never an asset copied from an unknown or copyrighted source.
+// If this file is ever missing or fails to load, AnatomyViewer
+// (components/anatomy-3d/anatomy-viewer.tsx) falls back to a clearly-
+// labeled procedural placeholder body instead of crashing — that fallback
+// path must be preserved. Never replace this asset with anything whose
+// license hasn't been verified (see the Phase 3B-1.5/3B-1.6 reports).
 export const ANATOMY_MODEL_URL = "/models/anatomy/human-body.glb";

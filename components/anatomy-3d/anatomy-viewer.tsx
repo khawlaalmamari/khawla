@@ -6,22 +6,55 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { ANATOMY_MODEL_URL } from "@/lib/anatomy-3d/model-config";
+import { ANATOMICAL_STRUCTURES } from "@/lib/anatomy-3d/structures";
 
 type ViewerState = "loading" | "ready" | "placeholder" | "error";
 
+// Derived once from the single source of truth (structures.ts) — never a
+// second, hand-maintained copy of the model-to-structure mapping.
+const NODE_NAME_TO_STRUCTURE_ID = new Map(
+  ANATOMICAL_STRUCTURES.filter((s) => s.modelNodeName).map((s) => [s.modelNodeName as string, s.id]),
+);
+const STRUCTURE_ID_TO_NODE_NAME = new Map(
+  ANATOMICAL_STRUCTURES.filter((s) => s.modelNodeName).map((s) => [s.id, s.modelNodeName as string]),
+);
+
+// Subtle emissive tint applied to the selected structure's meshes — no
+// glow/bloom/animation, just a modest color shift on the existing material.
+const HIGHLIGHT_EMISSIVE = 0x2f6f68;
+
 /**
- * Phase 3A foundation viewer. Renders the real production model
- * (public/models/anatomy/human-body.glb, see lib/anatomy-3d/model-config.ts)
- * when present; today that file doesn't exist, so the loader's own error
- * path renders a clearly-labeled procedural placeholder instead — this is
- * the actual fallback behavior Step 3/4 asks for, not a simulated one.
- * A genuine WebGL failure (unsupported browser, context creation error)
- * is a separate "error" state that never crashes the page.
+ * Renders the curated production model (public/models/anatomy/human-body.glb,
+ * see lib/anatomy-3d/model-config.ts) via GLTFLoader, with click-to-select
+ * and a subtle per-structure highlight wired to structures.ts. If that file
+ * is ever missing or fails to load, the loader's own error path renders a
+ * clearly-labeled procedural placeholder instead of crashing. A genuine
+ * WebGL failure (unsupported browser, context creation error) is a separate
+ * "error" state that never crashes the page.
  */
-export function AnatomyViewer({ dict }: { dict: Dictionary }) {
+export function AnatomyViewer({
+  dict,
+  selectedStructureId,
+  onSelectStructure,
+}: {
+  dict: Dictionary;
+  selectedStructureId?: string | null;
+  onSelectStructure?: (structureId: string) => void;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<ViewerState>("loading");
-  const actionsRef = useRef<{ reset: () => void; zoomIn: () => void; zoomOut: () => void } | null>(null);
+  const actionsRef = useRef<{
+    reset: () => void;
+    zoomIn: () => void;
+    zoomOut: () => void;
+    highlightStructure: (structureId: string | null | undefined) => void;
+  } | null>(null);
+  const onSelectStructureRef = useRef(onSelectStructure);
+  const selectedStructureIdRef = useRef(selectedStructureId);
+  useEffect(() => {
+    onSelectStructureRef.current = onSelectStructure;
+    selectedStructureIdRef.current = selectedStructureId;
+  }, [onSelectStructure, selectedStructureId]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -30,6 +63,8 @@ export function AnatomyViewer({ dict }: { dict: Dictionary }) {
     let disposed = false;
     let frameId = 0;
     let renderer: THREE.WebGLRenderer;
+    let modelRoot: THREE.Object3D | null = null;
+    let highlightedMeshes: THREE.Mesh[] = [];
 
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -45,8 +80,26 @@ export function AnatomyViewer({ dict }: { dict: Dictionary }) {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xeef2f7);
 
+    // Two framings: the curated model is a torso-height organ cluster
+    // (~0.9m tall, centered around y≈1.29 — measured directly from
+    // human-body.glb, not guessed), quite different in scale from the
+    // older full-body (~2m) procedural placeholder used as a fallback.
+    const MODEL_CAMERA = {
+      position: new THREE.Vector3(0, 1.55, 1.15),
+      target: new THREE.Vector3(0, 1.29, 0),
+      minDistance: 0.3,
+      maxDistance: 6,
+    };
+    const PLACEHOLDER_CAMERA = {
+      position: new THREE.Vector3(0, 1.3, 4),
+      target: new THREE.Vector3(0, 1, 0),
+      minDistance: 1.5,
+      maxDistance: 9,
+    };
+
+    let initialPosition = MODEL_CAMERA.position.clone();
+    let initialTarget = MODEL_CAMERA.target.clone();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    const initialPosition = new THREE.Vector3(0, 1.3, 4);
     camera.position.copy(initialPosition);
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -54,12 +107,22 @@ export function AnatomyViewer({ dict }: { dict: Dictionary }) {
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.target.set(0, 1, 0);
-    controls.minDistance = 1.5;
-    controls.maxDistance = 9;
+    controls.target.copy(MODEL_CAMERA.target);
+    controls.minDistance = MODEL_CAMERA.minDistance;
+    controls.maxDistance = MODEL_CAMERA.maxDistance;
     // Basic keyboard accessibility (Step 11): arrow keys pan once the
     // viewer has focus, built into OrbitControls itself.
     controls.listenToKeyEvents(container);
+
+    function applyCameraPreset(preset: typeof MODEL_CAMERA) {
+      initialPosition = preset.position.clone();
+      initialTarget = preset.target.clone();
+      camera.position.copy(initialPosition);
+      controls.target.copy(initialTarget);
+      controls.minDistance = preset.minDistance;
+      controls.maxDistance = preset.maxDistance;
+      controls.update();
+    }
 
     function zoomBy(factor: number) {
       const offset = camera.position.clone().sub(controls.target);
@@ -69,14 +132,39 @@ export function AnatomyViewer({ dict }: { dict: Dictionary }) {
       controls.update();
     }
 
+    function clearHighlight() {
+      for (const mesh of highlightedMeshes) {
+        if (mesh.material instanceof THREE.MeshStandardMaterial) {
+          mesh.material.emissive.setHex(0x000000);
+        }
+      }
+      highlightedMeshes = [];
+    }
+
+    function highlightStructure(structureId: string | null | undefined) {
+      clearHighlight();
+      if (!structureId || !modelRoot) return;
+      const nodeName = STRUCTURE_ID_TO_NODE_NAME.get(structureId);
+      if (!nodeName) return;
+      const target = modelRoot.getObjectByName(nodeName);
+      if (!target) return;
+      target.traverse((obj) => {
+        if (obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
+          obj.material.emissive.setHex(HIGHLIGHT_EMISSIVE);
+          highlightedMeshes.push(obj);
+        }
+      });
+    }
+
     actionsRef.current = {
       reset: () => {
         camera.position.copy(initialPosition);
-        controls.target.set(0, 1, 0);
+        controls.target.copy(initialTarget);
         controls.update();
       },
       zoomIn: () => zoomBy(0.8),
       zoomOut: () => zoomBy(1.25),
+      highlightStructure,
     };
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.9));
@@ -130,21 +218,72 @@ export function AnatomyViewer({ dict }: { dict: Dictionary }) {
       ANATOMY_MODEL_URL,
       (gltf) => {
         if (disposed) return;
+        // Every curated mesh shares one exported material instance; give
+        // each its own clone so one structure can be highlighted without
+        // tinting the whole model.
+        gltf.scene.traverse((obj) => {
+          if (obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
+            obj.material = obj.material.clone();
+          }
+        });
         scene.add(gltf.scene);
+        modelRoot = gltf.scene;
+        highlightStructure(selectedStructureIdRef.current);
         setState("ready");
       },
       undefined,
       () => {
         if (disposed) return;
+        applyCameraPreset(PLACEHOLDER_CAMERA);
         addPlaceholderBody();
         setState("placeholder");
       },
     );
 
+    // Click/tap-to-select (Step: structure selection + highlight). A small
+    // movement threshold tells a tap apart from an OrbitControls drag;
+    // OrbitControls' own listeners on the same element are unaffected.
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let pointerDown: { x: number; y: number; type: string } | null = null;
+
+    function onPointerDown(e: PointerEvent) {
+      pointerDown = { x: e.clientX, y: e.clientY, type: e.pointerType };
+    }
+
+    function onPointerUp(e: PointerEvent) {
+      const down = pointerDown;
+      pointerDown = null;
+      if (!down || !modelRoot) return;
+      const threshold = down.type === "touch" ? 12 : 6;
+      if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > threshold) return;
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObject(modelRoot, true);
+      if (hits.length === 0) return;
+
+      let node: THREE.Object3D | null = hits[0].object;
+      while (node && node !== modelRoot) {
+        const structureId = NODE_NAME_TO_STRUCTURE_ID.get(node.name);
+        if (structureId) {
+          onSelectStructureRef.current?.(structureId);
+          return;
+        }
+        node = node.parent;
+      }
+    }
+
+    renderer.domElement.addEventListener("pointerdown", onPointerDown);
+    renderer.domElement.addEventListener("pointerup", onPointerUp);
+
     return () => {
       disposed = true;
       cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
+      renderer.domElement.removeEventListener("pointerdown", onPointerDown);
+      renderer.domElement.removeEventListener("pointerup", onPointerUp);
       controls.dispose();
       scene.traverse((obj) => {
         if (obj instanceof THREE.Mesh) {
@@ -160,6 +299,13 @@ export function AnatomyViewer({ dict }: { dict: Dictionary }) {
       }
     };
   }, []);
+
+  // Keeps the 3D highlight in sync when a structure is selected from
+  // outside the viewer (e.g. the existing body-system structure list),
+  // not just from a click on the model itself.
+  useEffect(() => {
+    actionsRef.current?.highlightStructure(selectedStructureId);
+  }, [selectedStructureId]);
 
   return (
     <div className="relative h-[420px] w-full overflow-hidden rounded-xl border border-border bg-surface sm:h-[520px]">

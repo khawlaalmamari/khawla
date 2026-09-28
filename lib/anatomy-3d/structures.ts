@@ -3,6 +3,13 @@
 // Not an exhaustive anatomy database — that's future content work, not
 // part of this foundation phase. Content is educational/general only,
 // with no diagnosis or patient-specific advice.
+//
+// Phase 3B-1.7 — structures with a `modelNodeName` are selectable by
+// clicking the real 3D model (public/models/anatomy/human-body.glb); the
+// node names come from the curated GLB's own conversion report
+// (human-body-curated-report.json). Structures without a `modelNodeName`
+// have no matching geometry in that model yet and remain info-only —
+// never given a fake/approximate mapping.
 
 import type { AnatomicalStructure, BodySystem } from "./types";
 
@@ -54,6 +61,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
       "Basic anatomical understanding of the brain supports later learning about neurological assessment.",
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للدماغ يدعم التعلّم اللاحق حول التقييم العصبي.",
+    modelNodeName: "brain",
   },
   {
     id: "spinal-cord",
@@ -78,6 +86,20 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
       "Basic anatomical understanding of the heart supports later learning about circulation and cardiovascular assessment.",
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للقلب يدعم التعلّم اللاحق حول الدورة الدموية والتقييم القلبي الوعائي.",
+    modelNodeName: "heart",
+  },
+  {
+    id: "aorta",
+    nameEn: "Aorta",
+    nameAr: "الأبهر",
+    system: "CARDIOVASCULAR",
+    descriptionEn: "The body's largest artery, carrying oxygen-rich blood from the heart's left ventricle to the rest of the body.",
+    descriptionAr: "أكبر شريان في الجسم، ينقل الدم الغني بالأكسجين من البطين الأيسر للقلب إلى بقية أنحاء الجسم.",
+    nursingRelevanceEn:
+      "Basic anatomical understanding of the aorta supports later learning about blood pressure and circulatory assessment.",
+    nursingRelevanceAr:
+      "الفهم التشريحي الأساسي للأبهر يدعم التعلّم اللاحق حول ضغط الدم وتقييم الدورة الدموية.",
+    modelNodeName: "aorta",
   },
   {
     id: "lungs",
@@ -90,6 +112,20 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
       "Basic anatomical understanding of the lungs supports later learning about respiratory assessment.",
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للرئتين يدعم التعلّم اللاحق حول التقييم التنفسي.",
+    modelNodeName: "lungs",
+  },
+  {
+    id: "trachea",
+    nameEn: "Trachea",
+    nameAr: "القصبة الهوائية",
+    system: "RESPIRATORY",
+    descriptionEn: "The main airway connecting the throat to the bronchi, kept open by rings of cartilage.",
+    descriptionAr: "المجرى الهوائي الرئيسي الذي يصل الحلق بالقصبات الهوائية، وتحافظ حلقات غضروفية على بقائه مفتوحًا.",
+    nursingRelevanceEn:
+      "Basic anatomical understanding of the trachea supports later learning about airway management and respiratory assessment.",
+    nursingRelevanceAr:
+      "الفهم التشريحي الأساسي للقصبة الهوائية يدعم التعلّم اللاحق حول إدارة مجرى الهواء والتقييم التنفسي.",
+    modelNodeName: "trachea",
   },
   {
     id: "stomach",
@@ -102,6 +138,33 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
       "Basic anatomical understanding of the stomach supports later learning about digestive assessment and nutrition.",
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للمعدة يدعم التعلّم اللاحق حول التقييم الهضمي والتغذية.",
+    modelNodeName: "stomach",
+  },
+  {
+    id: "liver",
+    nameEn: "Liver",
+    nameAr: "الكبد",
+    system: "DIGESTIVE",
+    descriptionEn: "The body's largest internal organ; it processes nutrients, produces bile, and filters substances from the blood.",
+    descriptionAr: "أكبر عضو داخلي في الجسم؛ يعالج العناصر الغذائية وينتج الصفراء ويرشّح المواد من الدم.",
+    nursingRelevanceEn:
+      "Basic anatomical understanding of the liver supports later learning about digestive assessment, medication metabolism, and nutrition.",
+    nursingRelevanceAr:
+      "الفهم التشريحي الأساسي للكبد يدعم التعلّم اللاحق حول التقييم الهضمي وأيض الأدوية والتغذية.",
+    modelNodeName: "liver",
+  },
+  {
+    id: "small_intestine",
+    nameEn: "Small Intestine",
+    nameAr: "الأمعاء الدقيقة",
+    system: "DIGESTIVE",
+    descriptionEn: "A long, coiled tube (duodenum, jejunum, and ileum) where most digestion and nutrient absorption take place.",
+    descriptionAr: "أنبوب طويل وملتفّ (يتكوّن من الاثني عشر والصائم واللفائفي) يتم فيه معظم الهضم وامتصاص العناصر الغذائية.",
+    nursingRelevanceEn:
+      "Basic anatomical understanding of the small intestine supports later learning about digestive assessment and nutrition.",
+    nursingRelevanceAr:
+      "الفهم التشريحي الأساسي للأمعاء الدقيقة يدعم التعلّم اللاحق حول التقييم الهضمي والتغذية.",
+    modelNodeName: "small_intestine",
   },
   {
     id: "kidneys",
@@ -114,6 +177,20 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
       "Basic anatomical understanding of the kidneys supports later learning about fluid balance and urinary assessment.",
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للكليتين يدعم التعلّم اللاحق حول توازن السوائل والتقييم البولي.",
+    modelNodeName: "kidneys",
+  },
+  {
+    id: "urinary_bladder",
+    nameEn: "Urinary Bladder",
+    nameAr: "المثانة البولية",
+    system: "URINARY",
+    descriptionEn: "A muscular, expandable organ in the pelvis that stores urine before it leaves the body.",
+    descriptionAr: "عضو عضلي قابل للتمدد في الحوض يخزّن البول قبل خروجه من الجسم.",
+    nursingRelevanceEn:
+      "Basic anatomical understanding of the urinary bladder supports later learning about fluid balance and urinary assessment.",
+    nursingRelevanceAr:
+      "الفهم التشريحي الأساسي للمثانة البولية يدعم التعلّم اللاحق حول توازن السوائل والتقييم البولي.",
+    modelNodeName: "urinary_bladder",
   },
   {
     id: "uterus",
@@ -127,8 +204,25 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للرحم يدعم التعلّم اللاحق حول صحة الأم والصحة التناسلية.",
   },
+  {
+    id: "spine",
+    nameEn: "Spine",
+    nameAr: "العمود الفقري",
+    system: "SKELETAL",
+    descriptionEn: "The column of vertebrae running from the base of the skull to the pelvis, supporting the body and protecting the spinal cord.",
+    descriptionAr: "سلسلة من الفقرات تمتد من قاعدة الجمجمة إلى الحوض، تدعم الجسم وتحمي الحبل الشوكي.",
+    nursingRelevanceEn:
+      "Basic anatomical understanding of the spine supports later learning about posture, mobility assessment, and spinal precautions.",
+    nursingRelevanceAr:
+      "الفهم التشريحي الأساسي للعمود الفقري يدعم التعلّم اللاحق حول القوام وتقييم الحركة واحتياطات العمود الفقري.",
+    modelNodeName: "spine",
+  },
 ];
 
 export function getStructuresBySystem(system: BodySystem): AnatomicalStructure[] {
   return ANATOMICAL_STRUCTURES.filter((s) => s.system === system);
+}
+
+export function getStructureById(id: string): AnatomicalStructure | undefined {
+  return ANATOMICAL_STRUCTURES.find((s) => s.id === id);
 }
