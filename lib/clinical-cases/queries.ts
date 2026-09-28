@@ -4,6 +4,7 @@ import type {
   AssessmentType,
   ClinicalReasoningResponse,
   ConversationMessageDTO,
+  DebriefReflection,
   HiddenCaseData,
   InterviewSummary,
   QuestionCategory,
@@ -164,6 +165,8 @@ export type AttemptView = {
   // student-authored (see ClinicalReasoningResponse) — never derived from
   // or checked against hiddenData.
   reasoning: ClinicalReasoningResponse | null;
+  // Phase 2E — the student's own saved post-attempt reflection, if any.
+  reflection: DebriefReflection | null;
 };
 
 /**
@@ -219,6 +222,9 @@ export async function getAttemptView(attemptId: string, userId: string): Promise
     availableAssessments: getAvailableAssessments(hiddenData),
     reasoning: attempt.finalDecisionJson
       ? (JSON.parse(attempt.finalDecisionJson) as ClinicalReasoningResponse)
+      : null,
+    reflection: attempt.interactionLogJson
+      ? (JSON.parse(attempt.interactionLogJson) as DebriefReflection)
       : null,
   };
 }
@@ -355,6 +361,25 @@ export async function saveClinicalReasoning(
   const result = await prisma.clinicalCaseAttempt.updateMany({
     where: { id: attemptId, userId, status: "IN_PROGRESS" },
     data: { finalDecisionJson: JSON.stringify(reasoning) },
+  });
+  return result.count > 0;
+}
+
+/**
+ * Phase 2E — saves the student's post-attempt reflection (Step 6/7).
+ * Unlike saveClinicalReasoning, this only succeeds once the attempt is
+ * COMPLETED (Step 3: the debrief is a post-attempt feature) — ownership
+ * and that state check are enforced together by the updateMany filter.
+ */
+export async function saveDebriefReflection(
+  attemptId: string,
+  userId: string,
+  data: Omit<DebriefReflection, "updatedAt">,
+): Promise<boolean> {
+  const reflection: DebriefReflection = { ...data, updatedAt: new Date().toISOString() };
+  const result = await prisma.clinicalCaseAttempt.updateMany({
+    where: { id: attemptId, userId, status: "COMPLETED" },
+    data: { interactionLogJson: JSON.stringify(reflection) },
   });
   return result.count > 0;
 }

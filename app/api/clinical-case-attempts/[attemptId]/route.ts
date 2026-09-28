@@ -3,13 +3,14 @@ import { getCurrentUser } from "@/lib/auth/session";
 import {
   endInterview,
   saveClinicalReasoning,
+  saveDebriefReflection,
   updateAttemptNotes,
 } from "@/lib/clinical-cases/queries";
 import { updateAttemptSchema } from "@/lib/clinical-cases/schemas";
 
-/** Saves clinical notes, saves clinical-reasoning notes, or ends the
- * interview and returns its summary. Ownership is enforced in every
- * query function via the session user's id. */
+/** Saves clinical notes, saves clinical-reasoning notes, saves a
+ * post-attempt reflection, or ends the interview and returns its summary.
+ * Ownership is enforced in every query function via the session user's id. */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ attemptId: string }> },
@@ -39,6 +40,19 @@ export async function PATCH(
       supportingEvidence,
       missingInformation,
       recommendedNextAction,
+    });
+    if (!ok) return NextResponse.json({ error: "notFound" }, { status: 404 });
+    return NextResponse.json({ saved: true });
+  }
+
+  if (parsed.data.action === "saveReflection") {
+    const { mostImportantFindings, additionalInformationWanted, whatToReassess, whatToDoDifferently } =
+      parsed.data;
+    const ok = await saveDebriefReflection(attemptId, user.id, {
+      mostImportantFindings,
+      additionalInformationWanted,
+      whatToReassess,
+      whatToDoDifferently,
     });
     if (!ok) return NextResponse.json({ error: "notFound" }, { status: 404 });
     return NextResponse.json({ saved: true });

@@ -52,14 +52,24 @@ export const clinicalReasoningSchema = z.object({
   recommendedNextAction: z.string().max(2000),
 });
 
+// Phase 2E — Step 6/7: the student's post-attempt reflection fields. Same
+// plain-string, no-case-data shape as clinicalReasoningSchema above.
+export const debriefReflectionSchema = z.object({
+  mostImportantFindings: z.string().max(2000),
+  additionalInformationWanted: z.string().max(2000),
+  whatToReassess: z.string().max(2000),
+  whatToDoDifferently: z.string().max(2000),
+});
+
 // Body for PATCH /api/clinical-case-attempts/[attemptId] — a discriminated
-// union so "save notes", "end interview", and "save reasoning" stay
-// independently validated on one small route (Step 15) instead of
-// separate near-identical routes.
+// union so "save notes", "end interview", "save reasoning", and "save
+// reflection" stay independently validated on one small route (Step 15)
+// instead of separate near-identical routes.
 export const updateAttemptSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("saveNotes"), notes: z.string().max(5000) }),
   z.object({ action: z.literal("endInterview") }),
   z.object({ action: z.literal("saveReasoning") }).merge(clinicalReasoningSchema),
+  z.object({ action: z.literal("saveReflection") }).merge(debriefReflectionSchema),
 ]);
 
 // Phase 2C — Step 5/14: the only client input for an assessment request

@@ -8,6 +8,7 @@ import type {
   AssessmentType,
   ClinicalReasoningResponse,
   ConversationMessageDTO,
+  DebriefReflection,
   InterviewSummary,
   QuestionCategory,
 } from "@/lib/clinical-cases/types";
@@ -147,6 +148,36 @@ const REASONING_FIELDS: {
   },
 ];
 
+type ReflectionFields = Omit<DebriefReflection, "updatedAt">;
+
+const EMPTY_REFLECTION: ReflectionFields = {
+  mostImportantFindings: "",
+  additionalInformationWanted: "",
+  whatToReassess: "",
+  whatToDoDifferently: "",
+};
+
+// Same table pattern as REASONING_FIELDS above, for the four reflective
+// questions (Step 5/6).
+const REFLECTION_FIELDS: {
+  key: keyof ReflectionFields;
+  label: keyof Dictionary["clinicalCases"];
+  placeholder: keyof Dictionary["clinicalCases"];
+}[] = [
+  { key: "mostImportantFindings", label: "mostImportantFindingsLabel", placeholder: "mostImportantFindingsPlaceholder" },
+  {
+    key: "additionalInformationWanted",
+    label: "additionalInformationWantedLabel",
+    placeholder: "additionalInformationWantedPlaceholder",
+  },
+  { key: "whatToReassess", label: "whatToReassessLabel", placeholder: "whatToReassessPlaceholder" },
+  {
+    key: "whatToDoDifferently",
+    label: "whatToDoDifferentlyLabel",
+    placeholder: "whatToDoDifferentlyPlaceholder",
+  },
+];
+
 export function VirtualPatientConversation({
   attempt,
   locale,
@@ -170,6 +201,9 @@ export function VirtualPatientConversation({
   const [reasoning, setReasoning] = useState<ReasoningFields>(attempt.reasoning ?? EMPTY_REASONING);
   const [reasoningSaving, setReasoningSaving] = useState(false);
   const [reasoningSaved, setReasoningSaved] = useState(false);
+  const [reflection, setReflection] = useState<ReflectionFields>(attempt.reflection ?? EMPTY_REFLECTION);
+  const [reflectionSaving, setReflectionSaving] = useState(false);
+  const [reflectionSaved, setReflectionSaved] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
   const patient = attempt.visibleData.patientProfile;
@@ -259,6 +293,21 @@ export function VirtualPatientConversation({
       if (res.ok) setReasoningSaved(true);
     } finally {
       setReasoningSaving(false);
+    }
+  }
+
+  async function saveReflection() {
+    setReflectionSaving(true);
+    setReflectionSaved(false);
+    try {
+      const res = await fetch(`/api/clinical-case-attempts/${attempt.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "saveReflection", ...reflection }),
+      });
+      if (res.ok) setReflectionSaved(true);
+    } finally {
+      setReflectionSaving(false);
     }
   }
 
@@ -594,6 +643,85 @@ export function VirtualPatientConversation({
               </div>
             </dl>
           )}
+        </Card>
+      )}
+
+      {/* Clinical Debriefing — Phase 2E. Only ever rendered once the
+          attempt is COMPLETED (Step 3): a student mid-interview never
+          sees this section at all. */}
+      {status === "COMPLETED" && (
+        <Card>
+          <h2 className="text-lg font-bold">{dict.clinicalCases.debriefingTitle}</h2>
+          <p className="mt-1 text-sm text-muted">{dict.clinicalCases.debriefIntro}</p>
+
+          <h3 className="mt-4 text-sm font-semibold">{dict.clinicalCases.yourSimulationSummaryLabel}</h3>
+          {!hasEvidence ? (
+            <p className="mt-2 text-sm text-muted">{dict.clinicalCases.evidenceEmpty}</p>
+          ) : (
+            <ul className="mt-2 space-y-2">
+              {interviewEvidence.map((m) => (
+                <li key={m.id} className="rounded-lg bg-surface p-2 text-sm">
+                  <Badge tone="neutral">{chipLabel(dict, m.category as QuestionCategory)}</Badge>{" "}
+                  {m.message}
+                </li>
+              ))}
+              {assessmentMessages.map((m) => (
+                <li key={m.id} className="rounded-lg bg-surface p-2 text-sm">
+                  <Badge tone="neutral">{assessmentTypeLabel(dict, m.category as AssessmentType)}</Badge>{" "}
+                  {m.category === "VITAL_SIGNS" ? (
+                    <span className="mt-1 block">
+                      <VitalSignsResult dict={dict} message={m.message} />
+                    </span>
+                  ) : (
+                    m.message
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <h3 className="mt-4 text-sm font-semibold">{dict.clinicalCases.yourReasoningLabel}</h3>
+          {!attempt.reasoning ? (
+            <p className="mt-2 text-sm text-muted">{dict.clinicalCases.noReasoningRecorded}</p>
+          ) : (
+            <dl className="mt-2 space-y-2">
+              {REASONING_FIELDS.map((field) => (
+                <div key={field.key} className="rounded-lg bg-surface p-2 text-sm">
+                  <dt className="text-xs font-semibold text-muted">{dict.clinicalCases[field.label]}</dt>
+                  <dd className="mt-0.5">{reasoning[field.key] || "—"}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+          <p className="mt-6 text-xs text-muted">{dict.clinicalCases.reflectiveQuestionsIntro}</p>
+          <div className="mt-3 space-y-4">
+            {REFLECTION_FIELDS.map((field) => (
+              <div key={field.key}>
+                <label htmlFor={`reflection-${field.key}`} className="text-sm font-medium">
+                  {dict.clinicalCases[field.label]}
+                </label>
+                <textarea
+                  id={`reflection-${field.key}`}
+                  value={reflection[field.key]}
+                  onChange={(e) => {
+                    setReflection((r) => ({ ...r, [field.key]: e.target.value }));
+                    setReflectionSaved(false);
+                  }}
+                  placeholder={dict.clinicalCases[field.placeholder]}
+                  rows={3}
+                  className="mt-1 w-full rounded-lg border border-border bg-surface p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-3 flex items-center gap-3">
+            <Button variant="outline" onClick={saveReflection} disabled={reflectionSaving}>
+              {dict.clinicalCases.saveReflectionButton}
+            </Button>
+            {reflectionSaved && <span className="text-sm text-success">{dict.clinicalCases.reflectionSaved}</span>}
+          </div>
         </Card>
       )}
     </div>
