@@ -21,6 +21,7 @@ export function CoursesDropdown({ dict }: { dict: Dictionary }) {
   const items = [
     { href: "/anatomy", label: dict.nav.anatomy, icon: "🦴" },
     { href: "/physiology", label: dict.nav.physiology, icon: "🫀" },
+    { href: "/anatomy/3d-explorer", label: dict.nav.anatomy3D, icon: "🧍" },
   ];
 
   return (
