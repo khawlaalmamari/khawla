@@ -2,6 +2,11 @@ const { PrismaClient } = require("@prisma/client");
 const { anatomyModules, physiologyModules, slugify } = require("./content/course-outline");
 const skeletalSystem = require("./content/skeletal-system");
 const introAnatomy = require("./content/intro-anatomy");
+const cardiovascularSystem = require("./content/cardiovascular-system");
+const respiratorySystem = require("./content/respiratory-system");
+const digestiveSystem = require("./content/digestive-system");
+const urinarySystem = require("./content/urinary-system");
+const nervousSystem = require("./content/nervous-system");
 const { clinicalCases } = require("./content/clinical-cases");
 
 const prisma = new PrismaClient();
@@ -27,6 +32,51 @@ const FULL_CONTENT_MODULES = [
       "تعرّف على تركيب العظام، وكيفية تنظيم الهيكل إلى المنطقتين المحورية والطرفية، وآلية عمل المفاصل، والأساسيات السريرية التي يحتاجها كل طالب تمريض.",
     passThreshold: 70,
     ...skeletalSystem,
+  },
+  {
+    slug: "anatomy-cardiovascular-system",
+    descriptionEn:
+      "Learn the structure of the heart and blood vessels, the path blood takes through the pulmonary and systemic circuits, and the clinical landmarks nurses use for pulse, auscultation, and blood pressure.",
+    descriptionAr:
+      "تعرّف على تركيب القلب والأوعية الدموية، ومسار الدم عبر الدورتين الرئوية والجهازية، والمعالم السريرية التي يستخدمها الممرضون للنبض والإصغاء وقياس ضغط الدم.",
+    passThreshold: 70,
+    ...cardiovascularSystem,
+  },
+  {
+    slug: "anatomy-respiratory-system",
+    descriptionEn:
+      "Learn the structures of the airway from nose to alveoli, how the lungs and diaphragm work together to breathe, and the clinical landmarks used in airway and chest procedures.",
+    descriptionAr:
+      "تعرّف على بنى المجرى الهوائي من الأنف إلى الأسناخ، وكيفية عمل الرئتين والحجاب الحاجز معًا للتنفس، والمعالم السريرية المستخدمة في إجراءات المجرى الهوائي والصدر.",
+    passThreshold: 70,
+    ...respiratorySystem,
+  },
+  {
+    slug: "anatomy-digestive-system",
+    descriptionEn:
+      "Learn the structure and location of the GI tract and accessory organs (liver, gallbladder, pancreas), how they connect, and the clinical landmarks used in abdominal assessment.",
+    descriptionAr:
+      "تعرّف على تركيب القناة الهضمية والأعضاء الملحقة (الكبد والمرارة والبنكرياس) ومواقعها، وكيفية ارتباطها، والمعالم السريرية المستخدمة في تقييم البطن.",
+    passThreshold: 70,
+    ...digestiveSystem,
+  },
+  {
+    slug: "anatomy-urinary-system",
+    descriptionEn:
+      "Learn the structure of the kidneys and nephron, the location of the urinary organs, and the clinical landmarks used for catheterization and kidney assessment.",
+    descriptionAr:
+      "تعرّف على تركيب الكليتين والنُّبيب الكلوي، ومواقع أعضاء الجهاز البولي، والمعالم السريرية المستخدمة للقسطرة وتقييم الكلى.",
+    passThreshold: 70,
+    ...urinarySystem,
+  },
+  {
+    slug: "anatomy-nervous-system",
+    descriptionEn:
+      "Learn the structure of neurons and the brain, the organization of the central and peripheral nervous systems, and the clinical anatomy behind common neurological assessments.",
+    descriptionAr:
+      "تعرّف على تركيب الخلايا العصبية والدماغ، وتنظيم الجهازين العصبيين المركزي والمحيطي، والتشريح السريري وراء التقييمات العصبية الشائعة.",
+    passThreshold: 70,
+    ...nervousSystem,
   },
 ];
 

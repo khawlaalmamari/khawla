@@ -11,16 +11,11 @@
 // have no matching geometry in that model yet and remain info-only —
 // never given a fake/approximate mapping.
 //
-// Phase 3B-1.9 — `studyHref` links a structure to a real, already-seeded
-// Anatomy lesson/module that is genuinely about it (see prisma/seed.js /
-// prisma/content/*). Checked against actual seeded content: only the
-// Skeletal System module has real lesson content, and only its "Organs
-// and Their Locations" lesson has a dedicated section on the vertebral
-// column — so only `spine` gets a `studyHref`. Every other module
-// (Cardiovascular, Respiratory, Digestive, Urinary, Nervous) exists in
-// the database but has zero lessons yet, so their structures are left
-// without a `studyHref` on purpose — StructureInfoPanel shows a "content
-// coming soon" state for them instead of linking to an empty module page.
+// Phase 3B-1.9/3B-2 — `studyHref` links a structure to a real, seeded
+// Anatomy lesson that is genuinely about it (see prisma/seed.js /
+// prisma/content/*). Each link below points to the specific lesson whose
+// content actually names and describes that structure — never a generic
+// or approximate match.
 
 import type { AnatomicalStructure, BodySystem } from "./types";
 
@@ -73,6 +68,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للدماغ يدعم التعلّم اللاحق حول التقييم العصبي.",
     modelNodeName: "brain",
+    studyHref: "/anatomy/anatomy-nervous-system/nervous-organs-locations",
   },
   {
     id: "spinal-cord",
@@ -98,6 +94,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للقلب يدعم التعلّم اللاحق حول الدورة الدموية والتقييم القلبي الوعائي.",
     modelNodeName: "heart",
+    studyHref: "/anatomy/anatomy-cardiovascular-system/cardiovascular-organs-locations",
   },
   {
     id: "aorta",
@@ -111,6 +108,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للأبهر يدعم التعلّم اللاحق حول ضغط الدم وتقييم الدورة الدموية.",
     modelNodeName: "aorta",
+    studyHref: "/anatomy/anatomy-cardiovascular-system/cardiovascular-organs-locations",
   },
   {
     id: "lungs",
@@ -124,6 +122,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للرئتين يدعم التعلّم اللاحق حول التقييم التنفسي.",
     modelNodeName: "lungs",
+    studyHref: "/anatomy/anatomy-respiratory-system/respiratory-organs-locations",
   },
   {
     id: "trachea",
@@ -137,6 +136,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للقصبة الهوائية يدعم التعلّم اللاحق حول إدارة مجرى الهواء والتقييم التنفسي.",
     modelNodeName: "trachea",
+    studyHref: "/anatomy/anatomy-respiratory-system/respiratory-anatomical-structures",
   },
   {
     id: "stomach",
@@ -150,6 +150,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للمعدة يدعم التعلّم اللاحق حول التقييم الهضمي والتغذية.",
     modelNodeName: "stomach",
+    studyHref: "/anatomy/anatomy-digestive-system/digestive-organs-locations",
   },
   {
     id: "liver",
@@ -163,6 +164,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للكبد يدعم التعلّم اللاحق حول التقييم الهضمي وأيض الأدوية والتغذية.",
     modelNodeName: "liver",
+    studyHref: "/anatomy/anatomy-digestive-system/digestive-organs-locations",
   },
   {
     id: "small_intestine",
@@ -176,6 +178,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للأمعاء الدقيقة يدعم التعلّم اللاحق حول التقييم الهضمي والتغذية.",
     modelNodeName: "small_intestine",
+    studyHref: "/anatomy/anatomy-digestive-system/digestive-anatomical-structures",
   },
   {
     id: "kidneys",
@@ -189,6 +192,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للكليتين يدعم التعلّم اللاحق حول توازن السوائل والتقييم البولي.",
     modelNodeName: "kidneys",
+    studyHref: "/anatomy/anatomy-urinary-system/urinary-organs-locations",
   },
   {
     id: "urinary_bladder",
@@ -202,6 +206,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للمثانة البولية يدعم التعلّم اللاحق حول توازن السوائل والتقييم البولي.",
     modelNodeName: "urinary_bladder",
+    studyHref: "/anatomy/anatomy-urinary-system/urinary-organs-locations",
   },
   {
     id: "uterus",
