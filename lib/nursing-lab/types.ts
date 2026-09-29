@@ -70,4 +70,24 @@ export type NursingSkill = {
   preparationStepsAr: string[];
   procedureSteps: ProcedureStepDef[];
   observations: ObservationDef[];
+  /** Phase 3C-1 — slug of an existing, published lib/clinical-cases case
+   * that is a genuine educational continuation of this skill (see
+   * prisma/content/clinical-cases.js for the slugs that actually exist).
+   * A slug, not a database id, to match the existing Clinical Case
+   * routing convention (/clinical-cases/[slug]) and to stay static
+   * content — no database relation. Left undefined when no existing case
+   * is an honest fit; never invented. */
+  relatedClinicalCaseSlug?: string;
+};
+
+/** Phase 3C-1 — safe, student-facing preview of a related Clinical Case,
+ * resolved server-side from the existing lib/clinical-cases/queries.ts
+ * (which never includes hiddenDataJson) before being passed to the
+ * client SkillPractice component. Never carries hidden case data. */
+export type RelatedCasePreview = {
+  slug: string;
+  title: string;
+  description: string;
+  difficultyLabel: string;
+  categoryLabel: string;
 };

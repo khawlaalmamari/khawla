@@ -3,6 +3,19 @@
 // lib/anatomy-3d/structures.ts) and using the same fictional-patient,
 // educational-only spirit as lib/clinical-cases content. This is a practice
 // layer, not a replacement for the Clinical Case simulation system.
+//
+// Phase 3C-1 — `relatedClinicalCaseSlug` links a skill to a genuinely
+// matching, already-existing Clinical Case (see
+// prisma/content/clinical-cases.js). Only one case exists in this content
+// set today: "chest-pain-adult" (CARDIOVASCULAR, INTERMEDIATE) — an adult
+// with tachycardia, hypertension, mild tachypnea, and mildly low SpO2, so
+// it is a genuine fit for both Vital Signs Assessment (its own worked
+// example of "an adult case with abnormal vital signs") and Cardiovascular
+// Assessment (matching category and presentation). Respiratory Assessment
+// is deliberately left unmapped: the only existing case is categorized and
+// written as a cardiovascular presentation, not a respiratory one, and
+// connecting it there would misrepresent it — no new case was created to
+// avoid that (see the Phase 3C-1 final report).
 
 import type { NursingSkill } from "./types";
 
@@ -111,6 +124,7 @@ export const NURSING_SKILLS: NursingSkill[] = [
       { id: "blood-pressure", labelEn: "Blood Pressure", labelAr: "ضغط الدم", valueEn: "118/76 mmHg", valueAr: "118/76 مم زئبق" },
       { id: "spo2", labelEn: "SpO2", labelAr: "تشبع الأكسجين", valueEn: "98%", valueAr: "98%" },
     ],
+    relatedClinicalCaseSlug: "chest-pain-adult",
   },
   {
     id: "respiratory-assessment",
@@ -226,6 +240,11 @@ export const NURSING_SKILLS: NursingSkill[] = [
         valueAr: "لم يُلاحَظ استخدامها",
       },
     ],
+    // No relatedClinicalCaseSlug: the only existing Clinical Case
+    // ("chest-pain-adult") is categorized and written as a cardiovascular
+    // presentation, not a respiratory one. Connecting it here would
+    // misrepresent it as a respiratory case, so this mapping is left
+    // empty rather than forced (see the Phase 3C-1 final report).
   },
   {
     id: "cardiovascular-assessment",
@@ -342,6 +361,7 @@ export const NURSING_SKILLS: NursingSkill[] = [
         valueAr: "أقل من ثانيتين",
       },
     ],
+    relatedClinicalCaseSlug: "chest-pain-adult",
   },
 ];
 

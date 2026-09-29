@@ -508,6 +508,11 @@ export const ar = {
     backToSkillListButton: "الرجوع إلى قائمة المهارات",
     restartSkillButton: "إعادة المهارة",
     exitSkillButton: "خروج",
+    continuePracticeTitle: "واصلي ممارستك السريرية",
+    continuePracticeBody: "طبّقي ما تدرّبتِ عليه في حالة سريرية.",
+    practiceClinicalCaseButton: "تدرّبي على حالة سريرية",
+    relatedClinicalCaseLabel: "الحالة السريرية ذات الصلة",
+    noRelatedCaseAvailable: "لا توجد حالة سريرية ذات صلة متاحة حاليًا لهذه المهارة.",
   },
   common: {
     loading: "جارٍ التحميل...",
@@ -1137,6 +1142,11 @@ export const en: Dictionary = {
     backToSkillListButton: "Back to Skill List",
     restartSkillButton: "Restart Skill",
     exitSkillButton: "Exit",
+    continuePracticeTitle: "Continue Your Clinical Practice",
+    continuePracticeBody: "Apply what you practiced in a clinical case.",
+    practiceClinicalCaseButton: "Practice a Clinical Case",
+    relatedClinicalCaseLabel: "Related Clinical Case",
+    noRelatedCaseAvailable: "No related clinical case is available for this skill yet.",
   },
   common: {
     loading: "Loading...",

@@ -4,6 +4,9 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getServerLocale } from "@/lib/i18n/get-locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getSkillById } from "@/lib/nursing-lab/skills";
+import type { RelatedCasePreview } from "@/lib/nursing-lab/types";
+import { getCaseMetadataBySlug } from "@/lib/clinical-cases/queries";
+import { difficultyLabel, categoryLabel } from "@/lib/clinical-cases/labels";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { SkillPractice } from "@/components/nursing-lab/skill-practice";
@@ -33,6 +36,25 @@ export default async function NursingLabSkillPage({ params }: { params: Promise<
     );
   }
 
+  // Phase 3C-1 — resolved server-side via the existing Clinical Case
+  // query (which never includes hiddenDataJson), and reduced to a lean,
+  // already-locale-resolved preview before it ever reaches the client
+  // component. A stale/unpublished slug (or none defined) simply yields
+  // no CTA — never a broken link and never hidden case data.
+  let relatedCase: RelatedCasePreview | null = null;
+  if (skill.relatedClinicalCaseSlug) {
+    const c = await getCaseMetadataBySlug(skill.relatedClinicalCaseSlug, { isAdmin: user.role === "admin" });
+    if (c) {
+      relatedCase = {
+        slug: c.slug,
+        title: locale === "ar" ? c.titleAr : c.titleEn,
+        description: locale === "ar" ? c.descriptionAr : c.descriptionEn,
+        difficultyLabel: difficultyLabel(dict, c.difficulty),
+        categoryLabel: categoryLabel(dict, c.category),
+      };
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
@@ -41,7 +63,7 @@ export default async function NursingLabSkillPage({ params }: { params: Promise<
           &larr; {dict.nursingLab.backToLab}
         </Link>
 
-        <SkillPractice dict={dict} locale={locale} skill={skill} />
+        <SkillPractice dict={dict} locale={locale} skill={skill} relatedCase={relatedCase} />
       </main>
     </div>
   );

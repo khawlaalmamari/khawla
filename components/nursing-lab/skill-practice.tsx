@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
-import type { NursingSkill } from "@/lib/nursing-lab/types";
+import type { NursingSkill, RelatedCasePreview } from "@/lib/nursing-lab/types";
 import { getStructureById } from "@/lib/anatomy-3d/structures";
 import { systemLabel } from "@/components/anatomy-3d/body-system-selector";
 import { Card } from "@/components/ui/card";
@@ -63,7 +63,20 @@ function RelevantAnatomyLinks({
   );
 }
 
-export function SkillPractice({ dict, locale, skill }: { dict: Dictionary; locale: Locale; skill: NursingSkill }) {
+export function SkillPractice({
+  dict,
+  locale,
+  skill,
+  relatedCase,
+}: {
+  dict: Dictionary;
+  locale: Locale;
+  skill: NursingSkill;
+  /** Phase 3C-1 — safe, already-resolved preview of a related Clinical
+   * Case, or null when the skill has no mapping or that case isn't
+   * currently available to this student. Never contains hidden data. */
+  relatedCase: RelatedCasePreview | null;
+}) {
   const [stage, setStage] = useState<Stage>("intro");
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedStepNumbers, setCompletedStepNumbers] = useState<Set<number>>(new Set());
@@ -462,6 +475,27 @@ export function SkillPractice({ dict, locale, skill }: { dict: Dictionary; local
             <p className="text-xs font-semibold text-muted">{dict.nursingLab.nextRecommendedActionLabel}</p>
             <p className="text-sm">{dict.nursingLab.nextRecommendedActionText}</p>
             <RelevantAnatomyLinks dict={dict} locale={locale} structureIds={skill.relevantStructureIds} />
+          </Card>
+
+          <Card className="space-y-3">
+            <h2 className="text-lg font-bold">{dict.nursingLab.continuePracticeTitle}</h2>
+            <p className="text-sm text-muted">{dict.nursingLab.continuePracticeBody}</p>
+            {relatedCase ? (
+              <div className="rounded-lg border border-border bg-background p-4">
+                <p className="text-xs font-semibold text-muted">{dict.nursingLab.relatedClinicalCaseLabel}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Badge tone="primary">{relatedCase.categoryLabel}</Badge>
+                  <Badge tone="neutral">{relatedCase.difficultyLabel}</Badge>
+                </div>
+                <h3 className="mt-2 font-bold">{relatedCase.title}</h3>
+                <p className="mt-1 text-sm text-muted">{relatedCase.description}</p>
+                <ButtonLink href={`/clinical-cases/${relatedCase.slug}`} className="mt-3 !px-4 !py-2 text-sm">
+                  {dict.nursingLab.practiceClinicalCaseButton}
+                </ButtonLink>
+              </div>
+            ) : (
+              <p className="text-sm text-muted">{dict.nursingLab.noRelatedCaseAvailable}</p>
+            )}
           </Card>
 
           <div className="flex flex-wrap gap-2">
