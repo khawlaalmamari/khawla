@@ -611,7 +611,7 @@ export function VirtualPatientConversation({
                         <p className="text-xs font-semibold text-muted">
                           {dict.clinicalCases.decisionExplanationLabel}
                         </p>
-                        <p className="mt-1 text-sm">{resultMsg.message}</p>
+                        <p className="mt-1 text-sm text-primary-700">{resultMsg.message}</p>
                       </div>
 
                       <ol className="space-y-1 border-t border-border pt-3 text-xs">
