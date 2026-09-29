@@ -394,6 +394,24 @@ export function VirtualPatientConversation({
 
   const conversationMessages = messages.filter((m) => !isAssessmentType(m.category) && !isDecisionType(m.category));
   const assessmentMessages = messages.filter((m) => m.role === "SYSTEM" && isAssessmentType(m.category));
+  // Phase — labels each vital-signs entry with which reading it is (1st,
+  // reassessed) so a student comparing two otherwise-identically-labeled
+  // "Vital Signs" entries can tell them apart without reading every number.
+  // Only shown once there's actually more than one reading to compare.
+  const vitalSignsReadingNumbers = new Map<string, number>();
+  let vitalSignsReadingCount = 0;
+  for (const m of assessmentMessages) {
+    if (m.category === "VITAL_SIGNS") {
+      vitalSignsReadingCount += 1;
+      vitalSignsReadingNumbers.set(m.id, vitalSignsReadingCount);
+    }
+  }
+  function vitalSignsReadingNote(messageId: string): string | null {
+    if (vitalSignsReadingCount <= 1) return null;
+    return vitalSignsReadingNumbers.get(messageId) === 1
+      ? dict.clinicalCases.vitalSignsFirstReadingLabel
+      : dict.clinicalCases.vitalSignsReassessedReadingLabel;
+  }
   // Phase 2D — the facts available for reasoning: the patient's answers
   // (not the student's own questions) plus assessment findings. Built
   // entirely from data already in `messages` — no separate fetch, and
@@ -558,7 +576,12 @@ export function VirtualPatientConversation({
                 {assessmentTypeLabel(dict, m.category as AssessmentType)}
               </p>
               {m.category === "VITAL_SIGNS" ? (
-                <VitalSignsResult dict={dict} message={m.message} />
+                <>
+                  {vitalSignsReadingNote(m.id) && (
+                    <p className="mb-2 text-xs font-medium text-accent-700">{vitalSignsReadingNote(m.id)}</p>
+                  )}
+                  <VitalSignsResult dict={dict} message={m.message} />
+                </>
               ) : (
                 <p className="text-sm">{m.message}</p>
               )}
@@ -701,6 +724,11 @@ export function VirtualPatientConversation({
                 <Badge tone="neutral">{assessmentTypeLabel(dict, m.category as AssessmentType)}</Badge>{" "}
                 {m.category === "VITAL_SIGNS" ? (
                   <span className="mt-1 block">
+                    {vitalSignsReadingNote(m.id) && (
+                      <span className="mb-1 block text-xs font-medium text-accent-700">
+                        {vitalSignsReadingNote(m.id)}
+                      </span>
+                    )}
                     <VitalSignsResult dict={dict} message={m.message} />
                   </span>
                 ) : (
@@ -930,6 +958,11 @@ export function VirtualPatientConversation({
                   <Badge tone="neutral">{assessmentTypeLabel(dict, m.category as AssessmentType)}</Badge>{" "}
                   {m.category === "VITAL_SIGNS" ? (
                     <span className="mt-1 block">
+                      {vitalSignsReadingNote(m.id) && (
+                        <span className="mb-1 block text-xs font-medium text-accent-700">
+                          {vitalSignsReadingNote(m.id)}
+                        </span>
+                      )}
                       <VitalSignsResult dict={dict} message={m.message} />
                     </span>
                   ) : (
