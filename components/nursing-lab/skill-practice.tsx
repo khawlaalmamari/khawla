@@ -84,11 +84,17 @@ export function SkillPractice({
   const [reflection, setReflection] = useState<ReflectionAnswers>(EMPTY_REFLECTION);
   const [startedAt] = useState(() => Date.now());
   const [completedAt, setCompletedAt] = useState<number | null>(null);
+  // Phase 3D — which ClinicalChoicePrompt option the student picked for a
+  // given step number, keyed by stepNumber. Session-only, same as every
+  // other piece of Nursing Lab state here (see lib/nursing-lab/types.ts).
+  const [stepChoices, setStepChoices] = useState<Record<number, string>>({});
 
   const currentStep = skill.procedureSteps[currentStepIndex];
   const isLastStep = currentStepIndex === skill.procedureSteps.length - 1;
   const currentStepDone = completedStepNumbers.has(currentStep.stepNumber);
   const allObservationsRecorded = recordedObservationIds.size === skill.observations.length;
+  const selectedChoiceId = stepChoices[currentStep.stepNumber];
+  const selectedOption = currentStep.choicePrompt?.options.find((o) => o.id === selectedChoiceId);
 
   const reflectionComplete = useMemo(
     () =>
@@ -105,6 +111,16 @@ export function SkillPractice({
     setRecordedObservationIds(new Set());
     setReflection(EMPTY_REFLECTION);
     setCompletedAt(null);
+    setStepChoices({});
+  }
+
+  // Phase 3D — selecting a response IS the step's required action (same
+  // spirit as recordObservation below): it completes the step, and the
+  // chosen option's explanation is what actually teaches the reasoning —
+  // never a correct/incorrect verdict.
+  function selectChoice(optionId: string) {
+    setStepChoices((prev) => ({ ...prev, [currentStep.stepNumber]: optionId }));
+    setCompletedStepNumbers((s) => new Set(s).add(currentStep.stepNumber));
   }
 
   function recordObservation(id: string) {
@@ -312,6 +328,13 @@ export function SkillPractice({
               </p>
             </div>
 
+            {currentStep.rationaleEn && (
+              <div className="rounded-lg border border-accent-100 bg-accent-50 p-3">
+                <p className="text-xs font-semibold text-accent-700">{dict.nursingLab.whyThisMattersLabel}</p>
+                <p className="mt-1 text-sm">{locale === "ar" ? currentStep.rationaleAr : currentStep.rationaleEn}</p>
+              </div>
+            )}
+
             {currentStep.isObservationStep ? (
               <div>
                 <p className="text-sm font-semibold">{dict.nursingLab.recordObservationsTitle}</p>
@@ -342,6 +365,40 @@ export function SkillPractice({
                 <p className="mt-3 text-sm" role="status" aria-live="polite">
                   {allObservationsRecorded ? dict.nursingLab.allObservationsRecordedNotice : ""}
                 </p>
+              </div>
+            ) : currentStep.choicePrompt ? (
+              <div>
+                <p className="text-sm font-medium">
+                  {locale === "ar" ? currentStep.choicePrompt.promptAr : currentStep.choicePrompt.promptEn}
+                </p>
+                <div className="mt-3 flex flex-col gap-2">
+                  {currentStep.choicePrompt.options.map((option) => {
+                    const selected = option.id === selectedChoiceId;
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => selectChoice(option.id)}
+                        aria-pressed={selected}
+                        className={`rounded-lg border p-3 text-start text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                          selected
+                            ? "border-primary-600 bg-primary-50 font-medium"
+                            : "border-border bg-surface hover:bg-primary-50"
+                        }`}
+                      >
+                        {locale === "ar" ? option.labelAr : option.labelEn}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedOption && (
+                  <div className="mt-3 rounded-lg bg-background p-3" role="status" aria-live="polite">
+                    <p className="text-xs font-semibold text-muted">{dict.nursingLab.clinicalExplanationLabel}</p>
+                    <p className="mt-1 text-sm">
+                      {locale === "ar" ? selectedOption.explanationAr : selectedOption.explanationEn}
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <div>
@@ -446,6 +503,28 @@ export function SkillPractice({
                 ))}
               </ul>
             </div>
+
+            {skill.procedureSteps.some((s) => s.choicePrompt) && (
+              <div>
+                <p className="text-xs font-semibold text-muted">{dict.nursingLab.clinicalDecisionsLabel}</p>
+                <ul className="mt-1 space-y-2 text-sm">
+                  {skill.procedureSteps
+                    .filter((s) => s.choicePrompt)
+                    .map((s) => {
+                      const prompt = s.choicePrompt!;
+                      const chosen = prompt.options.find((o) => o.id === stepChoices[s.stepNumber]);
+                      return (
+                        <li key={s.stepNumber} className="rounded-lg bg-surface p-2">
+                          <p className="text-xs text-muted">{locale === "ar" ? prompt.promptAr : prompt.promptEn}</p>
+                          <p className="mt-1 font-medium">
+                            {chosen ? (locale === "ar" ? chosen.labelAr : chosen.labelEn) : "—"}
+                          </p>
+                        </li>
+                      );
+                    })}
+                </ul>
+              </div>
+            )}
 
             <div>
               <p className="text-xs font-semibold text-muted">{dict.nursingLab.reflectionResponsesLabel}</p>

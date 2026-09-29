@@ -7,6 +7,31 @@ import type { BodySystem } from "@/lib/anatomy-3d/types";
 
 export type NursingSkillDifficulty = "BEGINNER" | "INTERMEDIATE";
 
+/** Phase 3D — one response a student can choose for a `ClinicalChoicePrompt`,
+ * with its own honest clinical explanation. There is no "correct" option:
+ * every option's explanation is real and accurate for the skill's own
+ * (already-recorded) findings — the point is teaching the reasoning behind
+ * each choice, never scoring or revealing a hidden right answer. */
+export type ClinicalChoiceOption = {
+  id: string;
+  labelEn: string;
+  labelAr: string;
+  explanationEn: string;
+  explanationAr: string;
+};
+
+/** Phase 3D — a lightweight, bounded clinical-reasoning branch attached to
+ * a procedure step: a question grounded in the findings the student just
+ * recorded, with a small set of response options. Used for both
+ * "Interpret" (step 6: what do these findings mean?) and "Respond" (step
+ * 7: what should happen next?) in the existing procedure — never a
+ * separate simulation engine, never a diagnosis. */
+export type ClinicalChoicePrompt = {
+  promptEn: string;
+  promptAr: string;
+  options: ClinicalChoiceOption[];
+};
+
 /** One step of a guided procedure (Step 6/7). `isObservationStep` marks the
  * single step in a skill where the student records the scenario's clinical
  * observations (Step 9) instead of a plain "mark complete" action. */
@@ -17,6 +42,14 @@ export type ProcedureStepDef = {
   requiredActionEn: string;
   requiredActionAr: string;
   isObservationStep?: boolean;
+  /** Phase 3D — brief, accurate explanation of why this step matters
+   * clinically, shown inline under the instruction. Optional: only steps
+   * with real, verified rationale show one — never generic filler. */
+  rationaleEn?: string;
+  rationaleAr?: string;
+  /** Phase 3D — see ClinicalChoicePrompt. Optional: only steps 6 and 7 of
+   * each skill (Interpret / Respond) use this in practice. */
+  choicePrompt?: ClinicalChoicePrompt;
 };
 
 /** A single deterministic, scenario-defined clinical observation (Step 9).

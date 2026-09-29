@@ -535,6 +535,9 @@ export const ar = {
     practiceClinicalCaseButton: "تدرّبي على حالة سريرية",
     relatedClinicalCaseLabel: "الحالة السريرية ذات الصلة",
     noRelatedCaseAvailable: "لا توجد حالة سريرية ذات صلة متاحة حاليًا لهذه المهارة.",
+    whyThisMattersLabel: "لماذا يُعد هذا مهمًا سريريًا؟",
+    clinicalExplanationLabel: "التفسير السريري",
+    clinicalDecisionsLabel: "قراراتك السريرية",
   },
   common: {
     loading: "جارٍ التحميل...",
@@ -1192,6 +1195,9 @@ export const en: Dictionary = {
     practiceClinicalCaseButton: "Practice a Clinical Case",
     relatedClinicalCaseLabel: "Related Clinical Case",
     noRelatedCaseAvailable: "No related clinical case is available for this skill yet.",
+    whyThisMattersLabel: "Why This Matters Clinically",
+    clinicalExplanationLabel: "Clinical Explanation",
+    clinicalDecisionsLabel: "Your Clinical Decisions",
   },
   common: {
     loading: "Loading...",

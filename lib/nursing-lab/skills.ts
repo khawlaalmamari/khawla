@@ -72,6 +72,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "تحققي من هوية المريضة الافتراضية.",
         requiredActionEn: "Confirm the patient's name and identifying details.",
         requiredActionAr: "تأكدي من اسم المريضة وبياناتها التعريفية.",
+        rationaleEn:
+          "Confirming identity before any procedure prevents performing the wrong assessment on the wrong patient — a core patient-safety check before any clinical contact.",
+        rationaleAr:
+          "التحقق من الهوية قبل أي إجراء يمنع إجراء التقييم الخاطئ على مريضة أخرى — وهو تحقق أساسي لسلامة المريضة قبل أي تلامس سريري.",
       },
       {
         stepNumber: 2,
@@ -79,6 +83,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "اشرحي الإجراء للمريضة.",
         requiredActionEn: "State clearly what you are about to do and why.",
         requiredActionAr: "وضّحي بشكل واضح ما ستقومين به وسبب ذلك.",
+        rationaleEn:
+          "Explaining what you are about to do respects the patient's autonomy, reduces anxiety, and secures her informed cooperation before you begin.",
+        rationaleAr:
+          "شرح ما ستقومين به يحترم استقلالية المريضة، ويقلّل من قلقها، ويضمن تعاونها الواعي قبل البدء.",
       },
       {
         stepNumber: 3,
@@ -86,6 +94,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "قومي بنظافة اليدين.",
         requiredActionEn: "Wash or sanitize your hands before any contact.",
         requiredActionAr: "اغسلي يديك أو عقّميهما قبل أي تلامس.",
+        rationaleEn:
+          "Hand hygiene is the single most effective action for preventing the spread of microorganisms and reducing healthcare-associated infections.",
+        rationaleAr:
+          "نظافة اليدين هي الإجراء الأكثر فعالية لمنع انتقال الميكروبات وتقليل العدوى المرتبطة بالرعاية الصحية.",
       },
       {
         stepNumber: 4,
@@ -93,6 +105,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "جهّزي الأدوات بجانب السرير.",
         requiredActionEn: "Arrange the thermometer, stethoscope, cuff, and oximeter within reach.",
         requiredActionAr: "رتّبي ميزان الحرارة والسماعة وجهاز الضغط وجهاز التأكسج في متناول يدك.",
+        rationaleEn:
+          "Arranging equipment within reach avoids interrupting the procedure to search for tools, keeping your attention on the patient throughout.",
+        rationaleAr:
+          "ترتيب الأدوات في متناول اليد يمنع مقاطعة الإجراء للبحث عنها، ويبقي تركيزك على المريضة طوال الوقت.",
       },
       {
         stepNumber: 5,
@@ -101,6 +117,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         requiredActionEn: "Record temperature, heart rate, respiratory rate, blood pressure, and SpO2.",
         requiredActionAr: "سجّلي درجة الحرارة، ومعدل ضربات القلب، ومعدل التنفس، وضغط الدم، وتشبع الأكسجين.",
         isObservationStep: true,
+        rationaleEn:
+          "Measuring and recording every vital sign — not only the ones that seem relevant — builds a complete picture of the patient's physiological status.",
+        rationaleAr:
+          "قياس وتسجيل كل علامة حيوية — وليس فقط ما يبدو ذا صلة — يُكوّن صورة كاملة عن الحالة الفيزيولوجية للمريضة.",
       },
       {
         stepNumber: 6,
@@ -108,6 +128,41 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "قارني النتائج بالمعدلات الطبيعية للبالغين.",
         requiredActionEn: "Note whether each value falls within the expected range.",
         requiredActionAr: "لاحظي ما إذا كانت كل قيمة ضمن النطاق المتوقع.",
+        choicePrompt: {
+          promptEn:
+            "You measured: Temperature 37.0°C, Heart Rate 78 bpm, Respiratory Rate 16/min, Blood Pressure 118/76 mmHg, and SpO2 98%. How would you interpret this set of findings?",
+          promptAr:
+            "لقد قِستِ: درجة الحرارة 37.0° س، ومعدل ضربات القلب 78 نبضة/دقيقة، ومعدل التنفس 16/دقيقة، وضغط الدم 118/76 مم زئبق، وتشبع الأكسجين 98%. كيف تفسّرين هذه المجموعة من النتائج؟",
+          options: [
+            {
+              id: "within-normal",
+              labelEn: "All five values fall within normal adult ranges.",
+              labelAr: "جميع القيم الخمس ضمن المعدلات الطبيعية للبالغين.",
+              explanationEn:
+                "This is the correct reading: a temperature near 37°C, a heart rate of 60–100 bpm, a respiratory rate of 12–20/min, a blood pressure below 120/80 mmHg, and an SpO2 of 95% or higher are all within normal limits for a resting adult. Recognizing a normal set of vitals is just as important a skill as recognizing an abnormal one — it tells you the patient does not need an urgent response right now.",
+              explanationAr:
+                "هذه هي القراءة الصحيحة: درجة حرارة قريبة من 37°، ومعدل ضربات قلب بين 60-100 نبضة/دقيقة، ومعدل تنفس بين 12-20/دقيقة، وضغط دم أقل من 120/80، وتشبع أكسجين 95% فأعلى، كلها ضمن الحدود الطبيعية لبالغة في حالة راحة. التعرّف على مجموعة طبيعية من العلامات الحيوية مهارة لا تقل أهمية عن التعرّف على مجموعة غير طبيعية — فهي تخبرك أن المريضة لا تحتاج إلى استجابة عاجلة الآن.",
+            },
+            {
+              id: "concerning",
+              labelEn: "At least one value looks concerning and needs urgent follow-up.",
+              labelAr: "قيمة واحدة على الأقل تبدو مقلقة وتحتاج متابعة عاجلة.",
+              explanationEn:
+                "Looking again at the numbers — 37.0°C, 78 bpm, 16/min, 118/76 mmHg, 98% SpO2 — none actually fall outside the normal adult range. It's a good habit to check every value against its reference range before deciding something is concerning: treating normal findings as urgent can create unnecessary alarm and delay attention to genuinely abnormal findings elsewhere.",
+              explanationAr:
+                "بالنظر مرة أخرى إلى الأرقام — 37.0°، و78 نبضة/دقيقة، و16/دقيقة، و118/76، و98% — لا توجد قيمة تخرج فعليًا عن المعدل الطبيعي للبالغين. من العادات الجيدة مقارنة كل قيمة بمعدلها المرجعي قبل الحكم بأنها مقلقة: التعامل مع نتائج طبيعية على أنها عاجلة قد يُحدث قلقًا غير ضروري ويؤخّر الانتباه لنتائج غير طبيعية فعلية في مكان آخر.",
+            },
+            {
+              id: "repeat",
+              labelEn: "I would need to repeat the measurements before drawing any conclusion.",
+              labelAr: "أحتاج إلى إعادة القياس قبل استخلاص أي استنتاج.",
+              explanationEn:
+                "Repeating a measurement is reasonable when you have a specific reason to doubt it — for example, if the patient moved during the reading or the equipment seemed faulty. Here, the readings were taken correctly and are internally consistent with a calm, resting patient, so routine values like these do not need to be repeated automatically just because they are being reviewed.",
+              explanationAr:
+                "إعادة القياس أمر منطقي عندما يكون لديك سبب محدد للشك فيه — كأن تتحرك المريضة أثناء القياس أو يبدو الجهاز معطلاً. هنا، أُخذت القراءات بشكل صحيح وهي متّسقة مع حالة مريضة هادئة ومستريحة، لذا لا تحتاج قيم روتينية كهذه إلى إعادة تلقائية لمجرد مراجعتها.",
+            },
+          ],
+        },
       },
       {
         stepNumber: 7,
@@ -115,6 +170,39 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "انتقلي إلى التقييم التالي.",
         requiredActionEn: "Decide whether any finding needs to be reported or reassessed.",
         requiredActionAr: "حدّدي ما إذا كانت أي نتيجة بحاجة إلى الإبلاغ عنها أو إعادة تقييمها.",
+        choicePrompt: {
+          promptEn: "Given that all five vital signs are within normal limits, what is the most appropriate next action?",
+          promptAr: "بما أن جميع العلامات الحيوية الخمس ضمن الحدود الطبيعية، ما الإجراء التالي الأنسب؟",
+          options: [
+            {
+              id: "document-continue",
+              labelEn: "Document the findings accurately and continue routine monitoring.",
+              labelAr: "توثيق النتائج بدقة والاستمرار في المراقبة الروتينية.",
+              explanationEn:
+                "This is the standard response to a normal set of vital signs: accurate documentation creates a baseline for comparison at the next check, and routine monitoring continues without unnecessary escalation.",
+              explanationAr:
+                "هذا هو الإجراء المعياري لمجموعة طبيعية من العلامات الحيوية: التوثيق الدقيق يُنشئ خط أساس للمقارنة في الفحص التالي، وتستمر المراقبة الروتينية دون تصعيد غير ضروري.",
+            },
+            {
+              id: "escalate",
+              labelEn: "Immediately notify the physician or charge nurse.",
+              labelAr: "إبلاغ الطبيب أو الممرضة المسؤولة فورًا.",
+              explanationEn:
+                "Escalation is reserved for findings that are abnormal, trending in a concerning direction, or inconsistent with how the patient looks and feels. Escalating every normal set of vitals uses up limited clinical attention needed for patients who truly need it, and can undermine confidence in future, genuinely urgent reports.",
+              explanationAr:
+                "التصعيد مخصّص للنتائج غير الطبيعية أو المتجهة نحو اتجاه مقلق أو غير المتّسقة مع مظهر المريضة وحالتها. تصعيد كل مجموعة طبيعية من العلامات الحيوية يستنزف انتباهًا سريريًا محدودًا تحتاجه مريضات أخريات فعلاً، وقد يُضعف الثقة في البلاغات العاجلة الحقيقية لاحقًا.",
+            },
+            {
+              id: "withhold",
+              labelEn: "Withhold documentation until the next scheduled check.",
+              labelAr: "تأجيل التوثيق حتى الفحص المجدول التالي.",
+              explanationEn:
+                "Every set of vital signs should be documented as soon as it is measured, whether normal or abnormal — it is the permanent record other members of the care team rely on, and delaying it risks the information being forgotten or lost.",
+              explanationAr:
+                "يجب توثيق كل مجموعة من العلامات الحيوية فور قياسها، سواء كانت طبيعية أو غير طبيعية — فهي السجل الدائم الذي يعتمد عليه بقية أعضاء فريق الرعاية، وتأجيلها يُعرّض المعلومة لخطر النسيان أو الضياع.",
+            },
+          ],
+        },
       },
     ],
     observations: [
@@ -177,6 +265,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "تحققي من هوية المريض الافتراضي.",
         requiredActionEn: "Confirm the patient's name and identifying details.",
         requiredActionAr: "تأكدي من اسم المريض وبياناته التعريفية.",
+        rationaleEn:
+          "Confirming identity before any procedure prevents performing the wrong assessment on the wrong patient — a core patient-safety check before any clinical contact.",
+        rationaleAr:
+          "التحقق من الهوية قبل أي إجراء يمنع إجراء التقييم الخاطئ على مريض آخر — وهو تحقق أساسي لسلامة المريض قبل أي تلامس سريري.",
       },
       {
         stepNumber: 2,
@@ -184,6 +276,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "اشرحي التقييم التنفسي للمريض.",
         requiredActionEn: "State clearly what you are about to do and why.",
         requiredActionAr: "وضّحي بشكل واضح ما ستقومين به وسبب ذلك.",
+        rationaleEn:
+          "Explaining what you are about to do respects the patient's autonomy, reduces anxiety, and secures his informed cooperation before you begin.",
+        rationaleAr:
+          "شرح ما ستقومين به يحترم استقلالية المريض، ويقلّل من قلقه، ويضمن تعاونه الواعي قبل البدء.",
       },
       {
         stepNumber: 3,
@@ -191,6 +287,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "قومي بنظافة اليدين.",
         requiredActionEn: "Wash or sanitize your hands before any contact.",
         requiredActionAr: "اغسلي يديك أو عقّميهما قبل أي تلامس.",
+        rationaleEn:
+          "Hand hygiene is the single most effective action for preventing the spread of microorganisms and reducing healthcare-associated infections.",
+        rationaleAr:
+          "نظافة اليدين هي الإجراء الأكثر فعالية لمنع انتقال الميكروبات وتقليل العدوى المرتبطة بالرعاية الصحية.",
       },
       {
         stepNumber: 4,
@@ -198,6 +298,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "لاحظي معدل التنفس ونظمه وعمقه.",
         requiredActionEn: "Watch chest rise and fall for a full minute without alerting the patient.",
         requiredActionAr: "راقبي ارتفاع الصدر وانخفاضه لمدة دقيقة كاملة دون لفت انتباه المريض.",
+        rationaleEn:
+          "Observing breathing before touching the patient or drawing attention to it gives a truer picture of his natural, unaltered breathing pattern.",
+        rationaleAr:
+          "ملاحظة التنفس قبل لمس المريض أو لفت انتباهه إليه تعطي صورة أصدق عن نمط تنفسه الطبيعي غير المتأثر بالملاحظة.",
       },
       {
         stepNumber: 5,
@@ -206,6 +310,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         requiredActionEn: "Record respiratory rate, breath sounds, SpO2, and use of accessory muscles.",
         requiredActionAr: "سجّلي معدل التنفس، وأصوات التنفس، وتشبع الأكسجين، واستخدام العضلات المساعدة للتنفس.",
         isObservationStep: true,
+        rationaleEn:
+          "Recording rate, sound, oxygenation, and effort together gives a fuller respiratory picture than any single value alone.",
+        rationaleAr:
+          "تسجيل المعدل والصوت والتأكسج والجهد التنفسي معًا يُعطي صورة تنفسية أشمل من أي قيمة منفردة.",
       },
       {
         stepNumber: 6,
@@ -213,6 +321,41 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "لاحظي أي علامات لضيق التنفس.",
         requiredActionEn: "Check for labored breathing, unusual color, or abnormal sounds.",
         requiredActionAr: "تحققي من وجود صعوبة في التنفس، أو لون غير طبيعي، أو أصوات غير معتادة.",
+        choicePrompt: {
+          promptEn:
+            "You observed: Respiratory Rate 16/min, breath sounds clear bilaterally, SpO2 97%, and no use of accessory muscles. How would you interpret these findings?",
+          promptAr:
+            "لاحظتِ: معدل تنفس 16/دقيقة، وأصوات تنفس صافية على الجانبين، وتشبع أكسجين 97%، ودون استخدام للعضلات المساعدة للتنفس. كيف تفسّرين هذه النتائج؟",
+          options: [
+            {
+              id: "unlabored",
+              labelEn: "Breathing is unlabored and within the normal range for an adult at rest.",
+              labelAr: "التنفس غير مجهد وضمن المعدل الطبيعي لبالغ في حالة راحة.",
+              explanationEn:
+                "A respiratory rate of 12–20 breaths per minute, clear bilateral breath sounds, an SpO2 of 95% or above, and no accessory muscle use together describe comfortable, effective breathing — exactly what you'd expect from someone recovering well from a mild chest cold.",
+              explanationAr:
+                "معدل تنفس بين 12-20 نفسًا في الدقيقة، وأصوات تنفس صافية على الجانبين، وتشبع أكسجين 95% فأعلى، ودون استخدام للعضلات المساعدة، كلها تصف تنفسًا مريحًا وفعالًا — تمامًا كما يُتوقع من شخص يتعافى جيدًا من نزلة صدرية خفيفة.",
+            },
+            {
+              id: "under-breathing",
+              labelEn: "The absence of accessory muscle use suggests the patient is not breathing enough.",
+              labelAr: "عدم استخدام العضلات المساعدة يشير إلى أن المريض لا يتنفس بشكل كافٍ.",
+              explanationEn:
+                "It's actually the opposite: accessory muscles (in the neck and shoulders) only become active when normal breathing muscles can't keep up, such as in significant respiratory distress. Their absence here is a reassuring sign, not a concerning one.",
+              explanationAr:
+                "الأمر عكس ذلك تمامًا: العضلات المساعدة (في الرقبة والكتفين) تنشط فقط عندما لا تستطيع عضلات التنفس الطبيعية مواكبة الحاجة، كما في ضيق التنفس الشديد. غيابها هنا علامة مطمئنة وليست مقلقة.",
+            },
+            {
+              id: "no-further-need",
+              labelEn: "Clear breath sounds mean no further respiratory assessment is ever needed.",
+              labelAr: "الأصوات التنفسية الصافية تعني أنه لا حاجة لأي تقييم تنفسي لاحق أبدًا.",
+              explanationEn:
+                "Clear breath sounds at this moment are a good sign, but a patient's respiratory status can change — especially one recovering from a recent illness. Continued observation over time, not a single clear reading, is what confirms ongoing respiratory stability.",
+              explanationAr:
+                "الأصوات التنفسية الصافية في هذه اللحظة علامة جيدة، لكن حالة المريض التنفسية قد تتغيّر — خاصة وهو يتعافى من مرض حديث. المراقبة المستمرة عبر الوقت، وليس قراءة واحدة صافية، هي ما يؤكد استقرار التنفس المستمر.",
+            },
+          ],
+        },
       },
       {
         stepNumber: 7,
@@ -220,6 +363,39 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "انتقلي إلى التقييم التالي.",
         requiredActionEn: "Decide whether any finding needs to be reported or reassessed.",
         requiredActionAr: "حدّدي ما إذا كانت أي نتيجة بحاجة إلى الإبلاغ عنها أو إعادة تقييمها.",
+        choicePrompt: {
+          promptEn: "Based on this reassuring respiratory assessment, what is the most appropriate next step?",
+          promptAr: "بناءً على هذا التقييم التنفسي المطمئن، ما الخطوة التالية الأنسب؟",
+          options: [
+            {
+              id: "document-continue",
+              labelEn: "Document the findings and continue routine reassessment as scheduled.",
+              labelAr: "توثيق النتائج والاستمرار في إعادة التقييم الروتيني حسب الجدول.",
+              explanationEn:
+                "Reassuring findings still need to be recorded — they form the baseline that would make any future change easier to recognize — and routine reassessment continues on its normal schedule.",
+              explanationAr:
+                "النتائج المطمئنة تحتاج إلى تسجيل أيضًا — فهي تُشكّل خط الأساس الذي يجعل أي تغيّر مستقبلي أسهل ملاحظة — وتستمر إعادة التقييم الروتيني وفق جدولها الطبيعي.",
+            },
+            {
+              id: "supplemental-oxygen",
+              labelEn: "Apply supplemental oxygen as a precaution.",
+              labelAr: "إعطاء أكسجين إضافي كإجراء احترازي.",
+              explanationEn:
+                "Supplemental oxygen is a treatment for low oxygen saturation or respiratory distress, neither of which is present here (SpO2 97%, no distress). Applying oxygen without a clinical indication is not standard practice and should always follow an assessment that actually shows a need for it.",
+              explanationAr:
+                "الأكسجين الإضافي علاج لانخفاض تشبع الأكسجين أو ضيق التنفس، وكلاهما غير موجود هنا (تشبع 97% ودون ضيق). إعطاء الأكسجين دون مؤشر سريري ليس ممارسة معيارية، ويجب أن يأتي دائمًا بعد تقييم يُظهر فعلاً حاجة له.",
+            },
+            {
+              id: "force-breathing",
+              labelEn: "Ask the patient to breathe deeply and rapidly to confirm the reading.",
+              labelAr: "طلب من المريض التنفس بعمق وسرعة للتأكد من القراءة.",
+              explanationEn:
+                "Asking a patient to deliberately change their breathing pattern would change the very thing you are trying to measure. A respiratory assessment should always observe a patient's natural, resting breathing pattern.",
+              explanationAr:
+                "طلب تغيير نمط التنفس عمدًا يُغيّر بالضبط ما تحاولين قياسه. يجب أن يلاحظ التقييم التنفسي دائمًا نمط التنفس الطبيعي للمريض أثناء الراحة.",
+            },
+          ],
+        },
       },
     ],
     observations: [
@@ -297,6 +473,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "تحققي من هوية المريضة الافتراضية.",
         requiredActionEn: "Confirm the patient's name and identifying details.",
         requiredActionAr: "تأكدي من اسم المريضة وبياناتها التعريفية.",
+        rationaleEn:
+          "Confirming identity before any procedure prevents performing the wrong assessment on the wrong patient — a core patient-safety check before any clinical contact.",
+        rationaleAr:
+          "التحقق من الهوية قبل أي إجراء يمنع إجراء التقييم الخاطئ على مريضة أخرى — وهو تحقق أساسي لسلامة المريضة قبل أي تلامس سريري.",
       },
       {
         stepNumber: 2,
@@ -304,6 +484,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "اشرحي التقييم القلبي الوعائي للمريضة.",
         requiredActionEn: "State clearly what you are about to do and why.",
         requiredActionAr: "وضّحي بشكل واضح ما ستقومين به وسبب ذلك.",
+        rationaleEn:
+          "Explaining what you are about to do respects the patient's autonomy, reduces anxiety, and secures her informed cooperation before you begin.",
+        rationaleAr:
+          "شرح ما ستقومين به يحترم استقلالية المريضة، ويقلّل من قلقها، ويضمن تعاونها الواعي قبل البدء.",
       },
       {
         stepNumber: 3,
@@ -311,6 +495,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "قومي بنظافة اليدين.",
         requiredActionEn: "Wash or sanitize your hands before any contact.",
         requiredActionAr: "اغسلي يديك أو عقّميهما قبل أي تلامس.",
+        rationaleEn:
+          "Hand hygiene is the single most effective action for preventing the spread of microorganisms and reducing healthcare-associated infections.",
+        rationaleAr:
+          "نظافة اليدين هي الإجراء الأكثر فعالية لمنع انتقال الميكروبات وتقليل العدوى المرتبطة بالرعاية الصحية.",
       },
       {
         stepNumber: 4,
@@ -318,6 +506,8 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "حدّدي موضع النبض الرسغي أو القمي.",
         requiredActionEn: "Position your fingers or stethoscope to feel or hear the pulse clearly.",
         requiredActionAr: "ضعي أصابعك أو السماعة بشكل صحيح للإحساس بالنبض أو سماعه بوضوح.",
+        rationaleEn: "Correctly locating the pulse first ensures an accurate reading rather than a rushed or misplaced one.",
+        rationaleAr: "تحديد موضع النبض بدقة أولًا يضمن قراءة صحيحة بدلاً من قراءة متسرّعة أو في موضع خاطئ.",
       },
       {
         stepNumber: 5,
@@ -326,6 +516,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         requiredActionEn: "Record heart rate, blood pressure, apical rhythm, peripheral pulses, and capillary refill.",
         requiredActionAr: "سجّلي معدل ضربات القلب، وضغط الدم، ونظم النبض القمي، والنبض الطرفي، وزمن امتلاء الشعيرات الدموية.",
         isObservationStep: true,
+        rationaleEn:
+          "Recording rate, pressure, rhythm, and perfusion together — not just one number — reflects how the whole cardiovascular system is functioning.",
+        rationaleAr:
+          "تسجيل المعدل والضغط والنظم والتروية معًا — وليس رقمًا واحدًا فقط — يعكس كيفية عمل الجهاز القلبي الوعائي ككل.",
       },
       {
         stepNumber: 6,
@@ -333,6 +527,41 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "قيّمي الدورة الدموية الطرفية.",
         requiredActionEn: "Check the color, warmth, and pulses of the extremities.",
         requiredActionAr: "تحققي من لون الأطراف ودفئها ونبضها.",
+        choicePrompt: {
+          promptEn:
+            "You recorded: Heart Rate 82 bpm, Blood Pressure 122/80 mmHg, a regular apical rhythm, strong and equal peripheral pulses, and capillary refill under 2 seconds. How would you interpret these findings?",
+          promptAr:
+            "لقد سجّلتِ: معدل ضربات قلب 82 نبضة/دقيقة، وضغط دم 122/80 مم زئبق، ونظم نبض قمي منتظم، ونبض طرفي قوي ومتساوٍ، وزمن امتلاء شعيرات دموية أقل من ثانيتين. كيف تفسّرين هذه النتائج؟",
+          options: [
+            {
+              id: "normal",
+              labelEn: "Cardiovascular status appears normal for a resting adult.",
+              labelAr: "الحالة القلبية الوعائية تبدو طبيعية لبالغة في حالة راحة.",
+              explanationEn:
+                "A heart rate of 60–100 bpm, blood pressure below 130/80 mmHg, a regular rhythm, strong equal pulses, and capillary refill under 2–3 seconds together describe healthy circulatory function at rest — exactly what is expected for a calm, resting patient.",
+              explanationAr:
+                "معدل ضربات قلب بين 60-100، وضغط دم أقل من 130/80، ونظم منتظم، ونبض قوي ومتساوٍ، وزمن امتلاء شعيرات أقل من 2-3 ثوانٍ، كلها تصف وظيفة دورانية سليمة أثناء الراحة — تمامًا كما يُتوقع من مريضة هادئة ومستريحة.",
+            },
+            {
+              id: "bp-emergency",
+              labelEn: "The blood pressure reading is dangerously high and needs immediate treatment.",
+              labelAr: "قراءة ضغط الدم مرتفعة بشكل خطير وتحتاج علاجًا فوريًا.",
+              explanationEn:
+                "122/80 mmHg falls within the normal blood pressure range for an adult; it is not elevated. Treating a normal reading as a hypertensive emergency would expose the patient to unnecessary intervention.",
+              explanationAr:
+                "قراءة 122/80 ضمن المعدل الطبيعي لضغط الدم عند البالغين، وليست مرتفعة. التعامل مع قراءة طبيعية كحالة ارتفاع ضغط طارئة يُعرّض المريضة لتدخل غير ضروري.",
+            },
+            {
+              id: "poor-perfusion",
+              labelEn: "Capillary refill under 2 seconds is a warning sign of poor circulation.",
+              labelAr: "زمن امتلاء الشعيرات أقل من ثانيتين علامة تحذيرية لضعف الدورة الدموية.",
+              explanationEn:
+                "It's the opposite: a capillary refill time under 2 seconds is the normal, reassuring finding. A prolonged refill time (generally over 2–3 seconds) is what would raise concern about peripheral circulation.",
+              explanationAr:
+                "الأمر عكس ذلك: زمن امتلاء الشعيرات أقل من ثانيتين هو النتيجة الطبيعية والمطمئنة. الزمن المطوّل (عادة أكثر من 2-3 ثوانٍ) هو ما يُثير القلق بشأن الدورة الدموية الطرفية.",
+            },
+          ],
+        },
       },
       {
         stepNumber: 7,
@@ -340,6 +569,39 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "انتقلي إلى التقييم التالي.",
         requiredActionEn: "Decide whether any finding needs to be reported or reassessed.",
         requiredActionAr: "حدّدي ما إذا كانت أي نتيجة بحاجة إلى الإبلاغ عنها أو إعادة تقييمها.",
+        choicePrompt: {
+          promptEn: "Given these normal cardiovascular findings, what is the most appropriate next action?",
+          promptAr: "بالنظر إلى هذه النتائج القلبية الوعائية الطبيعية، ما الإجراء التالي الأنسب؟",
+          options: [
+            {
+              id: "document-continue",
+              labelEn: "Document the findings and proceed with the routine care plan.",
+              labelAr: "توثيق النتائج والمتابعة وفق خطة الرعاية الروتينية.",
+              explanationEn:
+                "Normal cardiovascular findings are documented just like abnormal ones — the record supports continuity of care — and the patient continues with her scheduled, routine plan.",
+              explanationAr:
+                "تُوثَّق النتائج القلبية الطبيعية تمامًا كغير الطبيعية — فالسجل يدعم استمرارية الرعاية — وتستمر المريضة في خطتها الروتينية المجدولة.",
+            },
+            {
+              id: "repeat-bp",
+              labelEn: "Repeat the blood pressure twice more in immediate succession to be certain.",
+              labelAr: "إعادة قياس ضغط الدم مرتين متتاليتين فورًا للتأكد.",
+              explanationEn:
+                "Repeating a measurement immediately and repeatedly, without a specific reason to doubt the first reading, is not standard practice and can itself raise the patient's anxiety, which may then affect the next reading. A single, correctly taken measurement is sufficient when there's no indication it was inaccurate.",
+              explanationAr:
+                "إعادة القياس فورًا ومرارًا دون سبب محدد للشك بالقراءة الأولى ليست ممارسة معيارية، وقد تُثير قلق المريضة بحد ذاتها، مما يؤثر على القراءة التالية. قياس واحد صحيح يكفي عندما لا يوجد ما يشير إلى عدم دقته.",
+            },
+            {
+              id: "fluid-advice",
+              labelEn: "Advise the patient to reduce fluid intake based on this result.",
+              labelAr: "نصح المريضة بتقليل تناول السوائل بناءً على هذه النتيجة.",
+              explanationEn:
+                "Nothing in these findings indicates a fluid-balance problem, and specific dietary or fluid advice should come from a full clinical assessment and the care team's plan — not be improvised from a single set of normal vital signs.",
+              explanationAr:
+                "لا شيء في هذه النتائج يشير إلى مشكلة في توازن السوائل، والنصائح الغذائية أو المتعلقة بالسوائل يجب أن تصدر عن تقييم سريري كامل وخطة فريق الرعاية — وليس ارتجالاً بناءً على مجموعة طبيعية واحدة من العلامات الحيوية.",
+            },
+          ],
+        },
       },
     ],
     observations: [
