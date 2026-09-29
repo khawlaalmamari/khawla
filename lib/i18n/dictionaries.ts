@@ -401,6 +401,13 @@ export const ar = {
     whatToDoDifferentlyPlaceholder: "ما الذي تعلمتِه لتطبيقه في محاكاة قادمة؟",
     saveReflectionButton: "حفظ التأمل",
     reflectionSaved: "تم حفظ تأملك.",
+    reasoningTransitionTitle: "الآن فكّر سريريًا",
+    reasoningTransitionBody: "لقد جمعت المعلومات من المريض ونتائج التقييم. استخدم المعلومات التي جمعتها لتنظيم تفكيرك السريري.",
+    continueToReasoningButton: "المتابعة إلى التفكير السريري",
+    debriefTransitionTitle: "تأمل في ممارستك",
+    debriefTransitionBody:
+      "التفكير السريري لا يقتصر على اتخاذ القرار. تأمل فيما لاحظته، والمعلومات التي كنت ترغب في الحصول عليها، وما الذي ستفعله بشكل مختلف.",
+    continueToDebriefButton: "المتابعة إلى التقييم التأملي",
   },
   anatomy3D: {
     pageTitle: "استكشاف التشريح ثلاثي الأبعاد",
@@ -1035,6 +1042,14 @@ export const en: Dictionary = {
     whatToDoDifferentlyPlaceholder: "What did you learn to apply in a future simulation?",
     saveReflectionButton: "Save Reflection",
     reflectionSaved: "Your reflection was saved.",
+    reasoningTransitionTitle: "Now Think Clinically",
+    reasoningTransitionBody:
+      "You have gathered information from the patient and assessments. Use the findings you collected to organize your clinical reasoning.",
+    continueToReasoningButton: "Continue to Clinical Reasoning",
+    debriefTransitionTitle: "Reflect on Your Practice",
+    debriefTransitionBody:
+      "Clinical reasoning is not only about making a decision. Reflect on what you noticed, what information you still wanted, and what you would do differently.",
+    continueToDebriefButton: "Continue to Debriefing",
   },
   anatomy3D: {
     pageTitle: "3D Anatomy Explorer",

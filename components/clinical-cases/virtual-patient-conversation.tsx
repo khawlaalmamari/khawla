@@ -205,6 +205,11 @@ export function VirtualPatientConversation({
   const [reflectionSaving, setReflectionSaving] = useState(false);
   const [reflectionSaved, setReflectionSaved] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  // Phase 3C-2 — pure navigation/continuity aids: both sections already
+  // render unconditionally (Reasoning) or once COMPLETED (Debriefing), so
+  // these only scroll to and focus the existing heading, never gate access.
+  const reasoningHeadingRef = useRef<HTMLHeadingElement>(null);
+  const debriefHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const patient = attempt.visibleData.patientProfile;
 
@@ -326,6 +331,17 @@ export function VirtualPatientConversation({
     } finally {
       setEnding(false);
     }
+  }
+
+  // Phase 3C-2 — scrolls to (and moves focus to) an existing section's own
+  // heading, respecting prefers-reduced-motion. Purely navigational: it
+  // never changes status, saves data, or reveals a section that wasn't
+  // already rendered.
+  function goToSection(ref: React.RefObject<HTMLHeadingElement | null>) {
+    const prefersReducedMotion =
+      typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    ref.current?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    ref.current?.focus();
   }
 
   const conversationMessages = messages.filter((m) => !isAssessmentType(m.category));
@@ -490,9 +506,28 @@ export function VirtualPatientConversation({
         </div>
       </Card>
 
+      {/* Phase 3C-2 — educational transition nudging the student from
+          gathering evidence toward organizing their clinical reasoning.
+          Purely navigational: Clinical Reasoning below is already
+          unconditionally rendered and editable while IN_PROGRESS, so this
+          never gates or reorders anything. Only shown once there is
+          something to reason about, and no longer once reasoning is
+          locked (status is no longer IN_PROGRESS). */}
+      {status === "IN_PROGRESS" && hasEvidence && (
+        <Card className="border-primary-200 bg-primary-50">
+          <h2 className="text-lg font-bold">{dict.clinicalCases.reasoningTransitionTitle}</h2>
+          <p className="mt-1 text-sm">{dict.clinicalCases.reasoningTransitionBody}</p>
+          <Button className="mt-3" onClick={() => goToSection(reasoningHeadingRef)}>
+            {dict.clinicalCases.continueToReasoningButton}
+          </Button>
+        </Card>
+      )}
+
       {/* Clinical Reasoning */}
       <Card>
-        <h2 className="text-lg font-bold">{dict.clinicalCases.clinicalReasoningTitle}</h2>
+        <h2 ref={reasoningHeadingRef} tabIndex={-1} className="text-lg font-bold">
+          {dict.clinicalCases.clinicalReasoningTitle}
+        </h2>
 
         <h3 className="mt-4 text-sm font-semibold">{dict.clinicalCases.evidenceTitle}</h3>
         <p className="mt-1 text-xs text-muted">{dict.clinicalCases.evidenceHint}</p>
@@ -646,12 +681,28 @@ export function VirtualPatientConversation({
         </Card>
       )}
 
+      {/* Phase 3C-2 — educational transition from Clinical Reasoning into
+          Debriefing. Only ever shown once COMPLETED, same as the
+          Debriefing section itself below — this never reorders or gates
+          anything, it only helps the student notice the next step. */}
+      {status === "COMPLETED" && (
+        <Card className="border-primary-200 bg-primary-50">
+          <h2 className="text-lg font-bold">{dict.clinicalCases.debriefTransitionTitle}</h2>
+          <p className="mt-1 text-sm">{dict.clinicalCases.debriefTransitionBody}</p>
+          <Button className="mt-3" onClick={() => goToSection(debriefHeadingRef)}>
+            {dict.clinicalCases.continueToDebriefButton}
+          </Button>
+        </Card>
+      )}
+
       {/* Clinical Debriefing — Phase 2E. Only ever rendered once the
           attempt is COMPLETED (Step 3): a student mid-interview never
           sees this section at all. */}
       {status === "COMPLETED" && (
         <Card>
-          <h2 className="text-lg font-bold">{dict.clinicalCases.debriefingTitle}</h2>
+          <h2 ref={debriefHeadingRef} tabIndex={-1} className="text-lg font-bold">
+            {dict.clinicalCases.debriefingTitle}
+          </h2>
           <p className="mt-1 text-sm text-muted">{dict.clinicalCases.debriefIntro}</p>
 
           <h3 className="mt-4 text-sm font-semibold">{dict.clinicalCases.yourSimulationSummaryLabel}</h3>
