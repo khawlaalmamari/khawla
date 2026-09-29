@@ -201,6 +201,25 @@ const DECISION_EXPLANATIONS: Record<string, Bilingual> = {
     en: "Routine monitoring alone is usually appropriate when findings are reassuring. Here, however, the patient's chest pain together with this specific set of vital sign changes is the kind of combination nursing education asks you to actively communicate and further assess, rather than waiting for the next scheduled check.",
     ar: "المراقبة الروتينية وحدها تكون مناسبة عادةً عندما تكون النتائج مطمئنة. أما هنا، فألم الصدر إلى جانب هذه المجموعة تحديدًا من التغيرات في العلامات الحيوية هو بالضبط نوع التوليفات الذي يطلب منكِ التعليم التمريضي التواصل بشأنه وتقييمه بشكل أكبر بفعالية، بدلاً من انتظار الفحص المجدول التالي.",
   },
+  // Phase 3G-2 — shortness-of-breath-adult's own decision. Grounded only
+  // in this case's own scripted findings (RR 26, HR 108, SpO2 93%,
+  // audible wheeze, accessory muscle use, short-phrase speech).
+  "DECISION_RESP_POST_VITALS:reassess": {
+    en: "Repeating the respiratory rate and oxygen saturation after a short interval helps determine whether her breathing is stable, improving, or worsening — useful here, where the initial reading already showed an elevated respiratory rate, mild tachycardia, and mildly reduced oxygen saturation.",
+    ar: "إعادة قياس معدل التنفس وتشبع الأكسجين بعد فترة قصيرة تساعد على معرفة ما إذا كان تنفسها مستقرًا أو يتحسن أو يزداد سوءًا — وهذا مفيد هنا، حيث أظهرت القراءة الأولية معدل تنفس مرتفعًا، وتسارعًا خفيفًا في ضربات القلب، وانخفاضًا طفيفًا في تشبع الأكسجين.",
+  },
+  "DECISION_RESP_POST_VITALS:assist-inhaler": {
+    en: "Assisting with her own prescribed reliever inhaler is an appropriate first nursing action for these findings — audible wheeze and accessory muscle use — since it is already her standing prescription for exactly this situation, and reassessing afterward shows whether her breathing is responding.",
+    ar: "مساعدتها على استخدام بخاخها المخفف الموصوف هو إجراء تمريضي أولي مناسب لهذه النتائج — الصفير المسموع واستخدام عضلات التنفس المساعدة — لأنه دواؤها الموصوف أصلاً لمثل هذا الموقف تحديدًا، وإعادة التقييم بعد ذلك يُظهر ما إذا كان تنفسها يستجيب.",
+  },
+  "DECISION_RESP_POST_VITALS:escalate": {
+    en: "Communicating findings promptly is appropriate when several signs point the same way, as they do here: audible wheeze, visible accessory muscle use, speech limited to short phrases, and mildly reduced oxygen saturation together suggest more than a mild exacerbation. Early communication keeps the wider care team informed rather than one nurse managing it alone.",
+    ar: "التواصل الفوري بشأن النتائج مناسب عندما تتفق عدة علامات في نفس الاتجاه، كما هو الحال هنا: الصفير المسموع، والاستخدام الظاهر لعضلات التنفس المساعدة، والتحدث بعبارات قصيرة فقط، وانخفاض طفيف في تشبع الأكسجين — كلها معًا تشير إلى أكثر من نوبة خفيفة. التواصل المبكر يُبقي فريق الرعاية الأوسع على اطّلاع بدلاً من أن تديره ممرضة واحدة بمفردها.",
+  },
+  "DECISION_RESP_POST_VITALS:monitor": {
+    en: "Routine monitoring alone is usually appropriate when breathing is settling and findings are reassuring. Here, however, the combination of audible wheeze, accessory muscle use, and short-phrase speech is the kind of pattern nursing education asks you to act on more actively, rather than waiting for the next scheduled check.",
+    ar: "المراقبة الروتينية وحدها تكون مناسبة عادةً عندما يكون التنفس يتحسن والنتائج مطمئنة. أما هنا، فمجموعة الصفير المسموع واستخدام عضلات التنفس المساعدة والتحدث بعبارات قصيرة هي بالضبط نوع النمط الذي يطلب منكِ التعليم التمريضي التصرف حياله بفعالية أكبر، بدلاً من انتظار الفحص المجدول التالي.",
+  },
 };
 
 /** Returns null for an unknown decision/option id pair — callers must
@@ -234,6 +253,23 @@ const DECISION_LEARNING_INSIGHTS: Record<string, Bilingual> = {
   "DECISION_POST_VITALS:monitor": {
     en: "This decision practiced routine monitoring. Clinical thinking also means weighing whether combined findings — like chest pain together with this specific set of vital-sign changes — call for more active follow-up than waiting for the next scheduled check, which is worth considering here.",
     ar: "هذا القرار درّبكِ على المراقبة الروتينية. يتضمن التفكير السريري أيضًا تقييم ما إذا كانت النتائج مجتمعة — كألم الصدر مع هذه المجموعة تحديدًا من التغيرات في العلامات الحيوية — تستدعي متابعة أكثر فاعلية من انتظار الفحص المجدول التالي، وهو أمر يستحق التفكير فيه هنا.",
+  },
+  // Phase 3G-2 — shortness-of-breath-adult.
+  "DECISION_RESP_POST_VITALS:reassess": {
+    en: "This decision practiced trend monitoring: recognizing that breathing status can change quickly, and that a short repeat check of respiratory rate and oxygen saturation helps you tell whether she is stable, improving, or worsening.",
+    ar: "هذا القرار درّبكِ على مهارة متابعة التطوّر: إدراك أن حالة التنفس قد تتغير بسرعة، وأن إعادة تقييم سريعة لمعدل التنفس وتشبع الأكسجين تساعدكِ على معرفة ما إذا كانت مستقرة أو تتحسن أو تزداد سوءًا.",
+  },
+  "DECISION_RESP_POST_VITALS:assist-inhaler": {
+    en: "This decision practiced prioritization: recognizing when a patient's findings — audible wheeze and accessory muscle use — call for a focused, already-prescribed nursing action rather than observation alone, then reassessing to see whether it helped.",
+    ar: "هذا القرار درّبكِ على مهارة تحديد الأولويات: التعرّف على الحالات التي تتطلب — كوجود صفير مسموع واستخدام عضلات التنفس المساعدة — إجراءً تمريضيًا مركّزًا وموصوفًا مسبقًا بدلاً من الاكتفاء بالملاحظة، ثم إعادة التقييم لمعرفة ما إذا كان قد ساعد.",
+  },
+  "DECISION_RESP_POST_VITALS:escalate": {
+    en: "This decision practiced clinical communication: recognizing that several findings pointing the same way — wheeze, accessory muscle use, short-phrase speech, and reduced oxygen saturation — call for informing the wider care team promptly, rather than one nurse managing it alone.",
+    ar: "هذا القرار درّبكِ على مهارة التواصل السريري: إدراك أن اجتماع عدة نتائج في اتجاه واحد — الصفير، واستخدام عضلات التنفس المساعدة، والتحدث بعبارات قصيرة، وانخفاض تشبع الأكسجين — يستدعي إبلاغ فريق الرعاية الأوسع فورًا، بدلاً من أن تديره ممرضة واحدة بمفردها.",
+  },
+  "DECISION_RESP_POST_VITALS:monitor": {
+    en: "This decision practiced routine monitoring. Clinical thinking also means weighing whether combined findings — like audible wheeze together with accessory muscle use and short-phrase speech — call for more active follow-up than waiting for the next scheduled check, which is worth considering here.",
+    ar: "هذا القرار درّبكِ على المراقبة الروتينية. يتضمن التفكير السريري أيضًا تقييم ما إذا كانت النتائج مجتمعة — كالصفير المسموع مع استخدام عضلات التنفس المساعدة والتحدث بعبارات قصيرة — تستدعي متابعة أكثر فاعلية من انتظار الفحص المجدول التالي، وهو أمر يستحق التفكير فيه هنا.",
   },
 };
 

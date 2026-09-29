@@ -66,6 +66,53 @@ export const DECISION_POINTS: Record<string, ClinicalDecisionPointSummary[]> = {
       ],
     },
   ],
+  // Phase 3G-2 — grounded entirely in this case's own scripted findings
+  // (elevated respiratory rate, mild tachycardia, mildly reduced oxygen
+  // saturation, audible wheeze, accessory muscle use, short-phrase
+  // speech). The decision id is globally unique on purpose: explanations
+  // and insights below are keyed "<decisionId>:<optionId>" in a flat map
+  // shared across all cases, so reusing chest-pain-adult's id here would
+  // silently collide with its entries.
+  "shortness-of-breath-adult": [
+    {
+      id: "DECISION_RESP_POST_VITALS",
+      triggerAssessment: "VITAL_SIGNS",
+      prompt: {
+        en: "Based on the vital signs and breathing pattern you just observed, what would you prioritize next?",
+        ar: "بناءً على العلامات الحيوية ونمط التنفس الذي لاحظتِه للتو، ما الذي ستُعطينه الأولوية بعد ذلك؟",
+      },
+      options: [
+        {
+          id: "reassess",
+          label: {
+            en: "Reassess vital signs and breathing shortly to check for a trend.",
+            ar: "إعادة تقييم العلامات الحيوية والتنفس بعد قليل لمتابعة تطوّرها.",
+          },
+        },
+        {
+          id: "assist-inhaler",
+          label: {
+            en: "Assist the patient with her prescribed reliever inhaler and reassess her breathing afterward.",
+            ar: "مساعدة المريضة على استخدام بخاخها المخفف الموصوف وإعادة تقييم تنفسها بعد ذلك.",
+          },
+        },
+        {
+          id: "escalate",
+          label: {
+            en: "Communicate your concern to the supervising nurse or physician now.",
+            ar: "إبلاغ الممرضة المسؤولة أو الطبيب بقلقك الآن.",
+          },
+        },
+        {
+          id: "monitor",
+          label: {
+            en: "Continue routine monitoring without further action.",
+            ar: "الاستمرار في المراقبة الروتينية دون إجراء إضافي.",
+          },
+        },
+      ],
+    },
+  ],
 };
 
 export function getDecisionPointSummaries(caseSlug: string): ClinicalDecisionPointSummary[] {

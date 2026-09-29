@@ -155,6 +155,157 @@ const clinicalCases = [
       },
     },
   },
+  {
+    // Phase 3G-2 — second case, deliberately a different learning pattern
+    // from chest-pain-adult: a young, otherwise well, known-asthmatic
+    // patient with an acute asthma exacerbation. Vital signs and exam
+    // findings are respiratory-led (tachypnea, mild tachycardia from
+    // effort, mildly reduced SpO2, near-normal blood pressure) rather than
+    // the cardiovascular-led pattern of chest-pain-adult, so the same
+    // "observe -> assess -> decide -> explain -> reason -> reflect" loop
+    // exercises a genuinely different set of findings and a different
+    // (non-cardiac) safe nursing action.
+    slug: "shortness-of-breath-adult",
+    titleEn: "Shortness of Breath — Adult Patient",
+    titleAr: "ضيق التنفس — مريضة بالغة",
+    descriptionEn:
+      "A fictional educational case: a young adult with known asthma presents with acute shortness of breath and wheezing. Practice structured respiratory assessment and safe nursing decision-making.",
+    descriptionAr:
+      "حالة تعليمية افتراضية: مريضة بالغة شابة معروف أنها مصابة بالربو تصل وهي تعاني من ضيق تنفس حاد وصفير في الصدر. تدرّبي على التقييم التنفسي المنظم واتخاذ قرار تمريضي آمن.",
+    difficulty: "BEGINNER",
+    category: "RESPIRATORY",
+    order: 2,
+    visibleData: {
+      patientProfile: {
+        age: 24,
+        gender: "female",
+        setting: { en: "Outpatient/walk-in clinic", ar: "عيادة المراجعين الخارجية" },
+        name: { en: "Maha", ar: "مها" },
+        personality: { en: "Cooperative but visibly anxious", ar: "متعاونة لكنها قلقة بوضوح" },
+        communicationStyle: {
+          en: "Speaks in short phrases, pauses to catch her breath",
+          ar: "تتحدث بعبارات قصيرة، وتتوقف لالتقاط أنفاسها",
+        },
+        initialEmotionalState: "ANXIOUS",
+      },
+      chiefComplaint: {
+        en: "\"I can't... catch my breath... my chest feels tight.\"",
+        ar: "«لا أستطيع... التقاط أنفاسي... صدري يشعر بضيق.»",
+      },
+      presentingSymptoms: [
+        { en: "Shortness of breath, started about 30 minutes ago", ar: "ضيق في التنفس بدأ منذ نحو 30 دقيقة" },
+        { en: "Audible wheeze when breathing out", ar: "صفير مسموع عند الزفير" },
+        { en: "Chest tightness", ar: "شعور بضيق في الصدر" },
+        { en: "Mild dry cough", ar: "سعال جاف خفيف" },
+        { en: "Used her reliever inhaler at home with only partial relief", ar: "استخدمت بخاخها المخفف في المنزل دون تحسّن كامل" },
+      ],
+      learningObjectives: [
+        {
+          en: "Recognize observable signs of respiratory distress during a first assessment.",
+          ar: "التعرّف على العلامات الظاهرة لضيق التنفس أثناء التقييم الأولي.",
+        },
+        {
+          en: "Take a structured, symptom-focused respiratory history.",
+          ar: "أخذ تاريخ مرضي منظم يركّز على أعراض الجهاز التنفسي.",
+        },
+        {
+          en: "Practice prioritizing a safe nursing action based on combined findings, not a single value alone.",
+          ar: "التدرّب على تحديد أولوية إجراء تمريضي آمن بناءً على مجموع النتائج، لا قيمة واحدة بمفردها.",
+        },
+      ],
+    },
+    hiddenData: {
+      medicalHistory: [
+        { en: "Asthma, diagnosed in childhood, usually well controlled", ar: "الربو، تم تشخيصه في الطفولة، وعادة ما يكون مضبوطًا جيدًا" },
+      ],
+      medications: [
+        { en: "Salbutamol inhaler (reliever), as needed", ar: "بخاخ سالبوتامول (موسّع للشعب الهوائية، للاستخدام عند الحاجة)" },
+        { en: "Fluticasone inhaler (preventer), twice daily", ar: "بخاخ فلوتيكازون (وقائي)، مرتين يوميًا" },
+      ],
+      allergies: [{ en: "No known drug allergies", ar: "لا توجد حساسية دوائية معروفة" }],
+      familyHistory: [{ en: "Mother also has asthma", ar: "الوالدة مصابة بالربو أيضًا" }],
+      socialHistory: [
+        { en: "University student, non-smoker", ar: "طالبة جامعية، غير مدخّنة" },
+        { en: "Lives in an older building with noticeable dust", ar: "تسكن في مبنى قديم فيه غبار ملحوظ" },
+      ],
+      clinicalClues: [
+        { en: "Symptoms began while cleaning a dusty room, shortly after climbing stairs", ar: "بدأت الأعراض أثناء تنظيف غرفة مليئة بالغبار، بعد صعود السلالم بوقت قصير" },
+        { en: "Only partial relief from her usual reliever inhaler so far", ar: "لم تشعر إلا بتحسّن جزئي من بخاخها المخفف المعتاد حتى الآن" },
+      ],
+      redFlags: [
+        {
+          en: "Speaking in short phrases, visible use of accessory neck muscles, and mildly reduced oxygen saturation together suggest at least a moderate asthma exacerbation",
+          ar: "التحدث بعبارات قصيرة، مع استخدام واضح لعضلات الرقبة المساعدة على التنفس، وانخفاض طفيف في تشبع الأكسجين — كلها معًا تشير إلى نوبة ربو متوسطة الشدة على الأقل",
+        },
+      ],
+      possibleDiagnoses: [
+        { en: "Acute asthma exacerbation", ar: "نوبة ربو حادة" },
+        { en: "Allergic reaction with bronchospasm", ar: "تفاعل تحسسي مصحوب بتشنج قصبي" },
+        { en: "Anxiety-related hyperventilation", ar: "فرط تهوية مرتبط بالقلق" },
+        { en: "Early respiratory infection", ar: "عدوى تنفسية مبكرة" },
+      ],
+      expectedQuestions: [
+        { en: "When exactly did the breathlessness start, and what were you doing?", ar: "متى بدأ ضيق التنفس بالضبط، وما كنتِ تفعلين؟" },
+        { en: "Have you used your inhaler, and did it help?", ar: "هل استخدمتِ بخاخكِ، وهل ساعدك؟" },
+        { en: "Do you have a history of asthma or other breathing problems?", ar: "هل لديكِ تاريخ من الربو أو مشاكل تنفسية أخرى؟" },
+        { en: "Is there anything around you that may have triggered this, like dust or an allergen?", ar: "هل يوجد شيء حولكِ قد يكون سببًا لهذا، كالغبار أو مسبب حساسية؟" },
+      ],
+      debriefing: {
+        en: "This presentation — audible wheeze, chest tightness, short-phrase speech, accessory muscle use, and only partial relief from her usual reliever inhaler — is consistent with a moderate asthma exacerbation that needs active nursing follow-up rather than routine observation alone. This is a fictional educational scenario, not medical guidance for a real patient.",
+        ar: "هذا العرض — الصفير المسموع، وضيق الصدر، والتحدث بعبارات قصيرة، واستخدام عضلات التنفس المساعدة، والتحسّن الجزئي فقط من بخاخها المخفف المعتاد — يتوافق مع نوبة ربو متوسطة الشدة تحتاج متابعة تمريضية فعّالة لا مجرد ملاحظة روتينية. هذا سيناريو تعليمي افتراضي، وليس توجيهًا طبيًا لحالة مريضة حقيقية.",
+      },
+      interviewResponses: {
+        ONSET: { en: "It started about 30 minutes ago, while I was cleaning.", ar: "بدأ منذ حوالي 30 دقيقة، بينما كنت أنظّف." },
+        LOCATION: { en: "The tightness is across my whole chest.", ar: "الضيق منتشر في كل صدري." },
+        DURATION: { en: "It's been going on for about half an hour now.", ar: "استمر الأمر منذ نحو نصف ساعة الآن." },
+        CHARACTER: { en: "My chest feels tight, and I can hear myself wheezing.", ar: "أشعر بضيق في صدري، وأسمع صفيرًا عندما أتنفس." },
+        SEVERITY: { en: "It's pretty bad, I can only say a few words at a time.", ar: "الأمر سيء إلى حد ما، لا أستطيع قول سوى كلمات قليلة في المرة الواحدة." },
+        TIMING: { en: "It hasn't gone away since it started.", ar: "لم يختفِ منذ أن بدأ." },
+        AGGRAVATING_FACTORS: { en: "Moving around or talking too much makes it worse.", ar: "الحركة أو الكلام الكثير يزيد الأمر سوءًا." },
+        RELIEVING_FACTORS: { en: "My inhaler helped a little, but not completely.", ar: "بخاخي ساعدني قليلاً، لكن ليس بشكل كامل." },
+        CHIEF_COMPLAINT: {
+          en: "I can't catch my breath and my chest feels tight.",
+          ar: "لا أستطيع التقاط أنفاسي وصدري يشعر بضيق.",
+        },
+      },
+      assessments: {
+        vitalSigns: {
+          temperatureCelsius: 37.0,
+          heartRate: 108,
+          bloodPressureSystolic: 122,
+          bloodPressureDiastolic: 78,
+          respiratoryRate: 26,
+          oxygenSaturation: 93,
+        },
+        physicalExaminations: {
+          GENERAL_INSPECTION: {
+            en: "The patient is sitting upright, leaning slightly forward, speaking in short phrases with visible use of accessory neck muscles.",
+            ar: "تجلس المريضة منتصبة ومائلة قليلاً إلى الأمام، تتحدث بعبارات قصيرة مع استخدام واضح لعضلات الرقبة المساعدة على التنفس.",
+          },
+          RESPIRATORY: {
+            en: "Bilateral expiratory wheeze on auscultation, with a prolonged expiratory phase. No crackles.",
+            ar: "صفير زفيري ثنائي الجانب عند التسمّع، مع إطالة في مرحلة الزفير. لا توجد أصوات فرقعة (Crackles).",
+          },
+          CARDIOVASCULAR: {
+            en: "Heart rate is mildly elevated with a regular rhythm. Peripheral pulses are strong and equal.",
+            ar: "معدل ضربات القلب مرتفع بشكل طفيف مع انتظام النظم. النبضات المحيطية قوية ومتساوية.",
+          },
+          PAIN: {
+            en: "The patient describes chest tightness rather than sharp pain, worsened by the effort of breathing.",
+            ar: "تصف المريضة شعورًا بالضيق في الصدر وليس ألمًا حادًا، ويزداد مع جهد التنفس.",
+          },
+          PALPATION: {
+            en: "Chest wall is non-tender, with equal and symmetric chest expansion.",
+            ar: "جدار الصدر غير مؤلم عند الجس، مع تمدد متساوٍ ومتناظر للصدر.",
+          },
+          AUSCULTATION: {
+            en: "Heart sounds S1 and S2 are normal, with no murmurs, rubs, or gallops.",
+            ar: "صوتا القلب S1 و S2 طبيعيان، دون أي لغط أو أصوات احتكاك أو أصوات إضافية.",
+          },
+        },
+      },
+    },
+  },
 ];
 
 module.exports = { clinicalCases };
