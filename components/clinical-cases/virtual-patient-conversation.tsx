@@ -15,6 +15,7 @@ import type {
 import { ASSESSMENT_TYPES, QUESTION_CATEGORIES } from "@/lib/clinical-cases/types";
 import { assessmentTypeLabel } from "@/lib/clinical-cases/labels";
 import { parseVitalSigns } from "@/lib/clinical-cases/assessment-format";
+import { getDecisionPointSummaries } from "@/lib/clinical-cases/decision-points";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -198,6 +199,7 @@ export function VirtualPatientConversation({
   const [summary, setSummary] = useState<InterviewSummary | null>(null);
   const [ending, setEnding] = useState(false);
   const [assessmentLoading, setAssessmentLoading] = useState<AssessmentType | null>(null);
+  const [decisionSubmitting, setDecisionSubmitting] = useState<string | null>(null);
   const [reasoning, setReasoning] = useState<ReasoningFields>(attempt.reasoning ?? EMPTY_REASONING);
   const [reasoningSaving, setReasoningSaving] = useState(false);
   const [reasoningSaved, setReasoningSaved] = useState(false);
@@ -268,6 +270,27 @@ export function VirtualPatientConversation({
       setMessages((m) => [...m, data.studentMessage, data.resultMessage]);
     } finally {
       setAssessmentLoading(null);
+    }
+  }
+
+  // Phase 3E — persists the student's choice as an ordinary STUDENT/SYSTEM
+  // turn pair (see recordClinicalDecision), then appends both to the same
+  // `messages` state the rest of the transcript already uses — no
+  // separate client-side store for this feature.
+  async function submitDecision(decisionId: string, optionId: string) {
+    if (status !== "IN_PROGRESS" || decisionSubmitting) return;
+    setDecisionSubmitting(decisionId);
+    try {
+      const res = await fetch(`/api/clinical-case-attempts/${attempt.id}/decisions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decisionId, optionId }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setMessages((m) => [...m, data.studentMessage, data.resultMessage]);
+    } finally {
+      setDecisionSubmitting(null);
     }
   }
 
@@ -344,7 +367,18 @@ export function VirtualPatientConversation({
     ref.current?.focus();
   }
 
-  const conversationMessages = messages.filter((m) => !isAssessmentType(m.category));
+  // Phase 3E — decision-point ids for this case, needed up front so the
+  // general conversation transcript below can exclude them (they get
+  // their own dedicated Clinical Decision Point card instead — see
+  // isDecisionType, mirroring how isAssessmentType already keeps
+  // assessment turns out of that same transcript).
+  const decisionPoints = getDecisionPointSummaries(attempt.caseSlug);
+  const decisionCategoryIds = new Set(decisionPoints.map((p) => p.id));
+  function isDecisionType(category: string | null): boolean {
+    return !!category && decisionCategoryIds.has(category);
+  }
+
+  const conversationMessages = messages.filter((m) => !isAssessmentType(m.category) && !isDecisionType(m.category));
   const assessmentMessages = messages.filter((m) => m.role === "SYSTEM" && isAssessmentType(m.category));
   // Phase 2D — the facts available for reasoning: the patient's answers
   // (not the student's own questions) plus assessment findings. Built
@@ -352,6 +386,14 @@ export function VirtualPatientConversation({
   // never anything from hiddenData that wasn't actually discovered.
   const interviewEvidence = messages.filter((m) => m.role === "PATIENT" && m.category);
   const hasEvidence = interviewEvidence.length > 0 || assessmentMessages.length > 0;
+  // Phase 3E — unlocked once its trigger assessment has actually been
+  // requested for THIS attempt (Step "Observe finding" before "Choose
+  // next action") — computed live from `messages`, the same reactive
+  // pattern `hasEvidence`/`alreadyPerformed` already use, so a newly
+  // unlocked decision point appears immediately without a page reload.
+  const unlockedDecisionPoints = decisionPoints.filter((p) =>
+    assessmentMessages.some((m) => m.category === p.triggerAssessment),
+  );
 
   return (
     <div className="space-y-6">
@@ -505,6 +547,61 @@ export function VirtualPatientConversation({
           ))}
         </div>
       </Card>
+
+      {/* Phase 3E — bounded branching interaction: a real nursing choice
+          grounded in a finding the student just observed in THIS attempt
+          (never a hidden diagnosis, never scored). Sits between Clinical
+          Assessment and Clinical Reasoning, matching the intended
+          Observe -> Choose -> Explain -> Reasoning flow. */}
+      {unlockedDecisionPoints.length > 0 && (
+        <Card>
+          <h2 className="text-lg font-bold">{dict.clinicalCases.clinicalDecisionTitle}</h2>
+          <p className="mt-1 text-sm text-muted">{dict.clinicalCases.clinicalDecisionIntro}</p>
+
+          <div className="mt-4 space-y-4">
+            {unlockedDecisionPoints.map((point) => {
+              const studentMsg = messages.find((m) => m.role === "STUDENT" && m.category === point.id);
+              const resultMsg = messages.find((m) => m.role === "SYSTEM" && m.category === point.id);
+              const answered = !!(studentMsg && resultMsg);
+
+              return (
+                <div key={point.id} className="rounded-lg border border-border bg-background p-4">
+                  <p className="text-sm font-medium">{locale === "ar" ? point.prompt.ar : point.prompt.en}</p>
+
+                  {answered ? (
+                    <div className="mt-3 space-y-2">
+                      <p className="rounded-lg bg-surface p-2 text-sm">
+                        <span className="font-semibold">{dict.clinicalCases.decisionChosenLabel} </span>
+                        {studentMsg.message}
+                      </p>
+                      <div className="rounded-lg bg-primary-50 p-3" role="status" aria-live="polite">
+                        <p className="text-xs font-semibold text-muted">
+                          {dict.clinicalCases.decisionExplanationLabel}
+                        </p>
+                        <p className="mt-1 text-sm">{resultMsg.message}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-3 flex flex-col gap-2">
+                      {point.options.map((option) => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => submitDecision(point.id, option.id)}
+                          disabled={status !== "IN_PROGRESS" || decisionSubmitting !== null}
+                          className="rounded-lg border border-border bg-surface p-3 text-start text-sm transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-50"
+                        >
+                          {locale === "ar" ? option.label.ar : option.label.en}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
 
       {/* Phase 3C-2 — educational transition nudging the student from
           gathering evidence toward organizing their clinical reasoning.

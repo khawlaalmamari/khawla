@@ -7,6 +7,7 @@
 import type { AssessmentType, Bilingual, HiddenCaseData, QuestionCategory, VisibleCaseData } from "./types";
 import { ASSESSMENT_TYPES, QUESTION_CATEGORIES } from "./types";
 import { encodeVitalSigns } from "./assessment-format";
+import { DECISION_POINTS } from "./decision-points";
 
 const NOT_SURE: Bilingual = {
   en: "I'm not sure about that.",
@@ -167,4 +168,53 @@ export function buildAssessmentResult(
   const finding = hiddenData.assessments.physicalExaminations[type];
   if (!finding) return null;
   return locale === "ar" ? finding.ar : finding.en;
+}
+
+// ---------------------------------------------------------------------
+// Phase 3E — Branching Clinical Case Interaction
+// ---------------------------------------------------------------------
+
+// Server-only: the clinical explanation for each decision option, keyed
+// by "<decisionId>:<optionId>". Deliberately NOT exported from
+// decision-points.ts (which the client component also imports) — this
+// file is only ever imported by lib/clinical-cases/queries.ts, a
+// server-only module, so this text never reaches the client bundle until
+// a student actually picks an option and it comes back as an ordinary
+// persisted conversation message (same reveal-on-request pattern as
+// buildAssessmentResult above). Every explanation is real commentary on
+// this case's own existing findings — no diagnosis is named, and no
+// option is marked correct or incorrect.
+const DECISION_EXPLANATIONS: Record<string, Bilingual> = {
+  "DECISION_POST_VITALS:reassess": {
+    en: "Repeating vital signs after a short interval helps determine whether a finding is stable, improving, or worsening — especially useful here, where the initial reading already showed an elevated heart rate, elevated blood pressure, an increased respiratory rate, and mildly reduced oxygen saturation.",
+    ar: "إعادة قياس العلامات الحيوية بعد فترة قصيرة تساعد على معرفة ما إذا كانت النتيجة مستقرة أو تتحسن أو تزداد سوءًا — وهذا مفيد بشكل خاص هنا، حيث أظهرت القراءة الأولية معدل ضربات قلب مرتفعًا، وضغط دم مرتفعًا، ومعدل تنفس متزايدًا، وتشبع أكسجين منخفضًا قليلاً.",
+  },
+  "DECISION_POST_VITALS:cardio-assess": {
+    en: "A focused cardiovascular assessment (use the Cardiovascular Assessment button above) adds information — heart sounds, peripheral pulses, signs of fluid overload — that vital signs alone don't provide, and is a logical next step when the initial vitals raise a cardiovascular question.",
+    ar: "التقييم القلبي الوعائي المركّز (استخدمي زر «تقييم القلب والأوعية الدموية» أعلاه) يضيف معلومات — كأصوات القلب والنبض الطرفي وعلامات احتقان السوائل — لا توفرها العلامات الحيوية وحدها، وهو خطوة منطقية تالية عندما تثير العلامات الحيوية الأولية تساؤلاً قلبيًا وعائيًا.",
+  },
+  "DECISION_POST_VITALS:escalate": {
+    en: "Communicating findings promptly is appropriate when a patient's presentation and vital signs together raise concern, as they do here: chest pain together with an elevated heart rate, elevated blood pressure, increased respiratory rate, and mildly reduced oxygen saturation. Early communication keeps the wider care team informed rather than one nurse deciding alone whether to act.",
+    ar: "التواصل الفوري بشأن النتائج مناسب عندما تثير حالة المريض وعلاماته الحيوية معًا القلق، كما هو الحال هنا: ألم في الصدر مع معدل ضربات قلب مرتفع، وضغط دم مرتفع، ومعدل تنفس متزايد، وتشبع أكسجين منخفض قليلاً. التواصل المبكر يُبقي فريق الرعاية الأوسع على اطّلاع بدلاً من أن تقرر ممرضة واحدة بمفردها ما إذا كان ينبغي التصرف.",
+  },
+  "DECISION_POST_VITALS:monitor": {
+    en: "Routine monitoring alone is usually appropriate when findings are reassuring. Here, however, the patient's chest pain together with this specific set of vital sign changes is the kind of combination nursing education asks you to actively communicate and further assess, rather than waiting for the next scheduled check.",
+    ar: "المراقبة الروتينية وحدها تكون مناسبة عادةً عندما تكون النتائج مطمئنة. أما هنا، فألم الصدر إلى جانب هذه المجموعة تحديدًا من التغيرات في العلامات الحيوية هو بالضبط نوع التوليفات الذي يطلب منكِ التعليم التمريضي التواصل بشأنه وتقييمه بشكل أكبر بفعالية، بدلاً من انتظار الفحص المجدول التالي.",
+  },
+};
+
+/** Returns null for an unknown decision/option id pair — callers must
+ * treat that as "not supported" (Step 14), never fall back to guessing. */
+export function getDecisionExplanation(decisionId: string, optionId: string): Bilingual | null {
+  return DECISION_EXPLANATIONS[`${decisionId}:${optionId}`] ?? null;
+}
+
+const ALL_DECISION_IDS = new Set(Object.values(DECISION_POINTS).flat().map((p) => p.id));
+
+/** True if `category` is one of this app's decision-point ids — used by
+ * getInterviewSummary to keep decision turns out of the existing
+ * questionsAsked/discovered-information counts, the same way assessment
+ * categories are already excluded there. */
+export function isDecisionCategory(category: string): boolean {
+  return ALL_DECISION_IDS.has(category);
 }

@@ -88,3 +88,11 @@ export const assessmentTypeSchema = z.enum([
 export const requestAssessmentSchema = z.object({
   type: assessmentTypeSchema,
 });
+
+// Phase 3E — Step 14: the only client input for a branching decision is
+// which decision point and which option were chosen; the server looks up
+// the real explanation from its own data, never from the request body.
+export const recordDecisionSchema = z.object({
+  decisionId: z.string().trim().min(1).max(100),
+  optionId: z.string().trim().min(1).max(100),
+});

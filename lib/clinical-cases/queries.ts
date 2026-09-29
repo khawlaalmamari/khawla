@@ -17,9 +17,12 @@ import {
   buildPatientResponse,
   classifyQuestion,
   getAvailableAssessments,
+  getDecisionExplanation,
   isAssessmentSupported,
+  isDecisionCategory,
   nextEmotionalState,
 } from "./patient-engine";
+import { getDecisionPointSummaries } from "./decision-points";
 
 /** Listing-safe fields only — never includes hiddenDataJson. */
 const metadataSelect = {
@@ -331,6 +334,79 @@ export async function requestAssessment(
   };
 }
 
+/**
+ * Phase 3E — records the student's choice at a bounded branching decision
+ * point (Step "Choose next action" -> "Receive clinical explanation") as
+ * an ordinary STUDENT/SYSTEM turn pair in the existing conversation-
+ * message table — the exact same persistence and shape as
+ * requestAssessment above, with a decision-point id in place of an
+ * AssessmentType. No new Prisma model or field.
+ *
+ * Enforces, in order (Step 14): authenticated user (caller's job, via
+ * userId), attempt exists + belongs to this user + is active, this case
+ * actually defines the given decision point, that its trigger assessment
+ * has genuinely been performed in THIS attempt (never trusts the
+ * client's own gating of which buttons it chose to show), the option
+ * exists, and the decision hasn't already been answered (Step "bounded":
+ * once made, a decision is permanent — it isn't re-explorable the way a
+ * Nursing Lab drill is, matching how the rest of this interview's record
+ * is a permanent transcript, not a scratchpad).
+ */
+export async function recordClinicalDecision(
+  attemptId: string,
+  userId: string,
+  decisionId: string,
+  optionId: string,
+  locale: "ar" | "en",
+): Promise<
+  | { error: "notFound" }
+  | { error: "notSupported" }
+  | { error: "alreadyAnswered" }
+  | { studentMessage: ConversationMessageDTO; resultMessage: ConversationMessageDTO }
+> {
+  const attempt = await prisma.clinicalCaseAttempt.findFirst({
+    where: { id: attemptId, userId, status: "IN_PROGRESS" },
+    include: { case: true, messages: true },
+  });
+  if (!attempt) return { error: "notFound" };
+
+  const point = getDecisionPointSummaries(attempt.case.slug).find((p) => p.id === decisionId);
+  if (!point) return { error: "notSupported" };
+
+  const performedAssessments = new Set(
+    attempt.messages
+      .filter((m) => m.role === "SYSTEM" && m.category && (ASSESSMENT_TYPES as readonly string[]).includes(m.category))
+      .map((m) => m.category as AssessmentType),
+  );
+  if (!performedAssessments.has(point.triggerAssessment)) return { error: "notSupported" };
+
+  if (attempt.messages.some((m) => m.category === decisionId)) return { error: "alreadyAnswered" };
+
+  const option = point.options.find((o) => o.id === optionId);
+  if (!option) return { error: "notSupported" };
+
+  const explanation = getDecisionExplanation(decisionId, optionId);
+  if (!explanation) return { error: "notSupported" };
+
+  const studentText = locale === "ar" ? option.label.ar : option.label.en;
+  const resultText = locale === "ar" ? explanation.ar : explanation.en;
+  const priorCount = attempt.messages.length;
+
+  const [studentMessage, resultMessage] = await prisma.$transaction([
+    prisma.clinicalCaseConversationMessage.create({
+      data: { attemptId, role: "STUDENT", message: studentText, category: decisionId, sequence: priorCount + 1 },
+    }),
+    prisma.clinicalCaseConversationMessage.create({
+      data: { attemptId, role: "SYSTEM", message: resultText, category: decisionId, sequence: priorCount + 2 },
+    }),
+  ]);
+
+  return {
+    studentMessage: toMessageDTO(studentMessage),
+    resultMessage: toMessageDTO(resultMessage),
+  };
+}
+
 /** Ownership enforced via the userId filter in the update itself — a
  * foreign attemptId simply updates zero rows. */
 export async function updateAttemptNotes(
@@ -399,6 +475,11 @@ export async function getInterviewSummary(
   let questionsAsked = 0;
   for (const m of attempt.messages) {
     if (!m.category) continue;
+    // Phase 3E reuses this same message table for decision-point turns
+    // (role STUDENT/SYSTEM, category a decision-point id) — keep those
+    // out of both questionsAsked and assessmentsPerformed, the same way
+    // assessment categories are already kept out of questionsAsked below.
+    if (isDecisionCategory(m.category)) continue;
     // Phase 2C reuses this same message table for assessment requests
     // (role SYSTEM, category an AssessmentType) — keep those out of the
     // Phase 2B interview-category count, and STUDENT-role assessment

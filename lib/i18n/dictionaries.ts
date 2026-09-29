@@ -423,6 +423,10 @@ export const ar = {
     debriefTransitionBody:
       "التفكير السريري لا يقتصر على اتخاذ القرار. تأمل فيما لاحظته، والمعلومات التي كنت ترغب في الحصول عليها، وما الذي ستفعله بشكل مختلف.",
     continueToDebriefButton: "المتابعة إلى التقييم التأملي",
+    clinicalDecisionTitle: "نقطة قرار سريري",
+    clinicalDecisionIntro: "اختاري الإجراء الذي تعتقدين أنه الأنسب بناءً على هذه الملاحظة.",
+    decisionChosenLabel: "اخترتِ:",
+    decisionExplanationLabel: "التفسير السريري",
   },
   anatomy3D: {
     pageTitle: "استكشاف التشريح ثلاثي الأبعاد",
@@ -1083,6 +1087,10 @@ export const en: Dictionary = {
     debriefTransitionBody:
       "Clinical reasoning is not only about making a decision. Reflect on what you noticed, what information you still wanted, and what you would do differently.",
     continueToDebriefButton: "Continue to Debriefing",
+    clinicalDecisionTitle: "Clinical Decision Point",
+    clinicalDecisionIntro: "Choose the action you think is most appropriate given this finding.",
+    decisionChosenLabel: "You chose:",
+    decisionExplanationLabel: "Clinical Explanation",
   },
   anatomy3D: {
     pageTitle: "3D Anatomy Explorer",
