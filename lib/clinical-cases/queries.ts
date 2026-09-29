@@ -182,6 +182,52 @@ export type AttemptView = {
 };
 
 /**
+ * Phase 3G-4 — the single rule for picking which of a student's (possibly
+ * several) attempts at something represents their current standing: a
+ * completed attempt if any exists (most recently completed first),
+ * otherwise their most recently started in-progress one, otherwise none.
+ * ABANDONED attempts are never picked (an honest "didn't finish" rather
+ * than invented partial credit) — this is the exact selection rule
+ * getLearningJourney already used for its single cross-case "primary"
+ * attempt; extracted here so the new per-case Dashboard breakdown (same
+ * file, see getLearningJourney in lib/dashboard/queries.ts) applies it
+ * identically instead of redefining it.
+ */
+export function pickRepresentativeAttempt<
+  T extends { status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED"; startedAt: Date; completedAt: Date | null },
+>(attempts: T[]): T | null {
+  const completed = attempts
+    .filter((a) => a.status === "COMPLETED")
+    .sort((a, b) => (b.completedAt?.getTime() ?? 0) - (a.completedAt?.getTime() ?? 0));
+  if (completed.length > 0) return completed[0];
+  const inProgress = attempts
+    .filter((a) => a.status === "IN_PROGRESS")
+    .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
+  return inProgress[0] ?? null;
+}
+
+/** Phase 3G-4 — a single Clinical Case's progress for one student, derived
+ * entirely from their existing ClinicalCaseAttempt data (see
+ * pickRepresentativeAttempt above) — no new persistence. REASONING_COMPLETED
+ * sits between IN_PROGRESS and COMPLETED: the student has saved Clinical
+ * Reasoning notes but hasn't ended the interview yet. */
+export type ClinicalCaseProgressStatus = "NOT_STARTED" | "IN_PROGRESS" | "REASONING_COMPLETED" | "COMPLETED";
+
+export type ClinicalCaseProgressSummary = {
+  slug: string;
+  titleEn: string;
+  titleAr: string;
+  status: ClinicalCaseProgressStatus;
+  /** True once a Learning Insight (Phase 3F) has actually been earned for
+   * this case's representative attempt — never sent to the client before
+   * that, mirroring decisionInsights above. */
+  learningInsightUnlocked: boolean;
+  /** The representative attempt's id, for a direct "continue" link — null
+   * only when status is NOT_STARTED. */
+  attemptId: string | null;
+};
+
+/**
  * Phase 3F — recovers which option a student chose at a decision point
  * from the STUDENT turn's own persisted text (recordClinicalDecision
  * never stores the option id itself, only its bilingual label — see

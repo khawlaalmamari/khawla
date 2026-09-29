@@ -231,6 +231,9 @@ export const ar = {
     continueAnatomyButton: "متابعة دراسة التشريح",
     practiceNursingSkillButton: "تدرّبي على مهارة تمريضية",
     reviewYourLearningButton: "مراجعة ما تعلمتِه",
+    caseReasoningCompletedLabel: "اكتمل التفكير السريري",
+    learningInsightUnlockedLabel: "الرؤية التعليمية متاحة",
+    openCaseButton: "فتح",
   },
   course: {
     modules: "الموديلات",
@@ -903,6 +906,9 @@ export const en: Dictionary = {
     continueAnatomyButton: "Continue Anatomy",
     practiceNursingSkillButton: "Practice a Nursing Skill",
     reviewYourLearningButton: "Review Your Learning",
+    caseReasoningCompletedLabel: "Clinical reasoning completed",
+    learningInsightUnlockedLabel: "Insight Unlocked",
+    openCaseButton: "Open",
   },
   course: {
     modules: "Modules",

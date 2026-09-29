@@ -1,4 +1,11 @@
 import { prisma } from "@/lib/db";
+import {
+  getPublishedCases,
+  pickRepresentativeAttempt,
+  type ClinicalCaseProgressStatus,
+  type ClinicalCaseProgressSummary,
+} from "@/lib/clinical-cases/queries";
+import { getDecisionPointSummaries } from "@/lib/clinical-cases/decision-points";
 
 // Phase 3C-3 — Learning Progression. A small representation of the
 // existing pipeline (Anatomy -> Nursing Skill Practice -> Clinical Case ->
@@ -35,6 +42,11 @@ export type LearningJourney = {
   currentStageId: LearningStageId | null; // null once every derivable stage is COMPLETED
   stagesCompletedCount: number;
   nextAction: LearningJourneyNextAction;
+  // Phase 3G-4 — one entry per published Clinical Case (not just the
+  // single cross-case "primary" attempt the CLINICAL_CASE stage above
+  // reflects), so a student can tell two cases apart instead of the whole
+  // area collapsing into one status. See getLearningJourney below.
+  caseProgress: ClinicalCaseProgressSummary[];
 };
 
 /**
@@ -80,25 +92,22 @@ export async function getLearningJourney(
       completedAt: true,
       finalDecisionJson: true,
       interactionLogJson: true,
-      case: { select: { slug: true } },
+      case: { select: { slug: true, titleEn: true, titleAr: true } },
+      // Phase 3G-4 — role+category only (never message text) is enough to
+      // tell whether a Learning Insight has been earned for a case's
+      // representative attempt; see caseProgress below.
+      messages: { select: { role: true, category: true } },
     },
     orderBy: { startedAt: "desc" },
   });
 
-  // ABANDONED attempts (declared in the schema, not currently reachable
-  // from any code path) count as neither in-progress nor completed here —
-  // an honest "didn't finish" rather than invented partial credit.
-  const completedAttempts = attempts
-    .filter((a) => a.status === "COMPLETED")
-    .sort((a, b) => (b.completedAt?.getTime() ?? 0) - (a.completedAt?.getTime() ?? 0));
-  const inProgressAttempts = attempts
-    .filter((a) => a.status === "IN_PROGRESS")
-    .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
   // The attempt representing the student's most advanced Clinical Case
-  // standing — a completed one if any exists, otherwise their most
-  // recent in-progress one.
-  const primary = completedAttempts[0] ?? inProgressAttempts[0] ?? null;
-  const hasAnyRelevantAttempt = completedAttempts.length > 0 || inProgressAttempts.length > 0;
+  // standing across ALL cases — a completed one if any exists, otherwise
+  // their most recent in-progress one. Reused as-is (see
+  // pickRepresentativeAttempt) for the per-case breakdown below, so both
+  // apply the identical selection rule.
+  const primary = pickRepresentativeAttempt(attempts);
+  const hasAnyRelevantAttempt = attempts.some((a) => a.status === "COMPLETED" || a.status === "IN_PROGRESS");
 
   const anatomyStatus: LearningStageStatus =
     anatomyStats.completed > 0 ? "COMPLETED" : anatomyStarted ? "IN_PROGRESS" : "NOT_STARTED";
@@ -106,8 +115,11 @@ export async function getLearningJourney(
   // Documented limitation (see function doc above): never verifiable.
   const nursingSkillStatus: LearningStageStatus = "NOT_STARTED";
 
-  const clinicalCaseStatus: LearningStageStatus =
-    completedAttempts.length > 0 ? "COMPLETED" : inProgressAttempts.length > 0 ? "IN_PROGRESS" : "NOT_STARTED";
+  const clinicalCaseStatus: LearningStageStatus = attempts.some((a) => a.status === "COMPLETED")
+    ? "COMPLETED"
+    : attempts.some((a) => a.status === "IN_PROGRESS")
+      ? "IN_PROGRESS"
+      : "NOT_STARTED";
 
   const reasoningStatus: LearningStageStatus = primary?.finalDecisionJson ? "COMPLETED" : "NOT_STARTED";
 
@@ -146,7 +158,48 @@ export async function getLearningJourney(
     nextAction = { kind: "JOURNEY_COMPLETE" };
   }
 
-  return { stages, currentStageId, stagesCompletedCount, nextAction };
+  // Phase 3G-4 — per-case breakdown, grouping these same already-fetched
+  // attempts by case (no extra attempt query) and applying
+  // pickRepresentativeAttempt within each group, so multiple cases never
+  // collapse into the single CLINICAL_CASE stage status above. A case the
+  // student never attempted still appears (via getPublishedCases) as
+  // NOT_STARTED, rather than silently disappearing.
+  const publishedCases = await getPublishedCases();
+  const attemptsByCaseSlug = new Map<string, typeof attempts>();
+  for (const a of attempts) {
+    const list = attemptsByCaseSlug.get(a.case.slug) ?? [];
+    list.push(a);
+    attemptsByCaseSlug.set(a.case.slug, list);
+  }
+  const caseProgress: ClinicalCaseProgressSummary[] = publishedCases.map((c) => {
+    const representative = pickRepresentativeAttempt(attemptsByCaseSlug.get(c.slug) ?? []);
+    if (!representative) {
+      return {
+        slug: c.slug,
+        titleEn: c.titleEn,
+        titleAr: c.titleAr,
+        status: "NOT_STARTED" as ClinicalCaseProgressStatus,
+        learningInsightUnlocked: false,
+        attemptId: null,
+      };
+    }
+    const hasReasoning = representative.finalDecisionJson !== null;
+    const decisionIds = new Set(getDecisionPointSummaries(c.slug).map((p) => p.id));
+    const learningInsightUnlocked =
+      hasReasoning && representative.messages.some((m) => m.role === "STUDENT" && m.category && decisionIds.has(m.category));
+    const status: ClinicalCaseProgressStatus =
+      representative.status === "COMPLETED" ? "COMPLETED" : hasReasoning ? "REASONING_COMPLETED" : "IN_PROGRESS";
+    return {
+      slug: c.slug,
+      titleEn: c.titleEn,
+      titleAr: c.titleAr,
+      status,
+      learningInsightUnlocked,
+      attemptId: representative.id,
+    };
+  });
+
+  return { stages, currentStageId, stagesCompletedCount, nextAction, caseProgress };
 }
 
 export async function getDashboardData(userId: string) {

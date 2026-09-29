@@ -1,8 +1,36 @@
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
 import type { LearningJourney, LearningStageId, LearningStageStatus } from "@/lib/dashboard/queries";
+import type { ClinicalCaseProgressStatus } from "@/lib/clinical-cases/queries";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
+
+// Phase 3G-4 — same tone/label/glyph convention as statusTone/statusLabel/
+// statusGlyph above, extended with one extra milestone (REASONING_COMPLETED)
+// the 3-state stage vocabulary doesn't have. Kept as sibling functions
+// rather than widening LearningStageStatus itself, since the 5 top-level
+// stages genuinely only ever have 3 states.
+function caseStatusTone(status: ClinicalCaseProgressStatus): "success" | "primary" | "accent" | "neutral" {
+  if (status === "COMPLETED") return "success";
+  if (status === "REASONING_COMPLETED") return "accent";
+  if (status === "IN_PROGRESS") return "primary";
+  return "neutral";
+}
+
+function caseStatusLabel(dict: Dictionary, status: ClinicalCaseProgressStatus): string {
+  if (status === "COMPLETED") return dict.course.completed;
+  if (status === "REASONING_COMPLETED") return dict.dashboard.caseReasoningCompletedLabel;
+  if (status === "IN_PROGRESS") return dict.course.inProgress;
+  return dict.course.notStarted;
+}
+
+function caseStatusGlyph(status: ClinicalCaseProgressStatus): string {
+  if (status === "COMPLETED") return "✓";
+  if (status === "REASONING_COMPLETED") return "✓";
+  if (status === "IN_PROGRESS") return "…";
+  return "○";
+}
 
 // Phase 3C-3 — reuses the exact status-tone/label convention already used
 // for module status elsewhere (see components/course/course-overview.tsx)
@@ -40,7 +68,15 @@ function stageLabel(dict: Dictionary, id: LearningStageId): string {
   }
 }
 
-export function LearningJourneyCard({ dict, journey }: { dict: Dictionary; journey: LearningJourney }) {
+export function LearningJourneyCard({
+  dict,
+  journey,
+  locale,
+}: {
+  dict: Dictionary;
+  journey: LearningJourney;
+  locale: Locale;
+}) {
   const { stages, currentStageId, stagesCompletedCount, nextAction } = journey;
 
   let ctaLabel: string;
@@ -96,6 +132,43 @@ export function LearningJourneyCard({ dict, journey }: { dict: Dictionary; journ
           );
         })}
       </ol>
+
+      {/* Phase 3G-4 — per-case breakdown, additive under the existing
+          CLINICAL_CASE stage row above (which still reflects only the
+          single most-advanced attempt across all cases, unchanged). This
+          is the only place a student can tell two cases apart instead of
+          the whole area collapsing into one status. */}
+      {journey.caseProgress.length > 0 && (
+        <div className="mt-3 space-y-2 border-t border-border pt-3">
+          <p className="text-xs font-semibold text-muted">{dict.nav.clinicalCases}</p>
+          <ul className="space-y-1">
+            {journey.caseProgress.map((c) => (
+              <li
+                key={c.slug}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface px-3 py-2 text-sm"
+              >
+                <span className="flex flex-wrap items-center gap-2">
+                  <span aria-hidden="true">{caseStatusGlyph(c.status)}</span>
+                  {locale === "ar" ? c.titleAr : c.titleEn}
+                  {c.learningInsightUnlocked && (
+                    <Badge tone="accent">{dict.dashboard.learningInsightUnlockedLabel}</Badge>
+                  )}
+                </span>
+                <span className="flex items-center gap-2">
+                  <Badge tone={caseStatusTone(c.status)}>{caseStatusLabel(dict, c.status)}</Badge>
+                  <ButtonLink
+                    href={c.attemptId ? `/clinical-cases/${c.slug}/attempt/${c.attemptId}` : `/clinical-cases/${c.slug}`}
+                    variant="outline"
+                    className="!px-3 !py-1 text-xs"
+                  >
+                    {dict.dashboard.openCaseButton}
+                  </ButtonLink>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-4 border-t border-border pt-4">
         {/* Always shown, even once "complete": Nursing Skill can never be

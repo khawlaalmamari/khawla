@@ -75,7 +75,7 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        <LearningJourneyCard dict={dict} journey={data.learningJourney} />
+        <LearningJourneyCard dict={dict} journey={data.learningJourney} locale={locale} />
 
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
