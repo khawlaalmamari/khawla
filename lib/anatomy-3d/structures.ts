@@ -243,3 +243,11 @@ export function getStructuresBySystem(system: BodySystem): AnatomicalStructure[]
 export function getStructureById(id: string): AnatomicalStructure | undefined {
   return ANATOMICAL_STRUCTURES.find((s) => s.id === id);
 }
+
+/** Structures actually selectable in the 3D model (have a `modelNodeName`).
+ * Phase 3B-3 — the single source of truth for both click-to-select
+ * (anatomy-viewer.tsx) and the Test Yourself question pool
+ * (anatomy-explorer.tsx), so the two never drift apart. */
+export function getSelectable3DStructures(): AnatomicalStructure[] {
+  return ANATOMICAL_STRUCTURES.filter((s) => !!s.modelNodeName);
+}

@@ -8,11 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 
 /**
- * Step 7 — future educational interactions ("Identify this structure",
- * "Explore this organ", "Show related structures", "Test yourself").
- * Only the UI hooks exist this phase; each button is disabled and marked
- * "coming soon" rather than wired to real logic, per the phase's explicit
- * "do not implement the full quiz system" instruction.
+ * Remaining future educational interactions not yet implemented
+ * ("Identify this structure", "Show related structures"). "Explore this
+ * organ" and "Test yourself" became real features in Phase 3B-3 and are
+ * no longer rendered here — see the Explore button above and
+ * test-yourself-panel.tsx.
  */
 function FutureInteractionButton({ label }: { label: string }) {
   return (
@@ -26,10 +26,21 @@ export function StructureInfoPanel({
   dict,
   locale,
   structure,
+  isExploring,
+  canExplore,
+  onExplore,
+  onBackToFullView,
 }: {
   dict: Dictionary;
   locale: Locale;
   structure: AnatomicalStructure | null;
+  /** Phase 3B-3 — whether the camera is currently focused on `structure`. */
+  isExploring?: boolean;
+  /** Whether Explore is technically possible right now (real model loaded,
+   * not the placeholder/loading/error state). */
+  canExplore?: boolean;
+  onExplore?: () => void;
+  onBackToFullView?: () => void;
 }) {
   if (!structure) {
     return (
@@ -39,10 +50,18 @@ export function StructureInfoPanel({
     );
   }
 
+  const structureName = locale === "ar" ? structure.nameAr : structure.nameEn;
+
   return (
     <div className="rounded-xl border border-border bg-surface p-4">
+      {/* Accessible confirmation that a selection happened, independent of
+          the 3D highlight (which sighted users see, but AT users can't). */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {dict.anatomy3D.structureSelectedAnnouncement.replace("{structure}", structureName)}
+      </p>
+
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-lg font-bold">{locale === "ar" ? structure.nameAr : structure.nameEn}</h3>
+        <h3 className="text-lg font-bold">{structureName}</h3>
         <Badge tone="primary">{systemLabel(dict, structure.system)}</Badge>
       </div>
 
@@ -69,11 +88,27 @@ export function StructureInfoPanel({
         </p>
       </div>
 
-      {/* Phase 3B-1.9 — only structures selectable in the 3D model
-          (modelNodeName set) get a study action; other structures keep
-          their existing info-only presentation unchanged. */}
+      {/* Phase 3B-1.9/3B-3 — only structures selectable in the 3D model
+          (modelNodeName set) get Explore/Study actions; other structures
+          keep their existing info-only presentation unchanged. */}
       {structure.modelNodeName && (
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {isExploring ? (
+            <Button variant="outline" className="!px-4 !py-2 text-sm" onClick={onBackToFullView}>
+              {dict.anatomy3D.backToFullViewButton}
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              className="!px-4 !py-2 text-sm"
+              onClick={onExplore}
+              disabled={!canExplore}
+              aria-disabled={!canExplore}
+            >
+              {dict.anatomy3D.exploreOrganButton}
+            </Button>
+          )}
+
           {structure.studyHref ? (
             <ButtonLink href={structure.studyHref} variant="outline" className="!px-4 !py-2 text-sm">
               {dict.anatomy3D.studyThisStructureButton}
@@ -83,6 +118,14 @@ export function StructureInfoPanel({
               {dict.anatomy3D.contentComingSoonLabel}
             </p>
           )}
+
+          {/* Only shown when the caller explicitly says Explore is
+              unavailable (e.g. the placeholder model) — not simply
+              whenever `canExplore` is left unset, such as when this panel
+              is reused for Test Yourself's correct-answer reinforcement. */}
+          {canExplore === false && !isExploring && (
+            <p className="w-full text-xs text-muted">{dict.anatomy3D.exploreUnavailableWhilePlaceholder}</p>
+          )}
         </div>
       )}
 
@@ -90,9 +133,7 @@ export function StructureInfoPanel({
         <p className="text-xs font-semibold text-muted">{dict.anatomy3D.interactionHooksTitle}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <FutureInteractionButton label={dict.anatomy3D.identifyStructureButton} />
-          <FutureInteractionButton label={dict.anatomy3D.exploreOrganButton} />
           <FutureInteractionButton label={dict.anatomy3D.showRelatedButton} />
-          <FutureInteractionButton label={dict.anatomy3D.testYourselfButton} />
         </div>
       </div>
     </div>

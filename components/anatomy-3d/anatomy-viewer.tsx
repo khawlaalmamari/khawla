@@ -6,17 +6,17 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { ANATOMY_MODEL_URL } from "@/lib/anatomy-3d/model-config";
-import { ANATOMICAL_STRUCTURES } from "@/lib/anatomy-3d/structures";
+import { getSelectable3DStructures } from "@/lib/anatomy-3d/structures";
 
 type ViewerState = "loading" | "ready" | "placeholder" | "error";
 
 // Derived once from the single source of truth (structures.ts) — never a
 // second, hand-maintained copy of the model-to-structure mapping.
 const NODE_NAME_TO_STRUCTURE_ID = new Map(
-  ANATOMICAL_STRUCTURES.filter((s) => s.modelNodeName).map((s) => [s.modelNodeName as string, s.id]),
+  getSelectable3DStructures().map((s) => [s.modelNodeName as string, s.id]),
 );
 const STRUCTURE_ID_TO_NODE_NAME = new Map(
-  ANATOMICAL_STRUCTURES.filter((s) => s.modelNodeName).map((s) => [s.id, s.modelNodeName as string]),
+  getSelectable3DStructures().map((s) => [s.id, s.modelNodeName as string]),
 );
 
 // Subtle emissive tint applied to the selected structure's meshes — no
@@ -36,10 +36,22 @@ export function AnatomyViewer({
   dict,
   selectedStructureId,
   onSelectStructure,
+  focusStructureId,
+  onViewerStateChange,
 }: {
   dict: Dictionary;
   selectedStructureId?: string | null;
   onSelectStructure?: (structureId: string) => void;
+  /** Phase 3B-3 "Explore": when set, the camera reframes on this structure
+   * (an instant reposition, not an animated tween — this keeps the motion
+   * minimal and means reduced-motion preferences are respected by
+   * construction, with nothing to disable). Set to null/undefined to
+   * return to the full-body view. */
+  focusStructureId?: string | null;
+  /** Lets the parent gate Explore on real geometry being loaded (disabled
+   * during "loading"/"placeholder"/"error", since there is nothing real to
+   * focus the camera on yet). */
+  onViewerStateChange?: (state: ViewerState) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<ViewerState>("loading");
@@ -48,13 +60,20 @@ export function AnatomyViewer({
     zoomIn: () => void;
     zoomOut: () => void;
     highlightStructure: (structureId: string | null | undefined) => void;
+    focusOnStructure: (structureId: string | null | undefined) => void;
   } | null>(null);
   const onSelectStructureRef = useRef(onSelectStructure);
   const selectedStructureIdRef = useRef(selectedStructureId);
+  const onViewerStateChangeRef = useRef(onViewerStateChange);
   useEffect(() => {
     onSelectStructureRef.current = onSelectStructure;
     selectedStructureIdRef.current = selectedStructureId;
-  }, [onSelectStructure, selectedStructureId]);
+    onViewerStateChangeRef.current = onViewerStateChange;
+  }, [onSelectStructure, selectedStructureId, onViewerStateChange]);
+
+  useEffect(() => {
+    onViewerStateChangeRef.current?.(state);
+  }, [state]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -156,6 +175,30 @@ export function AnatomyViewer({
       });
     }
 
+    // Phase 3B-3 "Explore" — reframes on a structure's real bounding box
+    // while keeping the current viewing angle (no forced reorientation).
+    // A no-op when the model isn't loaded yet (placeholder/loading), so
+    // Explore never pretends to focus on geometry that isn't there.
+    function focusOnStructure(structureId: string | null | undefined) {
+      if (!structureId || !modelRoot) return;
+      const nodeName = STRUCTURE_ID_TO_NODE_NAME.get(structureId);
+      if (!nodeName) return;
+      const target = modelRoot.getObjectByName(nodeName);
+      if (!target) return;
+      const box = new THREE.Box3().setFromObject(target);
+      if (box.isEmpty()) return;
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z, 0.05);
+      const distance = THREE.MathUtils.clamp(maxDim * 2.4, controls.minDistance, controls.maxDistance);
+      const direction = camera.position.clone().sub(controls.target);
+      if (direction.lengthSq() < 1e-6) direction.set(0, 0, 1);
+      direction.normalize();
+      controls.target.copy(center);
+      camera.position.copy(center).addScaledVector(direction, distance);
+      controls.update();
+    }
+
     actionsRef.current = {
       reset: () => {
         camera.position.copy(initialPosition);
@@ -165,6 +208,7 @@ export function AnatomyViewer({
       zoomIn: () => zoomBy(0.8),
       zoomOut: () => zoomBy(1.25),
       highlightStructure,
+      focusOnStructure,
     };
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.9));
@@ -306,6 +350,16 @@ export function AnatomyViewer({
   useEffect(() => {
     actionsRef.current?.highlightStructure(selectedStructureId);
   }, [selectedStructureId]);
+
+  // Phase 3B-3 "Explore" — reframe the camera whenever the parent sets a
+  // focus target; clearing it (null) returns to the full-body view.
+  useEffect(() => {
+    if (focusStructureId) {
+      actionsRef.current?.focusOnStructure(focusStructureId);
+    } else {
+      actionsRef.current?.reset();
+    }
+  }, [focusStructureId]);
 
   return (
     <div className="relative h-[420px] w-full overflow-hidden rounded-xl border border-border bg-surface sm:h-[520px]">
