@@ -384,7 +384,7 @@ export function SkillPractice({
                         aria-pressed={selected}
                         className={`rounded-lg border p-3 text-start text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                           selected
-                            ? "border-primary-600 bg-primary-50 font-medium"
+                            ? "border-primary-600 bg-primary-50 font-medium text-primary-800"
                             : "border-border bg-surface hover:bg-primary-50"
                         }`}
                       >

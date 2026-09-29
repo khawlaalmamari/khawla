@@ -119,7 +119,7 @@ export function LearningJourneyCard({
             <li
               key={stage.id}
               className={`flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm ${
-                isCurrent ? "border border-primary-300 bg-primary-50" : "bg-surface"
+                isCurrent ? "border border-primary-300 bg-primary-50 text-primary-800" : "bg-surface"
               }`}
             >
               <span className="flex items-center gap-2 font-medium">

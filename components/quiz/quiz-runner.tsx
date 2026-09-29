@@ -142,7 +142,7 @@ export function QuizRunner({ courseSlug, moduleSlug }: { courseSlug: string; mod
               key={choice.id}
               className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-colors ${
                 answers[question.id] === choice.id
-                  ? "border-primary-500 bg-primary-50"
+                  ? "border-primary-500 bg-primary-50 text-primary-800"
                   : "border-border hover:bg-surface"
               }`}
             >

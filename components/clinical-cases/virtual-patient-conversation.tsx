@@ -628,7 +628,7 @@ export function VirtualPatientConversation({
                           <p className="text-xs font-semibold text-accent-700">
                             {dict.clinicalCases.clinicalThinkingConnectionTitle}
                           </p>
-                          <p className="mt-1 text-sm">{dict.clinicalCases.clinicalThinkingConnectionBody}</p>
+                          <p className="mt-1 text-sm text-accent-700">{dict.clinicalCases.clinicalThinkingConnectionBody}</p>
                           <Button
                             variant="outline"
                             className="mt-3 !px-4 !py-1.5 text-xs"
@@ -669,7 +669,7 @@ export function VirtualPatientConversation({
           something to reason about, and no longer once reasoning is
           locked (status is no longer IN_PROGRESS). */}
       {status === "IN_PROGRESS" && hasEvidence && (
-        <Card className="border-primary-200 bg-primary-50">
+        <Card className="border-primary-200 bg-primary-50 text-primary-800">
           <h2 className="text-lg font-bold">{dict.clinicalCases.reasoningTransitionTitle}</h2>
           <p className="mt-1 text-sm">{dict.clinicalCases.reasoningTransitionBody}</p>
           <Button className="mt-3" onClick={() => goToSection(reasoningHeadingRef)}>
@@ -724,7 +724,7 @@ export function VirtualPatientConversation({
           const findingMsg = assessmentMessages.find((m) => m.category === point.triggerAssessment);
 
           return (
-            <div key={point.id} className="mt-6 rounded-lg border border-accent-100 bg-accent-50 p-4">
+            <div key={point.id} className="mt-6 rounded-lg border border-accent-100 bg-accent-50 p-4 text-accent-700">
               <h3 className="text-sm font-semibold">{dict.clinicalCases.decisionContextTitle}</h3>
               <dl className="mt-3 space-y-3 text-sm">
                 {findingMsg && (
@@ -895,7 +895,7 @@ export function VirtualPatientConversation({
           Debriefing section itself below — this never reorders or gates
           anything, it only helps the student notice the next step. */}
       {status === "COMPLETED" && (
-        <Card className="border-primary-200 bg-primary-50">
+        <Card className="border-primary-200 bg-primary-50 text-primary-800">
           <h2 className="text-lg font-bold">{dict.clinicalCases.debriefTransitionTitle}</h2>
           <p className="mt-1 text-sm">{dict.clinicalCases.debriefTransitionBody}</p>
           <Button className="mt-3" onClick={() => goToSection(debriefHeadingRef)}>

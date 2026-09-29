@@ -163,7 +163,7 @@ export function NotificationBell({ notifications }: { notifications: BellNotific
                       type="button"
                       onClick={() => openNotification(n)}
                       className={`block w-full px-4 py-3 text-start text-sm transition-colors ${
-                        n.read ? "hover:bg-surface" : "bg-primary-50 hover:bg-primary-100"
+                        n.read ? "hover:bg-surface" : "bg-primary-50 text-primary-800 hover:bg-primary-100"
                       }`}
                     >
                       <div className="flex items-center gap-2">
