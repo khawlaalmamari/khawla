@@ -331,7 +331,11 @@ export function SkillPractice({
             {currentStep.rationaleEn && (
               <div className="rounded-lg border border-accent-100 bg-accent-50 p-3">
                 <p className="text-xs font-semibold text-accent-700">{dict.nursingLab.whyThisMattersLabel}</p>
-                <p className="mt-1 text-sm">{locale === "ar" ? currentStep.rationaleAr : currentStep.rationaleEn}</p>
+                <p
+                  className={`mt-1 text-sm ${currentStep.emphasizeRationale ? "text-accent-700" : ""}`}
+                >
+                  {locale === "ar" ? currentStep.rationaleAr : currentStep.rationaleEn}
+                </p>
               </div>
             )}
 
