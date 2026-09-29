@@ -30,4 +30,9 @@ export type AnatomicalStructure = {
    * highlighting in AnatomyViewer. Left undefined when no matching model
    * geometry exists yet — never a fake/approximate mapping. */
   modelNodeName?: string;
+  /** Route to an existing Anatomy lesson/module that genuinely covers this
+   * structure (Phase 3B-1.9). Left undefined when no such content exists
+   * yet — StructureInfoPanel then shows a "content coming soon" state
+   * instead of inventing or approximating a link. */
+  studyHref?: string;
 };

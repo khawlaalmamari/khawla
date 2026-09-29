@@ -5,7 +5,7 @@ import type { Locale } from "@/lib/i18n/config";
 import type { AnatomicalStructure } from "@/lib/anatomy-3d/types";
 import { systemLabel } from "./body-system-selector";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 
 /**
  * Step 7 — future educational interactions ("Identify this structure",
@@ -68,6 +68,23 @@ export function StructureInfoPanel({
           {locale === "ar" ? structure.nursingRelevanceAr : structure.nursingRelevanceEn}
         </p>
       </div>
+
+      {/* Phase 3B-1.9 — only structures selectable in the 3D model
+          (modelNodeName set) get a study action; other structures keep
+          their existing info-only presentation unchanged. */}
+      {structure.modelNodeName && (
+        <div className="mt-4">
+          {structure.studyHref ? (
+            <ButtonLink href={structure.studyHref} variant="outline" className="!px-4 !py-2 text-sm">
+              {dict.anatomy3D.studyThisStructureButton}
+            </ButtonLink>
+          ) : (
+            <p className="rounded-lg border border-dashed border-border bg-background px-3 py-2 text-xs text-muted">
+              {dict.anatomy3D.contentComingSoonLabel}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="mt-4">
         <p className="text-xs font-semibold text-muted">{dict.anatomy3D.interactionHooksTitle}</p>

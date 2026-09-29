@@ -10,6 +10,17 @@
 // (human-body-curated-report.json). Structures without a `modelNodeName`
 // have no matching geometry in that model yet and remain info-only —
 // never given a fake/approximate mapping.
+//
+// Phase 3B-1.9 — `studyHref` links a structure to a real, already-seeded
+// Anatomy lesson/module that is genuinely about it (see prisma/seed.js /
+// prisma/content/*). Checked against actual seeded content: only the
+// Skeletal System module has real lesson content, and only its "Organs
+// and Their Locations" lesson has a dedicated section on the vertebral
+// column — so only `spine` gets a `studyHref`. Every other module
+// (Cardiovascular, Respiratory, Digestive, Urinary, Nervous) exists in
+// the database but has zero lessons yet, so their structures are left
+// without a `studyHref` on purpose — StructureInfoPanel shows a "content
+// coming soon" state for them instead of linking to an empty module page.
 
 import type { AnatomicalStructure, BodySystem } from "./types";
 
@@ -216,6 +227,7 @@ export const ANATOMICAL_STRUCTURES: AnatomicalStructure[] = [
     nursingRelevanceAr:
       "الفهم التشريحي الأساسي للعمود الفقري يدعم التعلّم اللاحق حول القوام وتقييم الحركة واحتياطات العمود الفقري.",
     modelNodeName: "spine",
+    studyHref: "/anatomy/anatomy-skeletal-system/skeletal-organs-locations",
   },
 ];
 
