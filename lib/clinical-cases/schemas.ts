@@ -70,6 +70,10 @@ export const updateAttemptSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("endInterview") }),
   z.object({ action: z.literal("saveReasoning") }).merge(clinicalReasoningSchema),
   z.object({ action: z.literal("saveReflection") }).merge(debriefReflectionSchema),
+  // Non-evaluative: reads the reflection already saved via "saveReflection"
+  // above (no fields of its own) and returns guiding feedback — see
+  // getReflectionFeedback in queries.ts. Never a correct/incorrect verdict.
+  z.object({ action: z.literal("getReflectionFeedback") }),
 ]);
 
 // Phase 2C — Step 5/14: the only client input for an assessment request

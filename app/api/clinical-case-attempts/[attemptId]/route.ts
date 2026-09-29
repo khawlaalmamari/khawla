@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
+import { getServerLocale } from "@/lib/i18n/get-locale";
 import {
   endInterview,
   getDecisionInsightsForAttempt,
+  getReflectionFeedback,
   saveClinicalReasoning,
   saveDebriefReflection,
   updateAttemptNotes,
@@ -10,8 +12,9 @@ import {
 import { updateAttemptSchema } from "@/lib/clinical-cases/schemas";
 
 /** Saves clinical notes, saves clinical-reasoning notes, saves a
- * post-attempt reflection, or ends the interview and returns its summary.
- * Ownership is enforced in every query function via the session user's id. */
+ * post-attempt reflection, gets non-evaluative feedback on an already-saved
+ * reflection, or ends the interview and returns its summary. Ownership is
+ * enforced in every query function via the session user's id. */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ attemptId: string }> },
@@ -60,6 +63,13 @@ export async function PATCH(
     });
     if (!ok) return NextResponse.json({ error: "notFound" }, { status: 404 });
     return NextResponse.json({ saved: true });
+  }
+
+  if (parsed.data.action === "getReflectionFeedback") {
+    const locale = await getServerLocale();
+    const feedback = await getReflectionFeedback(attemptId, user.id, locale);
+    if (!feedback) return NextResponse.json({ error: "notFound" }, { status: 404 });
+    return NextResponse.json(feedback);
   }
 
   const summary = await endInterview(attemptId, user.id);

@@ -24,6 +24,7 @@ import {
 } from "./patient-engine";
 import { getDecisionPointSummaries } from "./decision-points";
 import { resolvePatientReply } from "./ai-patient";
+import { getReflectionGuidance } from "./reflection-coach";
 
 /** Listing-safe fields only — never includes hiddenDataJson. */
 const metadataSelect = {
@@ -582,6 +583,35 @@ export async function saveDebriefReflection(
     data: { interactionLogJson: JSON.stringify(reflection) },
   });
   return result.count > 0;
+}
+
+/**
+ * Non-evaluative feedback on a student's already-saved reflection (must
+ * call saveDebriefReflection first — returns null if nothing's saved yet).
+ * Always returns this case's own expert-authored debriefing (hiddenData.
+ * debriefing — deterministic, never previously surfaced to students) plus,
+ * when AI_PROVIDER_API_KEY is configured, AI-guided feedback grounded only
+ * in that debriefing and the student's own words (see reflection-coach.ts).
+ * Never a correct/incorrect verdict — this only helps a student compare
+ * their own thinking against the expert summary.
+ */
+export async function getReflectionFeedback(
+  attemptId: string,
+  userId: string,
+  locale: "ar" | "en",
+): Promise<{ expertDebriefing: string; aiGuidance: string | null } | null> {
+  const attempt = await prisma.clinicalCaseAttempt.findFirst({
+    where: { id: attemptId, userId, status: "COMPLETED" },
+    include: { case: true },
+  });
+  if (!attempt || !attempt.interactionLogJson) return null;
+
+  const reflection = JSON.parse(attempt.interactionLogJson) as DebriefReflection;
+  const hiddenData = JSON.parse(attempt.case.hiddenDataJson) as HiddenCaseData;
+  const expertDebriefing = locale === "ar" ? hiddenData.debriefing.ar : hiddenData.debriefing.en;
+
+  const { guidance } = await getReflectionGuidance(reflection, expertDebriefing);
+  return { expertDebriefing, aiGuidance: guidance ?? null };
 }
 
 export async function getInterviewSummary(

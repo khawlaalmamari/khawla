@@ -206,7 +206,12 @@ export function VirtualPatientConversation({
   const [reasoningSaved, setReasoningSaved] = useState(false);
   const [reflection, setReflection] = useState<ReflectionFields>(attempt.reflection ?? EMPTY_REFLECTION);
   const [reflectionSaving, setReflectionSaving] = useState(false);
-  const [reflectionSaved, setReflectionSaved] = useState(false);
+  const [reflectionSaved, setReflectionSaved] = useState(!!attempt.reflection);
+  const [reflectionFeedback, setReflectionFeedback] = useState<{
+    expertDebriefing: string;
+    aiGuidance: string | null;
+  } | null>(null);
+  const [reflectionFeedbackLoading, setReflectionFeedbackLoading] = useState(false);
   // Phase 3F — Learning Insight per decision id, only ever populated by
   // the server once Clinical Reasoning has been saved (see
   // buildDecisionInsights in queries.ts). Seeded from the initial
@@ -350,6 +355,23 @@ export function VirtualPatientConversation({
       if (res.ok) setReflectionSaved(true);
     } finally {
       setReflectionSaving(false);
+    }
+  }
+
+  async function getReflectionFeedback() {
+    setReflectionFeedbackLoading(true);
+    try {
+      const res = await fetch(`/api/clinical-case-attempts/${attempt.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "getReflectionFeedback" }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setReflectionFeedback({ expertDebriefing: data.expertDebriefing, aiGuidance: data.aiGuidance });
+      }
+    } finally {
+      setReflectionFeedbackLoading(false);
     }
   }
 
@@ -1000,6 +1022,7 @@ export function VirtualPatientConversation({
                   onChange={(e) => {
                     setReflection((r) => ({ ...r, [field.key]: e.target.value }));
                     setReflectionSaved(false);
+                    setReflectionFeedback(null);
                   }}
                   placeholder={dict.clinicalCases[field.placeholder]}
                   rows={3}
@@ -1009,12 +1032,36 @@ export function VirtualPatientConversation({
             ))}
           </div>
 
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <Button variant="outline" onClick={saveReflection} disabled={reflectionSaving}>
               {dict.clinicalCases.saveReflectionButton}
             </Button>
             {reflectionSaved && <span className="text-sm text-success">{dict.clinicalCases.reflectionSaved}</span>}
+            {reflectionSaved && (
+              <Button variant="outline" onClick={getReflectionFeedback} disabled={reflectionFeedbackLoading}>
+                {dict.clinicalCases.getReflectionFeedbackButton}
+              </Button>
+            )}
           </div>
+
+          {reflectionFeedback && (
+            <div className="mt-4 space-y-3 rounded-lg border border-accent-100 bg-accent-50 p-4 text-accent-700">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-semibold">{dict.clinicalCases.reflectionFeedbackTitle}</h3>
+              </div>
+              <p className="text-xs">{dict.clinicalCases.reflectionFeedbackDisclaimer}</p>
+              <div>
+                <p className="text-xs font-semibold">{dict.clinicalCases.expertDebriefingLabel}</p>
+                <p className="mt-1 text-sm">{reflectionFeedback.expertDebriefing}</p>
+              </div>
+              {reflectionFeedback.aiGuidance && (
+                <div>
+                  <p className="text-xs font-semibold">{dict.clinicalCases.aiGuidanceLabel}</p>
+                  <p className="mt-1 text-sm">{reflectionFeedback.aiGuidance}</p>
+                </div>
+              )}
+            </div>
+          )}
         </Card>
       )}
     </div>
