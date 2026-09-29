@@ -427,6 +427,15 @@ export const ar = {
     clinicalDecisionIntro: "اختاري الإجراء الذي تعتقدين أنه الأنسب بناءً على هذه الملاحظة.",
     decisionChosenLabel: "اخترتِ:",
     decisionExplanationLabel: "التفسير السريري",
+    clinicalThinkingConnectionTitle: "رابط التفكير السريري",
+    clinicalThinkingConnectionBody:
+      "اتخذتِ قرارًا سريريًا بناءً على المعطيات المتاحة. الآن اشرحي التفكير الذي قادكِ إلى اختيارك.",
+    decisionContextTitle: "سياق قرارك السريري",
+    clinicalFindingLabel: "النتيجة السريرية",
+    reasoningPromptQuestion: "لماذا كان هذا الإجراء منطقيًا بناءً على نتائج المريضة؟",
+    learningInsightLabel: "رؤية تعليمية",
+    flowYourDecisionLabel: "قرارك",
+    flowReasoningLabel: "تفكيرك السريري",
   },
   anatomy3D: {
     pageTitle: "استكشاف التشريح ثلاثي الأبعاد",
@@ -1091,6 +1100,15 @@ export const en: Dictionary = {
     clinicalDecisionIntro: "Choose the action you think is most appropriate given this finding.",
     decisionChosenLabel: "You chose:",
     decisionExplanationLabel: "Clinical Explanation",
+    clinicalThinkingConnectionTitle: "Clinical Thinking Connection",
+    clinicalThinkingConnectionBody:
+      "You made a clinical decision based on the available findings. Now explain the reasoning behind your choice.",
+    decisionContextTitle: "Your Decision in Context",
+    clinicalFindingLabel: "Clinical Finding",
+    reasoningPromptQuestion: "Why did this action make sense based on the patient's findings?",
+    learningInsightLabel: "Learning Insight",
+    flowYourDecisionLabel: "Your Decision",
+    flowReasoningLabel: "Your Clinical Reasoning",
   },
   anatomy3D: {
     pageTitle: "3D Anatomy Explorer",

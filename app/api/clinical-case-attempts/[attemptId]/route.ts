@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import {
   endInterview,
+  getDecisionInsightsForAttempt,
   saveClinicalReasoning,
   saveDebriefReflection,
   updateAttemptNotes,
@@ -42,7 +43,10 @@ export async function PATCH(
       recommendedNextAction,
     });
     if (!ok) return NextResponse.json({ error: "notFound" }, { status: 404 });
-    return NextResponse.json({ saved: true });
+    // Phase 3F — now that reasoning is saved, Learning Insight (if any) is
+    // earned; compute it now so the client can reveal it without a reload.
+    const decisionInsights = await getDecisionInsightsForAttempt(attemptId, user.id);
+    return NextResponse.json({ saved: true, decisionInsights });
   }
 
   if (parsed.data.action === "saveReflection") {

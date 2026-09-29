@@ -209,6 +209,41 @@ export function getDecisionExplanation(decisionId: string, optionId: string): Bi
   return DECISION_EXPLANATIONS[`${decisionId}:${optionId}`] ?? null;
 }
 
+// Phase 3F — names the clinical-thinking skill the student's chosen
+// option practiced (never whether it was "correct"). Only ever revealed
+// by lib/clinical-cases/queries.ts once the student has also saved their
+// Clinical Reasoning notes for this attempt — the same reveal-on-earned-
+// progress principle as DECISION_EXPLANATIONS above, so a curious client
+// can't read every option's insight before choosing. Grounded in the same
+// scripted vital signs as DECISION_EXPLANATIONS; no diagnosis is named,
+// and "monitor" explains why closer follow-up is worth considering here
+// without ever labeling the choice wrong.
+const DECISION_LEARNING_INSIGHTS: Record<string, Bilingual> = {
+  "DECISION_POST_VITALS:reassess": {
+    en: "This decision practiced trend monitoring: recognizing that one set of vital signs is a single snapshot, and that a short repeat measurement helps you tell whether a finding is stable, improving, or worsening.",
+    ar: "هذا القرار درّبكِ على مهارة متابعة التطوّر: إدراك أن قياسًا واحدًا للعلامات الحيوية هو لحظة واحدة فقط، وأن إعادة القياس بعد فترة قصيرة تساعدكِ على معرفة ما إذا كانت النتيجة مستقرة أو تتحسن أو تزداد سوءًا.",
+  },
+  "DECISION_POST_VITALS:cardio-assess": {
+    en: "This decision practiced focused assessment: choosing a targeted cardiovascular exam to gather more specific evidence before deciding what to do next, rather than acting on vital signs alone.",
+    ar: "هذا القرار درّبكِ على مهارة التقييم المركّز: اختيار فحص قلبي وعائي محدد لجمع أدلة أكثر دقة قبل اتخاذ القرار التالي، بدلاً من الاعتماد على العلامات الحيوية وحدها.",
+  },
+  "DECISION_POST_VITALS:escalate": {
+    en: "This decision practiced clinical communication: recognizing findings — chest pain together with several changed vital signs — that call for informing the wider care team promptly, rather than one nurse deciding alone whether to act.",
+    ar: "هذا القرار درّبكِ على مهارة التواصل السريري: إدراك أن وجود ألم في الصدر مع عدة تغيّرات في العلامات الحيوية معًا يستدعي إبلاغ فريق الرعاية الأوسع فورًا، بدلاً من أن تقرر ممرضة واحدة بمفردها ما إذا كان ينبغي التصرف.",
+  },
+  "DECISION_POST_VITALS:monitor": {
+    en: "This decision practiced routine monitoring. Clinical thinking also means weighing whether combined findings — like chest pain together with this specific set of vital-sign changes — call for more active follow-up than waiting for the next scheduled check, which is worth considering here.",
+    ar: "هذا القرار درّبكِ على المراقبة الروتينية. يتضمن التفكير السريري أيضًا تقييم ما إذا كانت النتائج مجتمعة — كألم الصدر مع هذه المجموعة تحديدًا من التغيرات في العلامات الحيوية — تستدعي متابعة أكثر فاعلية من انتظار الفحص المجدول التالي، وهو أمر يستحق التفكير فيه هنا.",
+  },
+};
+
+/** Returns null for an unknown decision/option id pair, or when this
+ * option simply has no authored insight yet — callers must treat that as
+ * "nothing to show", never invent generic filler (Step 15). */
+export function getDecisionInsight(decisionId: string, optionId: string): Bilingual | null {
+  return DECISION_LEARNING_INSIGHTS[`${decisionId}:${optionId}`] ?? null;
+}
+
 const ALL_DECISION_IDS = new Set(Object.values(DECISION_POINTS).flat().map((p) => p.id));
 
 /** True if `category` is one of this app's decision-point ids — used by

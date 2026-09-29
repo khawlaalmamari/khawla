@@ -6,6 +6,7 @@ import type { Locale } from "@/lib/i18n/config";
 import type { AttemptView } from "@/lib/clinical-cases/queries";
 import type {
   AssessmentType,
+  Bilingual,
   ClinicalReasoningResponse,
   ConversationMessageDTO,
   DebriefReflection,
@@ -206,6 +207,15 @@ export function VirtualPatientConversation({
   const [reflection, setReflection] = useState<ReflectionFields>(attempt.reflection ?? EMPTY_REFLECTION);
   const [reflectionSaving, setReflectionSaving] = useState(false);
   const [reflectionSaved, setReflectionSaved] = useState(false);
+  // Phase 3F — Learning Insight per decision id, only ever populated by
+  // the server once Clinical Reasoning has been saved (see
+  // buildDecisionInsights in queries.ts). Seeded from the initial
+  // server-rendered attempt view (covers refresh/reopen), then merged
+  // with whatever saveReasoning's own response returns so it can appear
+  // in this same session without a reload.
+  const [decisionInsights, setDecisionInsights] = useState<Record<string, Bilingual>>(
+    attempt.decisionInsights,
+  );
   const listRef = useRef<HTMLDivElement>(null);
   // Phase 3C-2 — pure navigation/continuity aids: both sections already
   // render unconditionally (Reasoning) or once COMPLETED (Debriefing), so
@@ -318,7 +328,11 @@ export function VirtualPatientConversation({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "saveReasoning", ...reasoning }),
       });
-      if (res.ok) setReasoningSaved(true);
+      if (res.ok) {
+        setReasoningSaved(true);
+        const data = await res.json();
+        if (data.decisionInsights) setDecisionInsights(data.decisionInsights);
+      }
     } finally {
       setReasoningSaving(false);
     }
@@ -394,6 +408,11 @@ export function VirtualPatientConversation({
   const unlockedDecisionPoints = decisionPoints.filter((p) =>
     assessmentMessages.some((m) => m.category === p.triggerAssessment),
   );
+  // Phase 3F — true once reasoning has been saved for this attempt, either
+  // earlier (attempt.reasoning, from a previous session/reload) or just
+  // now in this session (reasoningSaved) — drives both the flow stepper
+  // below and whether Learning Insight has anything to show.
+  const hasSavedReasoning = reasoningSaved || attempt.reasoning !== null;
 
   return (
     <div className="space-y-6">
@@ -563,6 +582,20 @@ export function VirtualPatientConversation({
               const studentMsg = messages.find((m) => m.role === "STUDENT" && m.category === point.id);
               const resultMsg = messages.find((m) => m.role === "SYSTEM" && m.category === point.id);
               const answered = !!(studentMsg && resultMsg);
+              const insight = decisionInsights[point.id];
+              // Phase 3F — Step 6's compact visual relationship, reusing the
+              // same status-glyph list convention already established by
+              // components/dashboard/learning-journey-card.tsx rather than
+              // introducing a new visual language. Status only ever depends
+              // on real state (never just color), so it stays screen-reader
+              // and colorblind-safe.
+              const flowSteps = [
+                { label: dict.clinicalCases.clinicalFindingLabel, done: true },
+                { label: dict.clinicalCases.flowYourDecisionLabel, done: true },
+                { label: dict.clinicalCases.decisionExplanationLabel, done: answered },
+                { label: dict.clinicalCases.flowReasoningLabel, done: hasSavedReasoning },
+                { label: dict.clinicalCases.learningInsightLabel, done: !!insight },
+              ];
 
               return (
                 <div key={point.id} className="rounded-lg border border-border bg-background p-4">
@@ -580,6 +613,31 @@ export function VirtualPatientConversation({
                         </p>
                         <p className="mt-1 text-sm">{resultMsg.message}</p>
                       </div>
+
+                      <ol className="space-y-1 border-t border-border pt-3 text-xs">
+                        {flowSteps.map((step, i) => (
+                          <li key={i} className="flex items-center gap-2">
+                            <span aria-hidden="true">{step.done ? "✓" : "○"}</span>
+                            <span className={step.done ? "" : "text-muted"}>{step.label}</span>
+                          </li>
+                        ))}
+                      </ol>
+
+                      {!hasSavedReasoning && (
+                        <div className="rounded-lg border border-accent-100 bg-accent-50 p-3">
+                          <p className="text-xs font-semibold text-accent-700">
+                            {dict.clinicalCases.clinicalThinkingConnectionTitle}
+                          </p>
+                          <p className="mt-1 text-sm">{dict.clinicalCases.clinicalThinkingConnectionBody}</p>
+                          <Button
+                            variant="outline"
+                            className="mt-3 !px-4 !py-1.5 text-xs"
+                            onClick={() => goToSection(reasoningHeadingRef)}
+                          >
+                            {dict.clinicalCases.continueToReasoningButton}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="mt-3 flex flex-col gap-2">
@@ -653,6 +711,48 @@ export function VirtualPatientConversation({
           </ul>
         )}
 
+        {/* Phase 3F — contextual bridge from an already-answered decision
+            into this reasoning form. Purely informational: it never
+            pre-fills or replaces any of the textareas below, and only
+            shows the decision(s) this student themself already made and
+            was already shown the explanation for (nothing new revealed
+            here). */}
+        {unlockedDecisionPoints.map((point) => {
+          const studentMsg = messages.find((m) => m.role === "STUDENT" && m.category === point.id);
+          const resultMsg = messages.find((m) => m.role === "SYSTEM" && m.category === point.id);
+          if (!studentMsg || !resultMsg) return null;
+          const findingMsg = assessmentMessages.find((m) => m.category === point.triggerAssessment);
+
+          return (
+            <div key={point.id} className="mt-6 rounded-lg border border-accent-100 bg-accent-50 p-4">
+              <h3 className="text-sm font-semibold">{dict.clinicalCases.decisionContextTitle}</h3>
+              <dl className="mt-3 space-y-3 text-sm">
+                {findingMsg && (
+                  <div>
+                    <dt className="text-xs font-semibold text-muted">{dict.clinicalCases.clinicalFindingLabel}</dt>
+                    <dd className="mt-1">
+                      {findingMsg.category === "VITAL_SIGNS" ? (
+                        <VitalSignsResult dict={dict} message={findingMsg.message} />
+                      ) : (
+                        findingMsg.message
+                      )}
+                    </dd>
+                  </div>
+                )}
+                <div>
+                  <dt className="text-xs font-semibold text-muted">{dict.clinicalCases.decisionChosenLabel}</dt>
+                  <dd className="mt-1">{studentMsg.message}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold text-muted">{dict.clinicalCases.decisionExplanationLabel}</dt>
+                  <dd className="mt-1">{resultMsg.message}</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-sm font-medium">{dict.clinicalCases.reasoningPromptQuestion}</p>
+            </div>
+          );
+        })}
+
         <p className="mt-6 text-xs text-muted">{dict.clinicalCases.reasoningHint}</p>
 
         <div className="mt-3 space-y-4">
@@ -687,6 +787,18 @@ export function VirtualPatientConversation({
             {reasoningSaved && <span className="text-sm text-success">{dict.clinicalCases.reasoningSaved}</span>}
           </div>
         )}
+
+        {/* Phase 3F — Learning Insight: only ever present once the server
+            has confirmed reasoning was saved for this attempt (see
+            buildDecisionInsights) — never shown, and never in the initial
+            page data, before that. Named per Step 5: a skill practiced,
+            never a correct/wrong verdict. */}
+        {Object.entries(decisionInsights).map(([decisionId, insight]) => (
+          <div key={decisionId} className="mt-4 rounded-lg border border-success/20 bg-success/5 p-3" role="status">
+            <p className="text-xs font-semibold text-success">{dict.clinicalCases.learningInsightLabel}</p>
+            <p className="mt-1 text-sm">{locale === "ar" ? insight.ar : insight.en}</p>
+          </div>
+        ))}
       </Card>
 
       {/* Clinical Notes */}

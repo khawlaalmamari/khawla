@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import type { CaseCategory, CaseDifficulty, ConversationRole } from "@prisma/client";
 import type {
   AssessmentType,
+  Bilingual,
   ClinicalReasoningResponse,
   ConversationMessageDTO,
   DebriefReflection,
@@ -18,6 +19,7 @@ import {
   classifyQuestion,
   getAvailableAssessments,
   getDecisionExplanation,
+  getDecisionInsight,
   isAssessmentSupported,
   isDecisionCategory,
   nextEmotionalState,
@@ -170,7 +172,53 @@ export type AttemptView = {
   reasoning: ClinicalReasoningResponse | null;
   // Phase 2E — the student's own saved post-attempt reflection, if any.
   reflection: DebriefReflection | null;
+  // Phase 3F — a small, non-scoring educational note per answered decision
+  // point (keyed by decision id), naming the clinical-thinking skill that
+  // choice practiced. Only populated once the student has also saved
+  // their Clinical Reasoning notes for this attempt (see
+  // buildDecisionInsights) — never sent before that, so it can't be used
+  // to skip straight to "the answer" without reasoning first.
+  decisionInsights: Record<string, Bilingual>;
 };
+
+/**
+ * Phase 3F — recovers which option a student chose at a decision point
+ * from the STUDENT turn's own persisted text (recordClinicalDecision
+ * never stores the option id itself, only its bilingual label — see
+ * Phase 3E). Matching against both locales means this works regardless
+ * of which language was active when the choice was made.
+ */
+function findChosenOptionId(
+  point: ReturnType<typeof getDecisionPointSummaries>[number],
+  studentMessage: string,
+): string | null {
+  return point.options.find((o) => o.label.en === studentMessage || o.label.ar === studentMessage)?.id ?? null;
+}
+
+/**
+ * Phase 3F — computes the Learning Insight for every decision point in
+ * this case that the student has both answered AND (per hasReasoning)
+ * saved Clinical Reasoning notes for. Returns {} before that — this is
+ * the one gate that decides whether insight text reaches the client at
+ * all, so it must be applied here, not left to the UI to hide.
+ */
+function buildDecisionInsights(
+  caseSlug: string,
+  messages: { role: ConversationRole; category: string | null; message: string }[],
+  hasReasoning: boolean,
+): Record<string, Bilingual> {
+  if (!hasReasoning) return {};
+  const insights: Record<string, Bilingual> = {};
+  for (const point of getDecisionPointSummaries(caseSlug)) {
+    const studentMsg = messages.find((m) => m.role === "STUDENT" && m.category === point.id);
+    if (!studentMsg) continue;
+    const optionId = findChosenOptionId(point, studentMsg.message);
+    if (!optionId) continue;
+    const insight = getDecisionInsight(point.id, optionId);
+    if (insight) insights[point.id] = insight;
+  }
+  return insights;
+}
 
 /**
  * Starts a new attempt for a published case, seeding the patient's
@@ -229,7 +277,27 @@ export async function getAttemptView(attemptId: string, userId: string): Promise
     reflection: attempt.interactionLogJson
       ? (JSON.parse(attempt.interactionLogJson) as DebriefReflection)
       : null,
+    decisionInsights: buildDecisionInsights(attempt.case.slug, attempt.messages, attempt.finalDecisionJson !== null),
   };
+}
+
+/**
+ * Phase 3F — recomputes decisionInsights right after a successful
+ * saveClinicalReasoning call, so the client can reveal Learning Insight
+ * immediately without waiting for a full page reload. Independently
+ * re-checks ownership via the userId filter (Step 14: never trusts that
+ * the caller already validated this attempt belongs to the session user).
+ */
+export async function getDecisionInsightsForAttempt(
+  attemptId: string,
+  userId: string,
+): Promise<Record<string, Bilingual>> {
+  const attempt = await prisma.clinicalCaseAttempt.findFirst({
+    where: { id: attemptId, userId },
+    include: { case: true, messages: true },
+  });
+  if (!attempt) return {};
+  return buildDecisionInsights(attempt.case.slug, attempt.messages, attempt.finalDecisionJson !== null);
 }
 
 /**
