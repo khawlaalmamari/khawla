@@ -47,11 +47,6 @@ export type ProcedureStepDef = {
    * with real, verified rationale show one — never generic filler. */
   rationaleEn?: string;
   rationaleAr?: string;
-  /** Optional: gives this step's rationale text a distinct accent color so
-   * students can visually tell it apart from the instruction above it.
-   * Scoped per-step so other steps' rationale (same shared markup) are
-   * never affected — only set where explicitly requested. */
-  emphasizeRationale?: boolean;
   /** Phase 3D — see ClinicalChoicePrompt. Optional: only steps 6 and 7 of
    * each skill (Interpret / Respond) use this in practice. */
   choicePrompt?: ClinicalChoicePrompt;

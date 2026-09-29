@@ -76,7 +76,6 @@ export const NURSING_SKILLS: NursingSkill[] = [
           "Confirming identity before any procedure prevents performing the wrong assessment on the wrong patient — a core patient-safety check before any clinical contact.",
         rationaleAr:
           "التحقق من الهوية قبل أي إجراء يمنع إجراء التقييم الخاطئ على مريضة أخرى — وهو تحقق أساسي لسلامة المريضة قبل أي تلامس سريري.",
-        emphasizeRationale: true,
       },
       {
         stepNumber: 2,
