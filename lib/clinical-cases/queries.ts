@@ -431,7 +431,13 @@ export async function requestAssessment(
   const hiddenData = JSON.parse(attempt.case.hiddenDataJson) as HiddenCaseData;
   if (!isAssessmentSupported(hiddenData, type)) return { error: "notSupported" };
 
-  const resultText = buildAssessmentResult(hiddenData, type, locale);
+  const priorVitalSignsChecks =
+    type === "VITAL_SIGNS"
+      ? await prisma.clinicalCaseConversationMessage.count({
+          where: { attemptId, role: "SYSTEM", category: "VITAL_SIGNS" },
+        })
+      : 0;
+  const resultText = buildAssessmentResult(hiddenData, type, locale, priorVitalSignsChecks);
   if (resultText === null) return { error: "notSupported" };
 
   const requestText = ASSESSMENT_ACTION_LABELS[type][locale];

@@ -121,7 +121,13 @@ export type HiddenCaseData = {
   // vitalSigns/each exam entry is optional: only the ones a case defines
   // are "supported by the case" and offered to the student.
   assessments: {
-    vitalSigns?: VitalSigns;
+    // A single fixed reading (most cases), or an authored array of readings
+    // representing a short-interval trend (e.g. what "Reassess vital signs
+    // shortly to check for a trend" — see decision-points.ts — is meant to
+    // reveal). Each re-measurement in the same attempt advances to the next
+    // reading; the last reading repeats after that. Always authored content,
+    // never randomized or client-supplied — see patient-engine.ts.
+    vitalSigns?: VitalSigns | VitalSigns[];
     physicalExaminations: Partial<Record<PhysicalExamType, Bilingual>>;
   };
 };

@@ -117,15 +117,35 @@ const clinicalCases = [
       // (tachycardic, hypertensive, mildly tachypneic, mildly low SpO2,
       // no fever) — never randomized, never client-supplied. Findings are
       // plain observations only, with no diagnosis or interpretation.
+      //
+      // Two authored readings (a short-interval trend), not one: the
+      // student's own "Reassess vital signs shortly to check for a trend"
+      // decision option (decision-points.ts, DECISION_POST_VITALS) only
+      // means something if re-measuring actually shows something different.
+      // The second reading is a small, same-direction continuation of the
+      // first (nothing here has been treated yet at that point in the
+      // interaction) — still tachycardic/hypertensive/mildly tachypneic/
+      // mildly low SpO2, just slightly more so. See patient-engine.ts /
+      // buildAssessmentResult for how the reading index advances.
       assessments: {
-        vitalSigns: {
-          temperatureCelsius: 37.1,
-          heartRate: 102,
-          bloodPressureSystolic: 148,
-          bloodPressureDiastolic: 92,
-          respiratoryRate: 22,
-          oxygenSaturation: 95,
-        },
+        vitalSigns: [
+          {
+            temperatureCelsius: 37.1,
+            heartRate: 102,
+            bloodPressureSystolic: 148,
+            bloodPressureDiastolic: 92,
+            respiratoryRate: 22,
+            oxygenSaturation: 95,
+          },
+          {
+            temperatureCelsius: 37.1,
+            heartRate: 108,
+            bloodPressureSystolic: 152,
+            bloodPressureDiastolic: 94,
+            respiratoryRate: 23,
+            oxygenSaturation: 94,
+          },
+        ],
         physicalExaminations: {
           GENERAL_INSPECTION: {
             en: "The patient appears anxious and diaphoretic, holding a hand over the center of his chest.",
@@ -268,15 +288,30 @@ const clinicalCases = [
           ar: "لا أستطيع التقاط أنفاسي وصدري يشعر بضيق.",
         },
       },
+      // Two authored readings (a short-interval trend) — same rationale as
+      // chest-pain-adult above: the "Reassess vital signs shortly" decision
+      // option (DECISION_RESP_POST_VITALS) needs a real second reading to
+      // reveal. Still tachypneic/mildly tachycardic/mildly low SpO2, just
+      // slightly more so — nothing has been treated yet at that point.
       assessments: {
-        vitalSigns: {
-          temperatureCelsius: 37.0,
-          heartRate: 108,
-          bloodPressureSystolic: 122,
-          bloodPressureDiastolic: 78,
-          respiratoryRate: 26,
-          oxygenSaturation: 93,
-        },
+        vitalSigns: [
+          {
+            temperatureCelsius: 37.0,
+            heartRate: 108,
+            bloodPressureSystolic: 122,
+            bloodPressureDiastolic: 78,
+            respiratoryRate: 26,
+            oxygenSaturation: 93,
+          },
+          {
+            temperatureCelsius: 37.0,
+            heartRate: 114,
+            bloodPressureSystolic: 124,
+            bloodPressureDiastolic: 80,
+            respiratoryRate: 28,
+            oxygenSaturation: 92,
+          },
+        ],
         physicalExaminations: {
           GENERAL_INSPECTION: {
             en: "The patient is sitting upright, leaning slightly forward, speaking in short phrases with visible use of accessory neck muscles.",

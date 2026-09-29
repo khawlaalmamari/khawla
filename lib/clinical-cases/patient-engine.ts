@@ -153,7 +153,10 @@ export const ASSESSMENT_ACTION_LABELS: Record<AssessmentType, Bilingual> = {
  * case's own hiddenData actually defines a result for it. Never assume
  * every case supports every type. */
 export function isAssessmentSupported(hiddenData: HiddenCaseData, type: AssessmentType): boolean {
-  if (type === "VITAL_SIGNS") return !!hiddenData.assessments.vitalSigns;
+  if (type === "VITAL_SIGNS") {
+    const vitals = hiddenData.assessments.vitalSigns;
+    return Array.isArray(vitals) ? vitals.length > 0 : !!vitals;
+  }
   return !!hiddenData.assessments.physicalExaminations[type];
 }
 
@@ -171,15 +174,27 @@ export function getAvailableAssessments(hiddenData: HiddenCaseData): AssessmentT
  * text, same as an interview response. Returns null if unsupported —
  * callers must check isAssessmentSupported first and never call this as a
  * substitute for that check.
+ *
+ * `priorVitalSignsChecks` (ignored for other types) is how many times this
+ * attempt has already measured vital signs — when a case authors more than
+ * one reading (a short-interval trend), each re-measurement advances to the
+ * next authored reading, and the last one repeats after that. A case with
+ * only a single reading behaves exactly as before, regardless of this
+ * count. Never randomized — always one of the case's own authored values.
  */
 export function buildAssessmentResult(
   hiddenData: HiddenCaseData,
   type: AssessmentType,
   locale: "ar" | "en",
+  priorVitalSignsChecks = 0,
 ): string | null {
   if (type === "VITAL_SIGNS") {
     const vitals = hiddenData.assessments.vitalSigns;
-    return vitals ? encodeVitalSigns(vitals) : null;
+    if (!vitals) return null;
+    const reading = Array.isArray(vitals)
+      ? vitals[Math.min(priorVitalSignsChecks, vitals.length - 1)]
+      : vitals;
+    return encodeVitalSigns(reading);
   }
   const finding = hiddenData.assessments.physicalExaminations[type];
   if (!finding) return null;
