@@ -13,6 +13,7 @@ import { ScoreTrendChart } from "@/components/dashboard/score-trend-chart";
 import { ModuleBestScoresChart } from "@/components/dashboard/module-best-scores-chart";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { PracticeWithNoviaButton } from "@/components/dashboard/practice-with-novia-button";
+import { LearningJourneyCard } from "@/components/dashboard/learning-journey-card";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -73,6 +74,8 @@ export default async function DashboardPage() {
             </p>
           </Card>
         </div>
+
+        <LearningJourneyCard dict={dict} journey={data.learningJourney} />
 
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
