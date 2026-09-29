@@ -30,6 +30,9 @@ export async function POST(
   if (!mod || mod.questions.length === 0) {
     return NextResponse.json({ error: "notFound" }, { status: 404 });
   }
+  if (!mod.isPublished && user.role !== "admin") {
+    return NextResponse.json({ error: "notFound" }, { status: 404 });
+  }
 
   const questionById = new Map(mod.questions.map((q) => [q.id, q]));
   const { answers } = parsed.data;

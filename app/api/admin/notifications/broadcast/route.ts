@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { logAdminAction } from "@/lib/auth/audit-log";
+import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
 
 const broadcastSchema = z
   .object({
@@ -22,6 +23,12 @@ export async function POST(req: NextRequest) {
   const admin = await requireAdmin();
   if (!admin) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+
+  const ip = clientIpFrom(req.headers);
+  const rl = checkRateLimit(`admin-broadcast:${ip}`, { limit: 20, windowMs: 10 * 60 * 1000 });
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "rateLimited" }, { status: 429 });
   }
 
   const body = await req.json().catch(() => null);

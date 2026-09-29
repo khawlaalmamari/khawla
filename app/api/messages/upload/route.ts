@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { put } from "@vercel/blob";
 import { getCurrentUser } from "@/lib/auth/session";
+import { checkRateLimit, clientIpFrom } from "@/lib/auth/rate-limit";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
@@ -9,6 +10,12 @@ const ALLOWED_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/g
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const ip = clientIpFrom(req.headers);
+  const rl = checkRateLimit(`message-upload:${ip}`, { limit: 20, windowMs: 10 * 60 * 1000 });
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "rateLimited" }, { status: 429 });
+  }
 
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     return NextResponse.json({ error: "notConfigured" }, { status: 503 });
