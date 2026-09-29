@@ -66,7 +66,10 @@ See `.env.example`. Copy it to `.env` and fill in real values:
 - `DATABASE_URL` — a PostgreSQL connection string (local or hosted).
 - `SESSION_SECRET` — must be a long random value in production.
 - `AI_PROVIDER_API_KEY` — optional; without it, the "Ask Novia" widget honestly tells
-  students the AI tutor isn't configured yet instead of fabricating answers.
+  students the AI tutor isn't configured yet instead of fabricating answers, and
+  Clinical Case patient interviews fall back to their deterministic scripted replies.
+  With it set, Clinical Case patient replies are AI-phrased for variety and in-character
+  tone, but are still constrained to only the case's own authored facts — never invented.
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` — reserved for a future
   migration from the local auth system to Clerk.
 

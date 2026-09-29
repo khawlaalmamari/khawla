@@ -93,6 +93,22 @@ export function buildPatientResponse(
   }
 }
 
+/** Which interview categories this specific case actually has a genuine
+ * scripted answer for (Step 6's `getAvailableAssessments` counterpart for
+ * interview questions) — i.e. everywhere buildPatientResponse would return
+ * something other than the generic NOT_SURE fallback. Used by the optional
+ * AI phrasing layer (lib/clinical-cases/ai-patient.ts) to build a menu of
+ * real, already-authored facts it's allowed to rephrase — it never sees or
+ * invents anything beyond what this function already reports as scripted. */
+export function getScriptedCategories(
+  visibleData: VisibleCaseData,
+  hiddenData: HiddenCaseData,
+): QuestionCategory[] {
+  return QUESTION_CATEGORIES.filter(
+    (category) => buildPatientResponse(visibleData, hiddenData, category) !== NOT_SURE,
+  );
+}
+
 export type EmotionalState = "CALM" | "ANXIOUS" | "UNCOMFORTABLE";
 
 // Lightweight, deterministic nudge (Step 7) — categories that touch on

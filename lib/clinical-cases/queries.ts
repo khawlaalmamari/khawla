@@ -15,8 +15,6 @@ import { ASSESSMENT_TYPES, QUESTION_CATEGORIES } from "./types";
 import {
   ASSESSMENT_ACTION_LABELS,
   buildAssessmentResult,
-  buildPatientResponse,
-  classifyQuestion,
   getAvailableAssessments,
   getDecisionExplanation,
   getDecisionInsight,
@@ -25,6 +23,7 @@ import {
   nextEmotionalState,
 } from "./patient-engine";
 import { getDecisionPointSummaries } from "./decision-points";
+import { resolvePatientReply } from "./ai-patient";
 
 /** Listing-safe fields only — never includes hiddenDataJson. */
 const metadataSelect = {
@@ -347,11 +346,12 @@ export async function getDecisionInsightsForAttempt(
 }
 
 /**
- * Classifies the student's question, generates the patient's deterministic
- * reply from the case's own data (see patient-engine.ts), persists both
- * turns, and nudges the attempt's emotional state. Ownership-checked via
- * the userId filter on the initial lookup; returns null for a
- * nonexistent/foreign/already-ended attempt.
+ * Classifies the student's question and resolves the patient's reply (see
+ * resolvePatientReply in ai-patient.ts — AI-phrased when configured, else
+ * the deterministic engine in patient-engine.ts), persists both turns, and
+ * nudges the attempt's emotional state. Ownership-checked via the userId
+ * filter on the initial lookup; returns null for a nonexistent/foreign/
+ * already-ended attempt.
  */
 export async function addConversationTurn(
   attemptId: string,
@@ -368,9 +368,13 @@ export async function addConversationTurn(
   const visibleData = JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData;
   const hiddenData = JSON.parse(attempt.case.hiddenDataJson) as HiddenCaseData;
 
-  const category = classifyQuestion(studentText);
-  const responseBilingual = buildPatientResponse(visibleData, hiddenData, category);
-  const patientText = locale === "ar" ? responseBilingual.ar : responseBilingual.en;
+  const { category, text: patientText } = await resolvePatientReply(
+    visibleData,
+    hiddenData,
+    studentText,
+    locale,
+    attempt.emotionalState,
+  );
   const newEmotionalState = nextEmotionalState(attempt.emotionalState, category);
 
   const priorCount = await prisma.clinicalCaseConversationMessage.count({ where: { attemptId } });

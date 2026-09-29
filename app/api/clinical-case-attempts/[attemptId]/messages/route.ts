@@ -6,10 +6,13 @@ import { addConversationTurn } from "@/lib/clinical-cases/queries";
 import { sendPatientMessageSchema } from "@/lib/clinical-cases/schemas";
 
 /**
- * Sends a student's question to the (deterministic, offline) virtual
- * patient and persists both turns. Never trusts a client-supplied userId
- * — ownership is enforced inside addConversationTurn via the session
- * user's id, and the response never includes hiddenData.
+ * Sends a student's question to the virtual patient and persists both
+ * turns. The reply is AI-phrased when AI_PROVIDER_API_KEY is configured,
+ * otherwise deterministic/offline (see lib/clinical-cases/ai-patient.ts) —
+ * either way it's grounded only in this case's own authored data. Never
+ * trusts a client-supplied userId — ownership is enforced inside
+ * addConversationTurn via the session user's id, and the response never
+ * includes hiddenData.
  */
 export async function POST(
   req: NextRequest,
