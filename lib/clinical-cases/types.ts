@@ -21,6 +21,16 @@ export type VisibleCaseData = {
     personality: Bilingual; // short descriptor, e.g. "Cooperative but worried"
     communicationStyle: Bilingual; // e.g. "Direct, short answers"
     initialEmotionalState: InitialEmotionalState;
+    // Optional pool of alternate (name, age) pairs for this same case —
+    // picked once per attempt (see startCaseAttempt/getAttemptView in
+    // queries.ts) so replaying the same case doesn't always show the exact
+    // same patient identity. Deliberately name/age ONLY: this case's own
+    // hiddenData is written in gendered Arabic (e.g. المريض/يده vs
+    // المريضة, matching verb conjugation throughout) tied to `gender`
+    // above — a variant must never change gender, or every hidden
+    // interview/exam sentence for this case would read grammatically
+    // wrong. A case with no variants authored behaves exactly as before.
+    nameAgeVariants?: { name: Bilingual; age: number }[];
   };
   chiefComplaint: Bilingual;
   presentingSymptoms: Bilingual[];

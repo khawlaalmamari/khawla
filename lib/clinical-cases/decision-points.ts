@@ -113,6 +113,49 @@ export const DECISION_POINTS: Record<string, ClinicalDecisionPointSummary[]> = {
       ],
     },
   ],
+  // Third case — grounded entirely in this case's own scripted findings
+  // (migrating right-lower-quadrant pain, guarding, low-grade fever, mild
+  // tachycardia). Globally-unique decision id, same rationale as above.
+  "abdominal-pain-adult": [
+    {
+      id: "DECISION_ABD_POST_VITALS",
+      triggerAssessment: "VITAL_SIGNS",
+      prompt: {
+        en: "Based on the vital signs and abdominal findings so far, what would you prioritize next?",
+        ar: "بناءً على العلامات الحيوية ونتائج فحص البطن حتى الآن، ما الذي ستُعطينه الأولوية بعد ذلك؟",
+      },
+      options: [
+        {
+          id: "reassess",
+          label: {
+            en: "Reassess vital signs and pain level shortly to check for a trend.",
+            ar: "إعادة تقييم العلامات الحيوية ومستوى الألم بعد قليل لمتابعة تطوّرها.",
+          },
+        },
+        {
+          id: "abdo-assess",
+          label: {
+            en: "Perform a focused abdominal reassessment (palpation).",
+            ar: "إجراء إعادة تقييم بطني مركّز (الجس).",
+          },
+        },
+        {
+          id: "escalate",
+          label: {
+            en: "Communicate your concern to the supervising nurse or physician now.",
+            ar: "إبلاغ الممرضة المسؤولة أو الطبيب بقلقك الآن.",
+          },
+        },
+        {
+          id: "monitor",
+          label: {
+            en: "Continue routine monitoring without further action.",
+            ar: "الاستمرار في المراقبة الروتينية دون إجراء إضافي.",
+          },
+        },
+      ],
+    },
+  ],
 };
 
 export function getDecisionPointSummaries(caseSlug: string): ClinicalDecisionPointSummary[] {

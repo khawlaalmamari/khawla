@@ -398,6 +398,14 @@ model ClinicalCaseAttempt {
   // Phase 2B: free-text clinical notes the student takes while
   // interviewing the patient. Not analyzed or scored this phase.
   notes          String?
+  // Which of the case's own authored patientProfile.nameAgeVariants (see
+  // lib/clinical-cases/types.ts) this attempt displays — null/0 means the
+  // case's own default profile. Chosen once at attempt creation
+  // (startCaseAttempt) and never changes afterward, so a single attempt's
+  // patient identity stays stable while a fresh attempt on the same case
+  // can show a different name/age. Never varies gender — see the
+  // case-authoring notes on nameAgeVariants for why.
+  patientVariantIndex Int?
 
   // JSON array of free-form events (questions asked, clues discovered,
   // assessments requested, decisions made, reasoning responses) — shape

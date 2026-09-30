@@ -28,6 +28,14 @@ const clinicalCases = [
         personality: { en: "Cooperative but worried", ar: "متعاون لكنه قلق" },
         communicationStyle: { en: "Direct, gives short answers", ar: "مباشر، يعطي إجابات قصيرة" },
         initialEmotionalState: "ANXIOUS",
+        // Name/age only — never gender (this case's hiddenData is written
+        // in male-gendered Arabic, e.g. المريض/يده, throughout). Picked
+        // once per attempt in startCaseAttempt so replaying this same case
+        // doesn't always show "Ahmed, 58" — see types.ts nameAgeVariants.
+        nameAgeVariants: [
+          { name: { en: "Salim", ar: "سالم" }, age: 55 },
+          { name: { en: "Khalid", ar: "خالد" }, age: 61 },
+        ],
       },
       chiefComplaint: {
         en: "\"I've had this crushing pain in my chest for the last hour.\"",
@@ -207,6 +215,13 @@ const clinicalCases = [
           ar: "تتحدث بعبارات قصيرة، وتتوقف لالتقاط أنفاسها",
         },
         initialEmotionalState: "ANXIOUS",
+        // Name/age only — never gender (this case's hiddenData is written
+        // in female-gendered Arabic, e.g. المريضة, throughout). See
+        // types.ts nameAgeVariants and the chest-pain-adult case above.
+        nameAgeVariants: [
+          { name: { en: "Noor", ar: "نور" }, age: 22 },
+          { name: { en: "Reem", ar: "ريم" }, age: 27 },
+        ],
       },
       chiefComplaint: {
         en: "\"I can't... catch my breath... my chest feels tight.\"",
@@ -336,6 +351,181 @@ const clinicalCases = [
           AUSCULTATION: {
             en: "Heart sounds S1 and S2 are normal, with no murmurs, rubs, or gallops.",
             ar: "صوتا القلب S1 و S2 طبيعيان، دون أي لغط أو أصوات احتكاك أو أصوات إضافية.",
+          },
+        },
+      },
+    },
+  },
+  {
+    // Third case — deliberately a different learning pattern from the
+    // first two: an abdominal (not cardiac/respiratory) presentation,
+    // where the single most important clue is the pain's LOCATION
+    // changing over the interview (migrating from the navel to the right
+    // lower quadrant), not just its severity. Vital signs are only mildly
+    // abnormal on their own (low-grade fever, mild tachycardia) — the
+    // point is that the pattern of findings together, not one striking
+    // number, is what calls for prompt communication.
+    slug: "abdominal-pain-adult",
+    titleEn: "Acute Abdominal Pain — Adult Patient",
+    titleAr: "ألم بطني حاد — مريضة بالغة",
+    descriptionEn:
+      "A fictional educational case: a young adult presents with worsening abdominal pain that has migrated over several hours. Practice structured pain history-taking and recognizing a pattern that calls for prompt escalation.",
+    descriptionAr:
+      "حالة تعليمية افتراضية: مريضة بالغة شابة تصل وهي تعاني من ألم بطني متزايد انتقل مكانه خلال عدة ساعات. تدرّبي على أخذ تاريخ منظم للألم والتعرّف على النمط الذي يستدعي تصعيدًا سريعًا.",
+    difficulty: "INTERMEDIATE",
+    category: "GASTROINTESTINAL",
+    order: 3,
+    visibleData: {
+      patientProfile: {
+        age: 27,
+        gender: "female",
+        setting: { en: "Emergency department", ar: "قسم الطوارئ" },
+        name: { en: "Salma", ar: "سلمى" },
+        personality: { en: "Cooperative but in visible discomfort", ar: "متعاونة لكن يبدو عليها الانزعاج بوضوح" },
+        communicationStyle: {
+          en: "Lies still, winces and pauses when the pain spikes",
+          ar: "تستلقي ساكنة، وتتألم وتتوقف عن الكلام عند اشتداد الألم",
+        },
+        initialEmotionalState: "UNCOMFORTABLE",
+        // Name/age only — never gender (this case's hiddenData is written
+        // in female-gendered Arabic throughout). See types.ts
+        // nameAgeVariants.
+        nameAgeVariants: [
+          { name: { en: "Aisha", ar: "عائشة" }, age: 24 },
+          { name: { en: "Muna", ar: "منى" }, age: 31 },
+        ],
+      },
+      chiefComplaint: {
+        en: "\"I have this awful pain in my lower belly, and it keeps getting worse.\"",
+        ar: "«عندي ألم رهيب في أسفل بطني، وهو يزداد سوءًا.»",
+      },
+      presentingSymptoms: [
+        { en: "Abdominal pain, started about 6 hours ago", ar: "ألم بطني بدأ منذ حوالي 6 ساعات" },
+        { en: "Nausea with one episode of vomiting", ar: "غثيان مع نوبة تقيؤ واحدة" },
+        { en: "Loss of appetite", ar: "فقدان الشهية" },
+        { en: "Feels warm/feverish", ar: "تشعر بالسخونة/الحمى" },
+        { en: "Pain worse with movement or coughing", ar: "يزداد الألم مع الحركة أو السعال" },
+      ],
+      learningObjectives: [
+        {
+          en: "Recognize why the location and pattern of abdominal pain (not just its severity) matters in a first assessment.",
+          ar: "التعرّف على أهمية مكان الألم البطني ونمط تطوّره (لا شدته فقط) أثناء التقييم الأولي.",
+        },
+        {
+          en: "Take a structured, symptom-focused pain history.",
+          ar: "أخذ تاريخ منظم يركّز على أعراض الألم.",
+        },
+        {
+          en: "Practice prioritizing a safe nursing action based on the combined pattern of findings, not one reassuring vital sign alone.",
+          ar: "التدرّب على تحديد أولوية إجراء تمريضي آمن بناءً على نمط النتائج مجتمعة، لا علامة حيوية واحدة مطمئنة بمفردها.",
+        },
+      ],
+    },
+    hiddenData: {
+      medicalHistory: [{ en: "No significant past medical history", ar: "لا يوجد تاريخ مرضي سابق ذو أهمية" }],
+      medications: [{ en: "Occasional paracetamol for headaches", ar: "باراسيتامول بين الحين والآخر للصداع" }],
+      allergies: [{ en: "No known drug allergies", ar: "لا توجد حساسية دوائية معروفة" }],
+      familyHistory: [{ en: "No family history of gastrointestinal disease", ar: "لا يوجد تاريخ عائلي لأمراض الجهاز الهضمي" }],
+      socialHistory: [
+        { en: "University student, non-smoker", ar: "طالبة جامعية، غير مدخّنة" },
+        { en: "Lives with family", ar: "تسكن مع عائلتها" },
+      ],
+      clinicalClues: [
+        {
+          en: "Pain reportedly started around the navel and has since moved toward the right lower abdomen",
+          ar: "بدأ الألم حول السرّة على حد قولها ثم انتقل نحو أسفل يمين البطن",
+        },
+        {
+          en: "Pain worsens with movement, coughing, or pressing on the area",
+          ar: "يزداد الألم مع الحركة أو السعال أو الضغط على المنطقة",
+        },
+      ],
+      redFlags: [
+        {
+          en: "Localized right lower quadrant tenderness together with a migrating pain pattern, low-grade fever, and vomiting together suggest a condition requiring prompt physician evaluation, not routine observation",
+          ar: "الألم الموضعي في أسفل يمين البطن مع نمط الألم المهاجر والحمى الخفيفة والتقيؤ مجتمعة تشير إلى حالة تستدعي تقييمًا طبيًا سريعًا لا مجرد ملاحظة روتينية",
+        },
+      ],
+      possibleDiagnoses: [
+        { en: "Acute appendicitis", ar: "التهاب الزائدة الدودية الحاد" },
+        { en: "Gastroenteritis", ar: "التهاب المعدة والأمعاء" },
+        { en: "Ovarian cyst (torsion or rupture)", ar: "كيس مبيضي (التواء أو تمزق)" },
+        { en: "Urinary tract infection", ar: "التهاب المسالك البولية" },
+      ],
+      expectedQuestions: [
+        { en: "When exactly did the pain start, and where did it begin?", ar: "متى بدأ الألم بالضبط، وأين بدأ؟" },
+        { en: "Has the pain moved or changed since it started?", ar: "هل تغيّر مكان الألم أو طبيعته منذ أن بدأ؟" },
+        { en: "Have you had any nausea, vomiting, or changes in appetite?", ar: "هل شعرتِ بغثيان أو تقيؤ أو تغيّر في الشهية؟" },
+        { en: "Is there any chance you could be pregnant?", ar: "هل هناك احتمال أن تكوني حاملاً؟" },
+      ],
+      debriefing: {
+        en: "This presentation — pain that started around the navel and migrated to the right lower quadrant, together with nausea, vomiting, and a low-grade fever — is a classic pattern nursing education asks you to recognize as needing prompt physician evaluation rather than reassurance or routine monitoring. This is a fictional educational scenario, not medical guidance for a real patient.",
+        ar: "هذا العرض — الألم الذي بدأ حول السرّة وانتقل إلى أسفل يمين البطن، مع الغثيان والتقيؤ وحمى خفيفة — هو نمط كلاسيكي يطلب منكِ التعليم التمريضي التعرّف عليه كحالة تستدعي تقييمًا طبيًا سريعًا بدلاً من الطمأنة أو المراقبة الروتينية. هذا سيناريو تعليمي افتراضي، وليس توجيهًا طبيًا لحالة مريضة حقيقية.",
+      },
+      interviewResponses: {
+        ONSET: { en: "It started about 6 hours ago, first around my belly button.", ar: "بدأ منذ حوالي 6 ساعات، حول سرّتي أولاً." },
+        LOCATION: {
+          en: "It was around my navel at first, but now it's more toward my lower right side.",
+          ar: "كان حول سرّتي في البداية، لكنه الآن أكثر نحو أسفل جانبي الأيمن.",
+        },
+        DURATION: { en: "It's been going on for about 6 hours and keeps getting worse.", ar: "استمر لحوالي 6 ساعات ويزداد سوءًا باستمرار." },
+        CHARACTER: { en: "It's a constant, dull ache that gets sharp when I move.", ar: "إنه ألم خفيف مستمر يصبح حادًا عندما أتحرك." },
+        SEVERITY: { en: "It's really bad now, maybe 8 out of 10.", ar: "إنه سيء جدًا الآن، ربما 8 من 10." },
+        TIMING: { en: "It hasn't stopped since it started, just gotten worse.", ar: "لم يتوقف منذ أن بدأ، فقط ازداد سوءًا." },
+        AGGRAVATING_FACTORS: { en: "Walking, coughing, and pressing on my belly all make it worse.", ar: "المشي والسعال والضغط على بطني كلها تزيد الألم." },
+        RELIEVING_FACTORS: { en: "Staying still and curling up a little helps a bit.", ar: "البقاء ساكنة والانحناء قليلاً يساعد شوي." },
+        CHIEF_COMPLAINT: {
+          en: "I have this awful pain in my lower belly and it keeps getting worse.",
+          ar: "عندي ألم رهيب في أسفل بطني وهو يزداد سوءًا.",
+        },
+      },
+      // Two authored readings (a short-interval trend) — same rationale as
+      // the other two cases: the "Reassess" decision option needs a real
+      // second reading to reveal. Mild fever/tachycardia, both nudging
+      // slightly further in the same direction on reassessment.
+      assessments: {
+        vitalSigns: [
+          {
+            temperatureCelsius: 37.8,
+            heartRate: 96,
+            bloodPressureSystolic: 118,
+            bloodPressureDiastolic: 76,
+            respiratoryRate: 18,
+            oxygenSaturation: 98,
+          },
+          {
+            temperatureCelsius: 38.1,
+            heartRate: 102,
+            bloodPressureSystolic: 116,
+            bloodPressureDiastolic: 74,
+            respiratoryRate: 20,
+            oxygenSaturation: 97,
+          },
+        ],
+        physicalExaminations: {
+          GENERAL_INSPECTION: {
+            en: "The patient is lying still with her knees drawn up, wincing with movement.",
+            ar: "تستلقي المريضة ساكنة وركبتاها مثنيتان، وتتألم عند الحركة.",
+          },
+          RESPIRATORY: {
+            en: "Respiratory effort is normal, with clear breath sounds bilaterally.",
+            ar: "الجهد التنفسي طبيعي، مع أصوات تنفس صافية في الجانبين.",
+          },
+          CARDIOVASCULAR: {
+            en: "Heart rate is mildly elevated with a regular rhythm. Peripheral pulses are strong and equal.",
+            ar: "معدل ضربات القلب مرتفع بشكل طفيف مع انتظام النظم. النبضات المحيطية قوية ومتساوية.",
+          },
+          PAIN: {
+            en: "The patient rates the pain as 8 out of 10, localized to the right lower abdomen, worse with movement.",
+            ar: "تصف المريضة الألم بأنه 8 من 10، موضعي في أسفل يمين البطن، ويزداد مع الحركة.",
+          },
+          PALPATION: {
+            en: "Tenderness on palpation of the right lower quadrant, with guarding. No palpable masses.",
+            ar: "ألم عند الجس في أسفل يمين البطن، مع تيبّس وقائي (Guarding). لا توجد كتل محسوسة.",
+          },
+          AUSCULTATION: {
+            en: "Bowel sounds are present but reduced in frequency.",
+            ar: "أصوات الأمعاء موجودة لكن بتكرار أقل من الطبيعي.",
           },
         },
       },

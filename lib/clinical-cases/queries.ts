@@ -267,22 +267,43 @@ function buildDecisionInsights(
 }
 
 /**
+ * Overlays an attempt's stored patientVariantIndex onto a case's own
+ * visibleData, if any variant was actually picked — index 0/null means the
+ * case's own default profile, so this is a no-op for every case that
+ * hasn't authored nameAgeVariants. Never touches gender or anything else.
+ */
+function applyPatientVariant(visibleData: VisibleCaseData, variantIndex: number | null): VisibleCaseData {
+  if (!variantIndex) return visibleData;
+  const variant = visibleData.patientProfile.nameAgeVariants?.[variantIndex - 1];
+  if (!variant) return visibleData;
+  return {
+    ...visibleData,
+    patientProfile: { ...visibleData.patientProfile, name: variant.name, age: variant.age },
+  };
+}
+
+/**
  * Starts a new attempt for a published case, seeding the patient's
- * emotional state from the case's own persona data. Returns null if the
- * case doesn't exist or isn't published — never trusts a caller-provided
- * case id, only the slug looked up server-side.
+ * emotional state from the case's own persona data and (if this case
+ * authors any) picking a random name/age variant for this attempt — see
+ * nameAgeVariants in types.ts. Returns null if the case doesn't exist or
+ * isn't published — never trusts a caller-provided case id, only the slug
+ * looked up server-side.
  */
 export async function startCaseAttempt(userId: string, slug: string) {
   const found = await prisma.clinicalCase.findUnique({ where: { slug } });
   if (!found || !found.isPublished) return null;
 
   const visibleData = JSON.parse(found.visibleDataJson) as VisibleCaseData;
+  const variants = visibleData.patientProfile.nameAgeVariants ?? [];
+  const patientVariantIndex = variants.length > 0 ? Math.floor(Math.random() * (variants.length + 1)) : null;
 
   return prisma.clinicalCaseAttempt.create({
     data: {
       userId,
       caseId: found.id,
       emotionalState: visibleData.patientProfile.initialEmotionalState,
+      patientVariantIndex,
     },
   });
 }
@@ -305,6 +326,10 @@ export async function getAttemptView(attemptId: string, userId: string): Promise
   // valid for this case (Step 6) — the parsed object itself, and its
   // findings, are never included in the returned AttemptView.
   const hiddenData = JSON.parse(attempt.case.hiddenDataJson) as HiddenCaseData;
+  const visibleData = applyPatientVariant(
+    JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData,
+    attempt.patientVariantIndex,
+  );
 
   return {
     id: attempt.id,
@@ -314,7 +339,7 @@ export async function getAttemptView(attemptId: string, userId: string): Promise
     notes: attempt.notes,
     startedAt: attempt.startedAt.toISOString(),
     completedAt: attempt.completedAt ? attempt.completedAt.toISOString() : null,
-    visibleData: JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData,
+    visibleData,
     messages: attempt.messages.map(toMessageDTO),
     availableAssessments: getAvailableAssessments(hiddenData),
     reasoning: attempt.finalDecisionJson
@@ -366,7 +391,10 @@ export async function addConversationTurn(
   });
   if (!attempt) return null;
 
-  const visibleData = JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData;
+  const visibleData = applyPatientVariant(
+    JSON.parse(attempt.case.visibleDataJson) as VisibleCaseData,
+    attempt.patientVariantIndex,
+  );
   const hiddenData = JSON.parse(attempt.case.hiddenDataJson) as HiddenCaseData;
 
   const { category, text: patientText } = await resolvePatientReply(

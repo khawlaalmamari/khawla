@@ -251,6 +251,24 @@ const DECISION_EXPLANATIONS: Record<string, Bilingual> = {
     en: "Routine monitoring alone is usually appropriate when breathing is settling and findings are reassuring. Here, however, the combination of audible wheeze, accessory muscle use, and short-phrase speech is the kind of pattern nursing education asks you to act on more actively, rather than waiting for the next scheduled check.",
     ar: "المراقبة الروتينية وحدها تكون مناسبة عادةً عندما يكون التنفس يتحسن والنتائج مطمئنة. أما هنا، فمجموعة الصفير المسموع واستخدام عضلات التنفس المساعدة والتحدث بعبارات قصيرة هي بالضبط نوع النمط الذي يطلب منكِ التعليم التمريضي التصرف حياله بفعالية أكبر، بدلاً من انتظار الفحص المجدول التالي.",
   },
+  // Third case — grounded in migrating right-lower-quadrant pain,
+  // guarding, low-grade fever, and mild tachycardia.
+  "DECISION_ABD_POST_VITALS:reassess": {
+    en: "Repeating vital signs and the pain assessment after a short interval helps determine whether the presentation is stable, improving, or worsening — especially useful here, where the initial findings already showed a migrating pain pattern, low-grade fever, and mild tachycardia.",
+    ar: "إعادة تقييم العلامات الحيوية ومستوى الألم بعد فترة قصيرة تساعد على معرفة ما إذا كانت الحالة مستقرة أو تتحسن أو تزداد سوءًا — وهذا مفيد بشكل خاص هنا، حيث أظهرت النتائج الأولية نمط ألم مهاجر وحمى خفيفة وتسارعًا خفيفًا في ضربات القلب.",
+  },
+  "DECISION_ABD_POST_VITALS:abdo-assess": {
+    en: "A focused abdominal reassessment (use the Palpation button above) adds information — localized tenderness, guarding, rebound signs — that vital signs alone don't provide, and is a logical next step when the initial presentation raises concern about the right lower quadrant.",
+    ar: "إعادة التقييم البطني المركّز (استخدمي زر «الجس» أعلاه) يضيف معلومات — كالألم الموضعي والتيبّس الوقائي وعلامات الارتداد — لا توفرها العلامات الحيوية وحدها، وهو خطوة منطقية تالية عندما يثير العرض الأولي القلق حول أسفل يمين البطن.",
+  },
+  "DECISION_ABD_POST_VITALS:escalate": {
+    en: "Communicating findings promptly is appropriate when a patient's presentation and vital signs together raise concern, as they do here: migrating right-lower-quadrant pain together with guarding, low-grade fever, and mild tachycardia. Early communication keeps the wider care team informed rather than one nurse deciding alone whether to act.",
+    ar: "التواصل الفوري بشأن النتائج مناسب عندما تثير حالة المريضة وعلاماتها الحيوية معًا القلق، كما هو الحال هنا: ألم مهاجر في أسفل يمين البطن مع تيبّس وقائي وحمى خفيفة وتسارع خفيف في ضربات القلب. التواصل المبكر يُبقي فريق الرعاية الأوسع على اطّلاع بدلاً من أن تقرر ممرضة واحدة بمفردها ما إذا كان ينبغي التصرف.",
+  },
+  "DECISION_ABD_POST_VITALS:monitor": {
+    en: "Routine monitoring alone is usually appropriate when findings are reassuring. Here, however, the migrating pain pattern together with guarding, fever, and a worsening trend is the kind of combination nursing education asks you to actively communicate and further assess, rather than waiting for the next scheduled check.",
+    ar: "المراقبة الروتينية وحدها تكون مناسبة عادةً عندما تكون النتائج مطمئنة. أما هنا، فنمط الألم المهاجر مع التيبّس الوقائي والحمى والتوجّه نحو التدهور هو بالضبط نوع التوليفات الذي يطلب منكِ التعليم التمريضي التواصل بشأنه وتقييمه بشكل أكبر بفعالية، بدلاً من انتظار الفحص المجدول التالي.",
+  },
 };
 
 /** Returns null for an unknown decision/option id pair — callers must
@@ -301,6 +319,23 @@ const DECISION_LEARNING_INSIGHTS: Record<string, Bilingual> = {
   "DECISION_RESP_POST_VITALS:monitor": {
     en: "This decision practiced routine monitoring. Clinical thinking also means weighing whether combined findings — like audible wheeze together with accessory muscle use and short-phrase speech — call for more active follow-up than waiting for the next scheduled check, which is worth considering here.",
     ar: "هذا القرار درّبكِ على المراقبة الروتينية. يتضمن التفكير السريري أيضًا تقييم ما إذا كانت النتائج مجتمعة — كالصفير المسموع مع استخدام عضلات التنفس المساعدة والتحدث بعبارات قصيرة — تستدعي متابعة أكثر فاعلية من انتظار الفحص المجدول التالي، وهو أمر يستحق التفكير فيه هنا.",
+  },
+  // Third case — abdominal-pain-adult.
+  "DECISION_ABD_POST_VITALS:reassess": {
+    en: "This decision practiced trend monitoring: recognizing that pain and vital signs can change quickly, and that a short repeat assessment helps you tell whether she is stable, improving, or worsening.",
+    ar: "هذا القرار درّبكِ على مهارة متابعة التطوّر: إدراك أن الألم والعلامات الحيوية قد تتغيّر بسرعة، وأن إعادة التقييم بعد فترة قصيرة تساعدكِ على معرفة ما إذا كانت مستقرة أو تتحسن أو تزداد سوءًا.",
+  },
+  "DECISION_ABD_POST_VITALS:abdo-assess": {
+    en: "This decision practiced focused assessment: choosing a targeted abdominal exam to gather more specific evidence before deciding what to do next, rather than acting on vital signs alone.",
+    ar: "هذا القرار درّبكِ على مهارة التقييم المركّز: اختيار فحص بطني محدد لجمع أدلة أكثر دقة قبل اتخاذ القرار التالي، بدلاً من الاعتماد على العلامات الحيوية وحدها.",
+  },
+  "DECISION_ABD_POST_VITALS:escalate": {
+    en: "This decision practiced clinical communication: recognizing findings — migrating abdominal pain together with several changed vital signs — that call for informing the wider care team promptly, rather than one nurse deciding alone whether to act.",
+    ar: "هذا القرار درّبكِ على مهارة التواصل السريري: إدراك أن ألمًا بطنيًا مهاجرًا مع عدة تغيّرات في العلامات الحيوية معًا يستدعي إبلاغ فريق الرعاية الأوسع فورًا، بدلاً من أن تقرر ممرضة واحدة بمفردها ما إذا كان ينبغي التصرف.",
+  },
+  "DECISION_ABD_POST_VITALS:monitor": {
+    en: "This decision practiced routine monitoring. Clinical thinking also means weighing whether combined findings — like migrating pain together with this specific set of vital-sign changes — call for more active follow-up than waiting for the next scheduled check, which is worth considering here.",
+    ar: "هذا القرار درّبكِ على المراقبة الروتينية. يتضمن التفكير السريري أيضًا تقييم ما إذا كانت النتائج مجتمعة — كالألم المهاجر مع هذه المجموعة تحديدًا من التغيرات في العلامات الحيوية — تستدعي متابعة أكثر فاعلية من انتظار الفحص المجدول التالي، وهو أمر يستحق التفكير فيه هنا.",
   },
 };
 
