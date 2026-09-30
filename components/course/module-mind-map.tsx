@@ -324,15 +324,44 @@ function ModuleMindMapInner({ data }: { data: MindMapData }) {
     setBusy(true);
     const previousCollapsed = collapsed;
     setCollapsed(new Set());
+    // Wait for the collapse/expand transition (transition-all duration-300)
+    // to finish, then two animation frames so the browser has actually
+    // painted that final state — a bare setTimeout doesn't guarantee a
+    // paint has landed yet, which is part of why edges could still be
+    // mid-transition when html2canvas read the DOM.
     await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     try {
       const el = containerRef.current;
       if (!el) return;
+
+      // html2canvas silently falls back to the SVG spec's default 300x150
+      // size for an <svg> that has no explicit width/height attributes
+      // (only CSS sizing) — which is exactly how React Flow renders the
+      // edges' <svg>. That's why the connecting lines come out faint,
+      // clipped, or missing in the export despite looking fine on-screen.
+      // Set the missing attributes from each SVG's real rendered size right
+      // before capture, and restore them after, so this stays a
+      // snapshot-time-only fix.
+      const svgs = Array.from(el.querySelectorAll("svg"));
+      const restoreSvgAttrs = svgs.map((svg) => {
+        const hadWidth = svg.hasAttribute("width");
+        const hadHeight = svg.hasAttribute("height");
+        const rect = svg.getBoundingClientRect();
+        if (!hadWidth) svg.setAttribute("width", String(rect.width));
+        if (!hadHeight) svg.setAttribute("height", String(rect.height));
+        return () => {
+          if (!hadWidth) svg.removeAttribute("width");
+          if (!hadHeight) svg.removeAttribute("height");
+        };
+      });
+
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
         import("html2canvas-pro"),
         import("jspdf"),
       ]);
-      const canvas = await html2canvas(el, { backgroundColor: BOX_BG, scale: 2 });
+      const canvas = await html2canvas(el, { backgroundColor: BOX_BG, scale: 3, useCORS: true });
+      restoreSvgAttrs.forEach((restore) => restore());
       const imgData = canvas.toDataURL("image/png");
       const orientation = canvas.width >= canvas.height ? "landscape" : "portrait";
       const pdf = new jsPDF({ orientation, unit: "px", format: [canvas.width, canvas.height] });
