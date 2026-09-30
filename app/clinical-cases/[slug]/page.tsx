@@ -93,6 +93,33 @@ export default async function ClinicalCaseDetailPage({
         </Card>
 
         <Card>
+          <h2 className="text-sm font-semibold">{dict.clinicalCases.normalVitalSignsTitle}</h2>
+          <p className="mt-1 text-xs text-muted">{dict.clinicalCases.normalVitalSignsHint}</p>
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div>
+              <dt className="text-xs text-muted">{dict.clinicalCases.temperatureLabel}</dt>
+              <dd className="font-medium">{dict.clinicalCases.normalTemperatureRange}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted">{dict.clinicalCases.heartRateLabel}</dt>
+              <dd className="font-medium">{dict.clinicalCases.normalHeartRateRange}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted">{dict.clinicalCases.bloodPressureLabel}</dt>
+              <dd className="font-medium">{dict.clinicalCases.normalBloodPressureRange}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted">{dict.clinicalCases.respiratoryRateLabel}</dt>
+              <dd className="font-medium">{dict.clinicalCases.normalRespiratoryRateRange}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted">{dict.clinicalCases.oxygenSaturationLabel}</dt>
+              <dd className="font-medium">{dict.clinicalCases.normalOxygenSaturationRange}</dd>
+            </div>
+          </dl>
+        </Card>
+
+        <Card>
           <p className="text-sm text-muted">{dict.clinicalCases.fictionalDisclaimer}</p>
         </Card>
 
