@@ -82,7 +82,10 @@ async function callAI(
       }),
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("AI patient reply provider error:", res.status, await res.text().catch(() => ""));
+      return null;
+    }
 
     const data = await res.json();
     const raw: string = data.content?.[0]?.text ?? "";
@@ -94,7 +97,8 @@ async function callAI(
       return { category: parsed.category as QuestionCategory, text: parsed.reply };
     }
     return null;
-  } catch {
+  } catch (err) {
+    console.error("AI patient reply provider error:", err);
     return null;
   } finally {
     clearTimeout(timeout);

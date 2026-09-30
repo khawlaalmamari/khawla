@@ -87,7 +87,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ configured: true, reply: result.reply, sessionId });
-  } catch {
+  } catch (err) {
+    console.error("Novia chat provider error:", err);
     return NextResponse.json({ error: "providerError", sessionId }, { status: 502 });
   }
 }

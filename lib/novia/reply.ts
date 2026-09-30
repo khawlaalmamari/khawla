@@ -66,7 +66,8 @@ export async function getNoviaReply(
   });
 
   if (!res.ok) {
-    throw new Error(`AI provider error: ${res.status}`);
+    const errorBody = await res.text().catch(() => "");
+    throw new Error(`AI provider error: ${res.status} ${errorBody}`);
   }
 
   const data = await res.json();

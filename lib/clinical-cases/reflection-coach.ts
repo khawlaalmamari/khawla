@@ -65,13 +65,17 @@ export async function getReflectionGuidance(
       }),
     });
 
-    if (!res.ok) return { configured: true };
+    if (!res.ok) {
+      console.error("Reflection guidance provider error:", res.status, await res.text().catch(() => ""));
+      return { configured: true };
+    }
 
     const data = await res.json();
     const guidance: string = data.content?.[0]?.text ?? "";
     if (!guidance.trim()) return { configured: true };
     return { configured: true, guidance };
-  } catch {
+  } catch (err) {
+    console.error("Reflection guidance provider error:", err);
     return { configured: true };
   }
 }
