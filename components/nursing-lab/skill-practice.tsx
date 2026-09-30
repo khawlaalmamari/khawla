@@ -226,15 +226,6 @@ export function SkillPractice({
             </div>
 
             <div>
-              <p className="text-xs font-semibold text-muted">{dict.nursingLab.requiredEquipmentLabel}</p>
-              <ul className="mt-1 list-inside list-disc space-y-1 text-sm">
-                {(locale === "ar" ? skill.requiredEquipmentAr : skill.requiredEquipmentEn).map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
               <p className="text-xs font-semibold text-muted">{dict.nursingLab.prerequisitesLabel}</p>
               {(locale === "ar" ? skill.prerequisitesAr : skill.prerequisitesEn).length === 0 ? (
                 <p className="mt-1 text-sm text-muted">{dict.nursingLab.noPrerequisites}</p>
