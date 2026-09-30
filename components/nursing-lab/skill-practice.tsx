@@ -164,11 +164,10 @@ export function SkillPractice({
     });
   }
 
-  function markStepComplete() {
-    setCompletedStepNumbers((s) => new Set(s).add(currentStep.stepNumber));
-  }
-
   function goToNextStep() {
+    // A plain step (no observations, no choice) has nothing to mark
+    // complete on its own — pressing Next here is the completion.
+    setCompletedStepNumbers((s) => new Set(s).add(currentStep.stepNumber));
     if (isLastStep) {
       setStage("reflection");
     } else {
@@ -461,14 +460,7 @@ export function SkillPractice({
                   </div>
                 )}
               </div>
-            ) : (
-              <div>
-                <p className="text-sm" role="status" aria-live="polite">
-                  {currentStepDone ? `✓ ${dict.nursingLab.stepCompletedLabel}` : ""}
-                </p>
-                {!currentStepDone && <Button onClick={markStepComplete}>{dict.nursingLab.markStepCompleteButton}</Button>}
-              </div>
-            )}
+            ) : null}
           </Card>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -477,7 +469,7 @@ export function SkillPractice({
             </Button>
             <Button
               onClick={goToNextStep}
-              disabled={currentStep.isObservationStep ? !allObservationsRecorded : !currentStepDone}
+              disabled={currentStep.isObservationStep ? !allObservationsRecorded : choicePrompt ? !currentStepDone : false}
             >
               {dict.nursingLab.nextButton}
             </Button>
