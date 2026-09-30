@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
-import type { NursingSkill, RelatedCasePreview } from "@/lib/nursing-lab/types";
+import type { NursingSkill, RelatedCasePreview, PatientVitalState, ProcedureStepDef, GeneratedVitals } from "@/lib/nursing-lab/types";
+import { generateVitalSigns, formatVitalValue, buildInterpretStepPrompt, buildRespondStepPrompt } from "@/lib/nursing-lab/vitals-generator";
 import { getStructureById } from "@/lib/anatomy-3d/structures";
 import { systemLabel } from "@/components/anatomy-3d/body-system-selector";
 import { Card } from "@/components/ui/card";
@@ -20,6 +21,16 @@ type ReflectionAnswers = {
 };
 
 const EMPTY_REFLECTION: ReflectionAnswers = { observed: "", mostImportant: "", nextAssessment: "" };
+
+/** `dynamicChoicePromptKind` is a tag, not the builder function itself (the
+ * skill data crosses a Server->Client Component boundary, which cannot
+ * serialize functions) — this resolves it client-side against that
+ * attempt's actual vitals. */
+function resolveChoicePrompt(step: ProcedureStepDef, vitals: GeneratedVitals) {
+  if (step.dynamicChoicePromptKind === "interpretVitals") return buildInterpretStepPrompt(vitals);
+  if (step.dynamicChoicePromptKind === "respondToVitals") return buildRespondStepPrompt(vitals);
+  return step.choicePrompt;
+}
 
 const textareaClass =
   "mt-1 w-full rounded-lg border border-border bg-surface p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-50";
@@ -89,12 +100,31 @@ export function SkillPractice({
   // other piece of Nursing Lab state here (see lib/nursing-lab/types.ts).
   const [stepChoices, setStepChoices] = useState<Record<number, string>>({});
 
+  // A fresh, realistic reading for this attempt — see
+  // lib/nursing-lab/vitals-generator.ts. Only observations tagged with a
+  // vitalKey (see lib/nursing-lab/types.ts) actually use it; every other
+  // observation still shows its fixed, authored value.
+  const hasVitals = skill.observations.some((o) => o.vitalKey);
+  const [patientState, setPatientState] = useState<PatientVitalState>("stable");
+  const [vitals, setVitals] = useState(() => generateVitalSigns("stable"));
+
+  function choosePatientState(next: PatientVitalState) {
+    setPatientState(next);
+    setVitals(generateVitalSigns(next));
+  }
+
   const currentStep = skill.procedureSteps[currentStepIndex];
   const isLastStep = currentStepIndex === skill.procedureSteps.length - 1;
   const currentStepDone = completedStepNumbers.has(currentStep.stepNumber);
   const allObservationsRecorded = recordedObservationIds.size === skill.observations.length;
   const selectedChoiceId = stepChoices[currentStep.stepNumber];
-  const selectedOption = currentStep.choicePrompt?.options.find((o) => o.id === selectedChoiceId);
+  const choicePrompt = resolveChoicePrompt(currentStep, vitals);
+  const selectedOption = choicePrompt?.options.find((o) => o.id === selectedChoiceId);
+
+  function observationDisplayValue(obs: NursingSkill["observations"][number]): string {
+    if (!obs.vitalKey) return locale === "ar" ? obs.valueAr : obs.valueEn;
+    return formatVitalValue(obs.vitalKey, vitals, locale);
+  }
 
   const reflectionComplete = useMemo(
     () =>
@@ -112,6 +142,7 @@ export function SkillPractice({
     setReflection(EMPTY_REFLECTION);
     setCompletedAt(null);
     setStepChoices({});
+    setVitals(generateVitalSigns(patientState));
   }
 
   // Phase 3D — selecting a response IS the step's required action (same
@@ -280,6 +311,30 @@ export function SkillPractice({
             </div>
           </Card>
 
+          {hasVitals && (
+            <Card>
+              <p className="text-xs font-semibold text-muted">{dict.nursingLab.patientStateLabel}</p>
+              <p className="mt-1 text-xs text-muted">{dict.nursingLab.patientStateHint}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(["stable", "fever"] as const).map((state) => (
+                  <button
+                    key={state}
+                    type="button"
+                    onClick={() => choosePatientState(state)}
+                    aria-pressed={patientState === state}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                      patientState === state
+                        ? "border-primary-600 bg-primary-50 text-primary-800"
+                        : "border-border bg-surface hover:bg-primary-50"
+                    }`}
+                  >
+                    {state === "stable" ? dict.nursingLab.patientStateStable : dict.nursingLab.patientStateFever}
+                  </button>
+                ))}
+              </div>
+            </Card>
+          )}
+
           <Card>
             <p className="text-sm text-muted">{dict.clinicalCases.fictionalDisclaimer}</p>
           </Card>
@@ -353,7 +408,7 @@ export function SkillPractice({
                         {recorded ? (
                           <span className="flex items-center gap-1 text-sm font-semibold text-green-800">
                             <span aria-hidden="true">✓</span>
-                            {locale === "ar" ? obs.valueAr : obs.valueEn}
+                            {observationDisplayValue(obs)}
                           </span>
                         ) : (
                           <Button variant="outline" className="!px-3 !py-1.5 text-xs" onClick={() => recordObservation(obs.id)}>
@@ -368,13 +423,11 @@ export function SkillPractice({
                   {allObservationsRecorded ? dict.nursingLab.allObservationsRecordedNotice : ""}
                 </p>
               </div>
-            ) : currentStep.choicePrompt ? (
+            ) : choicePrompt ? (
               <div>
-                <p className="text-sm font-medium">
-                  {locale === "ar" ? currentStep.choicePrompt.promptAr : currentStep.choicePrompt.promptEn}
-                </p>
+                <p className="text-sm font-medium">{locale === "ar" ? choicePrompt.promptAr : choicePrompt.promptEn}</p>
                 <div className="mt-3 flex flex-col gap-2">
-                  {currentStep.choicePrompt.options.map((option) => {
+                  {choicePrompt.options.map((option) => {
                     const selected = option.id === selectedChoiceId;
                     return (
                       <button
@@ -500,20 +553,21 @@ export function SkillPractice({
               <ul className="mt-1 space-y-1 text-sm">
                 {skill.observations.map((obs) => (
                   <li key={obs.id}>
-                    {locale === "ar" ? obs.labelAr : obs.labelEn}: <span className="font-medium">{locale === "ar" ? obs.valueAr : obs.valueEn}</span>
+                    {locale === "ar" ? obs.labelAr : obs.labelEn}:{" "}
+                    <span className="font-medium">{observationDisplayValue(obs)}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {skill.procedureSteps.some((s) => s.choicePrompt) && (
+            {skill.procedureSteps.some((s) => s.choicePrompt || s.dynamicChoicePromptKind) && (
               <div>
                 <p className="text-xs font-semibold text-muted">{dict.nursingLab.clinicalDecisionsLabel}</p>
                 <ul className="mt-1 space-y-2 text-sm">
                   {skill.procedureSteps
-                    .filter((s) => s.choicePrompt)
+                    .filter((s) => s.choicePrompt || s.dynamicChoicePromptKind)
                     .map((s) => {
-                      const prompt = s.choicePrompt!;
+                      const prompt = resolveChoicePrompt(s, vitals)!;
                       const chosen = prompt.options.find((o) => o.id === stepChoices[s.stepNumber]);
                       return (
                         <li key={s.stepNumber} className="rounded-lg bg-surface p-2">

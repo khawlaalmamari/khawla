@@ -128,41 +128,10 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "قارني النتائج بالمعدلات الطبيعية للبالغين.",
         requiredActionEn: "Note whether each value falls within the expected range.",
         requiredActionAr: "لاحظي ما إذا كانت كل قيمة ضمن النطاق المتوقع.",
-        choicePrompt: {
-          promptEn:
-            "You measured: Temperature 37.0°C, Heart Rate 78 bpm, Respiratory Rate 16/min, Blood Pressure 118/76 mmHg, and SpO2 98%. How would you interpret this set of findings?",
-          promptAr:
-            "لقد قِستِ: درجة الحرارة 37.0° س، ومعدل ضربات القلب 78 نبضة/دقيقة، ومعدل التنفس 16/دقيقة، وضغط الدم 118/76 مم زئبق، وتشبع الأكسجين 98%. كيف تفسّرين هذه المجموعة من النتائج؟",
-          options: [
-            {
-              id: "within-normal",
-              labelEn: "All five values fall within normal adult ranges.",
-              labelAr: "جميع القيم الخمس ضمن المعدلات الطبيعية للبالغين.",
-              explanationEn:
-                "This is the correct reading: a temperature near 37°C, a heart rate of 60–100 bpm, a respiratory rate of 12–20/min, a blood pressure below 120/80 mmHg, and an SpO2 of 95% or higher are all within normal limits for a resting adult. Recognizing a normal set of vitals is just as important a skill as recognizing an abnormal one — it tells you the patient does not need an urgent response right now.",
-              explanationAr:
-                "هذه هي القراءة الصحيحة: درجة حرارة قريبة من 37°، ومعدل ضربات قلب بين 60-100 نبضة/دقيقة، ومعدل تنفس بين 12-20/دقيقة، وضغط دم أقل من 120/80، وتشبع أكسجين 95% فأعلى، كلها ضمن الحدود الطبيعية لبالغة في حالة راحة. التعرّف على مجموعة طبيعية من العلامات الحيوية مهارة لا تقل أهمية عن التعرّف على مجموعة غير طبيعية — فهي تخبرك أن المريضة لا تحتاج إلى استجابة عاجلة الآن.",
-            },
-            {
-              id: "concerning",
-              labelEn: "At least one value looks concerning and needs urgent follow-up.",
-              labelAr: "قيمة واحدة على الأقل تبدو مقلقة وتحتاج متابعة عاجلة.",
-              explanationEn:
-                "Looking again at the numbers — 37.0°C, 78 bpm, 16/min, 118/76 mmHg, 98% SpO2 — none actually fall outside the normal adult range. It's a good habit to check every value against its reference range before deciding something is concerning: treating normal findings as urgent can create unnecessary alarm and delay attention to genuinely abnormal findings elsewhere.",
-              explanationAr:
-                "بالنظر مرة أخرى إلى الأرقام — 37.0°، و78 نبضة/دقيقة، و16/دقيقة، و118/76، و98% — لا توجد قيمة تخرج فعليًا عن المعدل الطبيعي للبالغين. من العادات الجيدة مقارنة كل قيمة بمعدلها المرجعي قبل الحكم بأنها مقلقة: التعامل مع نتائج طبيعية على أنها عاجلة قد يُحدث قلقًا غير ضروري ويؤخّر الانتباه لنتائج غير طبيعية فعلية في مكان آخر.",
-            },
-            {
-              id: "repeat",
-              labelEn: "I would need to repeat the measurements before drawing any conclusion.",
-              labelAr: "أحتاج إلى إعادة القياس قبل استخلاص أي استنتاج.",
-              explanationEn:
-                "Repeating a measurement is reasonable when you have a specific reason to doubt it — for example, if the patient moved during the reading or the equipment seemed faulty. Here, the readings were taken correctly and are internally consistent with a calm, resting patient, so routine values like these do not need to be repeated automatically just because they are being reviewed.",
-              explanationAr:
-                "إعادة القياس أمر منطقي عندما يكون لديك سبب محدد للشك فيه — كأن تتحرك المريضة أثناء القياس أو يبدو الجهاز معطلاً. هنا، أُخذت القراءات بشكل صحيح وهي متّسقة مع حالة مريضة هادئة ومستريحة، لذا لا تحتاج قيم روتينية كهذه إلى إعادة تلقائية لمجرد مراجعتها.",
-            },
-          ],
-        },
+        // Built at render time from this attempt's actual generated vitals
+        // (see lib/nursing-lab/vitals-generator.ts) so the prompt and each
+        // option's explanation stay accurate whatever was randomly drawn.
+        dynamicChoicePromptKind: "interpretVitals",
       },
       {
         stepNumber: 7,
@@ -170,47 +139,48 @@ export const NURSING_SKILLS: NursingSkill[] = [
         instructionAr: "انتقلي إلى التقييم التالي.",
         requiredActionEn: "Decide whether any finding needs to be reported or reassessed.",
         requiredActionAr: "حدّدي ما إذا كانت أي نتيجة بحاجة إلى الإبلاغ عنها أو إعادة تقييمها.",
-        choicePrompt: {
-          promptEn: "Given that all five vital signs are within normal limits, what is the most appropriate next action?",
-          promptAr: "بما أن جميع العلامات الحيوية الخمس ضمن الحدود الطبيعية، ما الإجراء التالي الأنسب؟",
-          options: [
-            {
-              id: "document-continue",
-              labelEn: "Document the findings accurately and continue routine monitoring.",
-              labelAr: "توثيق النتائج بدقة والاستمرار في المراقبة الروتينية.",
-              explanationEn:
-                "This is the standard response to a normal set of vital signs: accurate documentation creates a baseline for comparison at the next check, and routine monitoring continues without unnecessary escalation.",
-              explanationAr:
-                "هذا هو الإجراء المعياري لمجموعة طبيعية من العلامات الحيوية: التوثيق الدقيق يُنشئ خط أساس للمقارنة في الفحص التالي، وتستمر المراقبة الروتينية دون تصعيد غير ضروري.",
-            },
-            {
-              id: "escalate",
-              labelEn: "Immediately notify the physician or charge nurse.",
-              labelAr: "إبلاغ الطبيب أو الممرضة المسؤولة فورًا.",
-              explanationEn:
-                "Escalation is reserved for findings that are abnormal, trending in a concerning direction, or inconsistent with how the patient looks and feels. Escalating every normal set of vitals uses up limited clinical attention needed for patients who truly need it, and can undermine confidence in future, genuinely urgent reports.",
-              explanationAr:
-                "التصعيد مخصّص للنتائج غير الطبيعية أو المتجهة نحو اتجاه مقلق أو غير المتّسقة مع مظهر المريضة وحالتها. تصعيد كل مجموعة طبيعية من العلامات الحيوية يستنزف انتباهًا سريريًا محدودًا تحتاجه مريضات أخريات فعلاً، وقد يُضعف الثقة في البلاغات العاجلة الحقيقية لاحقًا.",
-            },
-            {
-              id: "withhold",
-              labelEn: "Withhold documentation until the next scheduled check.",
-              labelAr: "تأجيل التوثيق حتى الفحص المجدول التالي.",
-              explanationEn:
-                "Every set of vital signs should be documented as soon as it is measured, whether normal or abnormal — it is the permanent record other members of the care team rely on, and delaying it risks the information being forgotten or lost.",
-              explanationAr:
-                "يجب توثيق كل مجموعة من العلامات الحيوية فور قياسها، سواء كانت طبيعية أو غير طبيعية — فهي السجل الدائم الذي يعتمد عليه بقية أعضاء فريق الرعاية، وتأجيلها يُعرّض المعلومة لخطر النسيان أو الضياع.",
-            },
-          ],
-        },
+        // See the note on step 6 above — same reasoning applies to whether
+        // documenting-and-continuing or escalating is the right call.
+        dynamicChoicePromptKind: "respondToVitals",
       },
     ],
+    // valueEn/valueAr below are a fallback only; vitalKey means the actual
+    // displayed/recorded value comes from this attempt's freshly generated
+    // vitals instead (see lib/nursing-lab/vitals-generator.ts).
     observations: [
-      { id: "temperature", labelEn: "Temperature", labelAr: "درجة الحرارة", valueEn: "37.0°C", valueAr: "37.0° س" },
-      { id: "heart-rate", labelEn: "Heart Rate", labelAr: "معدل ضربات القلب", valueEn: "78 bpm", valueAr: "78 نبضة/دقيقة" },
-      { id: "respiratory-rate", labelEn: "Respiratory Rate", labelAr: "معدل التنفس", valueEn: "16/min", valueAr: "16/دقيقة" },
-      { id: "blood-pressure", labelEn: "Blood Pressure", labelAr: "ضغط الدم", valueEn: "118/76 mmHg", valueAr: "118/76 مم زئبق" },
-      { id: "spo2", labelEn: "SpO2", labelAr: "تشبع الأكسجين", valueEn: "98%", valueAr: "98%" },
+      {
+        id: "temperature",
+        labelEn: "Temperature",
+        labelAr: "درجة الحرارة",
+        valueEn: "37.0°C",
+        valueAr: "37.0° س",
+        vitalKey: "temperature",
+      },
+      {
+        id: "heart-rate",
+        labelEn: "Heart Rate",
+        labelAr: "معدل ضربات القلب",
+        valueEn: "78 bpm",
+        valueAr: "78 نبضة/دقيقة",
+        vitalKey: "heartRate",
+      },
+      {
+        id: "respiratory-rate",
+        labelEn: "Respiratory Rate",
+        labelAr: "معدل التنفس",
+        valueEn: "16/min",
+        valueAr: "16/دقيقة",
+        vitalKey: "respiratoryRate",
+      },
+      {
+        id: "blood-pressure",
+        labelEn: "Blood Pressure",
+        labelAr: "ضغط الدم",
+        valueEn: "118/76 mmHg",
+        valueAr: "118/76 مم زئبق",
+        vitalKey: "bloodPressure",
+      },
+      { id: "spo2", labelEn: "SpO2", labelAr: "تشبع الأكسجين", valueEn: "98%", valueAr: "98%", vitalKey: "spo2" },
     ],
     relatedClinicalCaseSlug: "chest-pain-adult",
   },

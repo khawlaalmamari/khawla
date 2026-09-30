@@ -50,17 +50,51 @@ export type ProcedureStepDef = {
   /** Phase 3D — see ClinicalChoicePrompt. Optional: only steps 6 and 7 of
    * each skill (Interpret / Respond) use this in practice. */
   choicePrompt?: ClinicalChoicePrompt;
+  /** Vitals-aware alternative to `choicePrompt`: a tag (not the builder
+   * function itself — this data crosses a Server->Client Component
+   * boundary, which cannot serialize functions) that the client component
+   * resolves via lib/nursing-lab/vitals-generator.ts's
+   * buildInterpretStepPrompt/buildRespondStepPrompt, built from that
+   * attempt's actual generated vitals so the prompt text and each option's
+   * explanation stay accurate no matter what was randomly drawn. Takes
+   * precedence over `choicePrompt` when both are present. */
+  dynamicChoicePromptKind?: "interpretVitals" | "respondToVitals";
 };
 
-/** A single deterministic, scenario-defined clinical observation (Step 9).
- * Values are fixed content shipped with the skill — never randomized and
- * never editable from the client. */
+/** The five core vital signs a skill's observations can be tied to. Used
+ * to look up a freshly generated reading (see vitals-generator.ts) instead
+ * of a fixed value at render time. */
+export type VitalKey = "temperature" | "heartRate" | "respiratoryRate" | "bloodPressure" | "spo2";
+
+/** A named patient presentation that biases which range each vital is
+ * drawn from (see vitals-generator.ts's STATE_RANGES). "stable" matches
+ * the normal adult reference ranges shown on the case detail page. */
+export type PatientVitalState = "stable" | "fever";
+
+/** One freshly generated set of vital signs, one attempt at a time — never
+ * persisted, never shared between students. */
+export type GeneratedVitals = {
+  temperatureC: number;
+  heartRateBpm: number;
+  respiratoryRateBrpm: number;
+  bloodPressureSystolic: number;
+  bloodPressureDiastolic: number;
+  spo2Percent: number;
+};
+
+/** A single clinical observation (Step 9). `valueEn`/`valueAr` are a
+ * fallback for observations with no `vitalKey` (breath sounds, pulses,
+ * capillary refill, ...) — fixed content shipped with the skill, never
+ * randomized. When `vitalKey` is set, the actual displayed/recorded value
+ * instead comes from that attempt's freshly generated vitals (see
+ * vitals-generator.ts's formatVitalValue). */
 export type ObservationDef = {
   id: string;
   labelEn: string;
   labelAr: string;
   valueEn: string;
   valueAr: string;
+  vitalKey?: VitalKey;
 };
 
 /** A fictional simulated patient profile (Step 8) — never real patient
