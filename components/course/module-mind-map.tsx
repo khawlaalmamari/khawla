@@ -335,33 +335,53 @@ function ModuleMindMapInner({ data }: { data: MindMapData }) {
       const el = containerRef.current;
       if (!el) return;
 
-      // html2canvas silently falls back to the SVG spec's default 300x150
-      // size for an <svg> that has no explicit width/height attributes
-      // (only CSS sizing) — which is exactly how React Flow renders the
-      // edges' <svg>. That's why the connecting lines come out faint,
-      // clipped, or missing in the export despite looking fine on-screen.
-      // Set the missing attributes from each SVG's real rendered size right
-      // before capture, and restore them after, so this stays a
-      // snapshot-time-only fix.
-      const svgs = Array.from(el.querySelectorAll("svg"));
-      const restoreSvgAttrs = svgs.map((svg) => {
-        const hadWidth = svg.hasAttribute("width");
-        const hadHeight = svg.hasAttribute("height");
-        const rect = svg.getBoundingClientRect();
-        if (!hadWidth) svg.setAttribute("width", String(rect.width));
-        if (!hadHeight) svg.setAttribute("height", String(rect.height));
-        return () => {
-          if (!hadWidth) svg.removeAttribute("width");
-          if (!hadHeight) svg.removeAttribute("height");
-        };
-      });
-
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
         import("html2canvas-pro"),
         import("jspdf"),
       ]);
-      const canvas = await html2canvas(el, { backgroundColor: BOX_BG, scale: 3, useCORS: true });
-      restoreSvgAttrs.forEach((restore) => restore());
+      const scale = 3;
+      const canvas = await html2canvas(el, { backgroundColor: BOX_BG, scale, useCORS: true });
+
+      // html2canvas-pro renders each edge's nested <svg> as an opaque
+      // serialized image (its SVGElementContainer path) — verified
+      // empirically that this consistently drops the connecting line
+      // itself even once stroke/stroke-width/opacity are mirrored onto
+      // real SVG attributes (not just inline style) beforehand. Rather
+      // than fight that further, draw every edge ourselves directly onto
+      // the finished canvas: each path's own getScreenCTM() maps its local
+      // coordinates to real page pixels, which is unaffected by React
+      // Flow's current pan/zoom or by html2canvas's SVG handling, since it
+      // reads the browser's own computed geometry rather than going
+      // through html2canvas at all.
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        const containerRect = el.getBoundingClientRect();
+        const edgePaths = Array.from(el.querySelectorAll<SVGPathElement>(".react-flow__edge-path"));
+        for (const path of edgePaths) {
+          const ctm = path.getScreenCTM();
+          const d = path.getAttribute("d");
+          if (!ctm || !d) continue;
+          const style = window.getComputedStyle(path);
+          const opacity = parseFloat(style.opacity);
+          if (!opacity) continue;
+          ctx.save();
+          ctx.setTransform(
+            scale * ctm.a,
+            scale * ctm.b,
+            scale * ctm.c,
+            scale * ctm.d,
+            scale * (ctm.e - containerRect.left),
+            scale * (ctm.f - containerRect.top),
+          );
+          ctx.globalAlpha = opacity;
+          ctx.strokeStyle = style.stroke;
+          ctx.lineWidth = parseFloat(style.strokeWidth) || 1;
+          ctx.lineCap = (style.strokeLinecap as CanvasLineCap) || "butt";
+          ctx.stroke(new Path2D(d));
+          ctx.restore();
+        }
+      }
+
       const imgData = canvas.toDataURL("image/png");
       const orientation = canvas.width >= canvas.height ? "landscape" : "portrait";
       const pdf = new jsPDF({ orientation, unit: "px", format: [canvas.width, canvas.height] });
