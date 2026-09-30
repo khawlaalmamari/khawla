@@ -97,6 +97,17 @@ export type ObservationDef = {
   vitalKey?: VitalKey;
 };
 
+/** One normal/reference value shown on a skill's preparation screen,
+ * before the student starts — lets her judge her own findings as normal
+ * or abnormal instead of being told. Purely informational, static content;
+ * never tied to a vitalKey or randomized. */
+export type ReferenceRangeDef = {
+  labelEn: string;
+  labelAr: string;
+  valueEn: string;
+  valueAr: string;
+};
+
 /** A fictional simulated patient profile (Step 8) — never real patient
  * information, and intentionally simple for this first version. */
 export type SimulatedPatientDef = {
@@ -132,6 +143,10 @@ export type NursingSkill = {
   learningObjectivesAr: string[];
   requiredEquipmentEn: string[];
   requiredEquipmentAr: string[];
+  /** Shown as a reference card on the preparation screen, directly above
+   * Required Equipment — optional so a skill with nothing to reference
+   * (no numeric or descriptive normal finding) simply shows no card. */
+  normalRanges?: ReferenceRangeDef[];
   patient: SimulatedPatientDef;
   preparationStepsEn: string[];
   preparationStepsAr: string[];

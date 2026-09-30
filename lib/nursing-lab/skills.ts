@@ -45,6 +45,18 @@ export const NURSING_SKILLS: NursingSkill[] = [
     ],
     requiredEquipmentEn: ["Thermometer", "Stethoscope", "Blood pressure cuff (sphygmomanometer)", "Pulse oximeter", "Watch or timer"],
     requiredEquipmentAr: ["ميزان حرارة", "سماعة طبية", "جهاز قياس ضغط الدم", "جهاز قياس تشبع الأكسجين", "ساعة أو مؤقّت"],
+    normalRanges: [
+      { labelEn: "Temperature", labelAr: "درجة الحرارة", valueEn: "36.1°C – 37.2°C", valueAr: "36.1° – 37.2° س" },
+      { labelEn: "Heart Rate", labelAr: "معدل ضربات القلب", valueEn: "60 – 100 bpm", valueAr: "60 – 100 نبضة/د" },
+      {
+        labelEn: "Blood Pressure",
+        labelAr: "ضغط الدم",
+        valueEn: "90/60 – 120/80 mmHg",
+        valueAr: "90/60 – 120/80 مم زئبق",
+      },
+      { labelEn: "Respiratory Rate", labelAr: "التنفس", valueEn: "12 – 20/min", valueAr: "12 – 20/د" },
+      { labelEn: "Oxygen Saturation", labelAr: "الأكسجين", valueEn: "95% – 100%", valueAr: "95% – 100%" },
+    ],
     patient: {
       nameEn: "Layla",
       nameAr: "ليلى",
@@ -198,16 +210,26 @@ export const NURSING_SKILLS: NursingSkill[] = [
     prerequisitesAr: ["تقييم العلامات الحيوية (يُستحسن إكمالها أولًا)"],
     learningObjectivesEn: [
       "Recognize a normal respiratory rate and breathing pattern.",
-      "Practice observing chest movement and breathing effort.",
-      "Connect respiratory anatomy to what is being assessed.",
+      "Practice examining lung sounds and simulated chest movements.",
+      "Evaluate respiratory system efficiency based on clinical findings.",
     ],
     learningObjectivesAr: [
       "التعرّف على معدل التنفس الطبيعي ونمط التنفس السليم.",
-      "التدرّب على ملاحظة حركة الصدر وجهد التنفس.",
-      "ربط تشريح الجهاز التنفسي بما يتم تقييمه.",
+      "التدرّب على فحص أصوات الرئة وحركات الصدر الافتراضية.",
+      "تقييم مدى كفاءة الجهاز التنفسي بناءً على المعطيات السريرية.",
     ],
     requiredEquipmentEn: ["Stethoscope", "Pulse oximeter", "Watch or timer"],
     requiredEquipmentAr: ["سماعة طبية", "جهاز قياس تشبع الأكسجين", "ساعة أو مؤقّت"],
+    normalRanges: [
+      { labelEn: "Normal Respiratory Rate", labelAr: "معدل التنفس الطبيعي", valueEn: "12 – 20 breaths/min", valueAr: "12 – 20 أنفاس/دقيقة" },
+      {
+        labelEn: "Healthy Breathing Pattern",
+        labelAr: "نمط التنفس السليم",
+        valueEn: "Regular, unlabored, and of normal depth",
+        valueAr: "منتظم وبدون مجهود وبعمق طبيعي",
+      },
+      { labelEn: "Normal Oxygen Saturation", labelAr: "تشبع الأكسجين الطبيعي", valueEn: "95% or above", valueAr: "95% فأعلى" },
+    ],
     patient: {
       nameEn: "Omar",
       nameAr: "عمر",
@@ -406,16 +428,31 @@ export const NURSING_SKILLS: NursingSkill[] = [
     prerequisitesAr: ["تقييم العلامات الحيوية (يُستحسن إكمالها أولًا)"],
     learningObjectivesEn: [
       "Practice measuring heart rate and blood pressure accurately.",
-      "Recognize a normal heart rhythm and peripheral pulses.",
-      "Connect basic heart anatomy to what is being assessed.",
+      "Recognize a normal heart rhythm and healthy peripheral pulses.",
+      "Distinguish abnormal readings and their effect on blood flow.",
     ],
     learningObjectivesAr: [
       "التدرّب على قياس معدل ضربات القلب وضغط الدم بدقة.",
-      "التعرّف على نظم القلب الطبيعي والنبض الطرفي.",
-      "ربط تشريح القلب الأساسي بما يتم تقييمه.",
+      "التعرّف على نظم القلب الطبيعي والنبض الطرفي السليم.",
+      "تمييز القراءات غير الطبيعية وتأثيرها على التدفق الدموي.",
     ],
     requiredEquipmentEn: ["Stethoscope", "Blood pressure cuff (sphygmomanometer)", "Watch or timer"],
     requiredEquipmentAr: ["سماعة طبية", "جهاز قياس ضغط الدم", "ساعة أو مؤقّت"],
+    normalRanges: [
+      {
+        labelEn: "Heart Rate",
+        labelAr: "معدل ضربات القلب",
+        valueEn: "60 – 100 bpm, regular rhythm",
+        valueAr: "60 – 100 نبضة/دقيقة بنظم منتظم",
+      },
+      { labelEn: "Ideal Blood Pressure", labelAr: "ضغط الدم المثالي", valueEn: "Below 120/80 mmHg", valueAr: "أقل من 120/80 مم زئبق" },
+      {
+        labelEn: "Peripheral Pulses",
+        labelAr: "النبض الطرفي",
+        valueEn: "Strong and equal, palpable bilaterally",
+        valueAr: "قوي ومتماثل ومحسوس في الطرفين",
+      },
+    ],
     patient: {
       nameEn: "Huda",
       nameAr: "هدى",

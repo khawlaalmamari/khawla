@@ -264,6 +264,21 @@ export function SkillPractice({
               <p className="mt-1 text-sm">{dict.nursingLab.patientSafetyNote}</p>
             </div>
 
+            {skill.normalRanges && skill.normalRanges.length > 0 && (
+              <div className="rounded-lg border border-border bg-background p-4">
+                <p className="text-sm font-semibold">{dict.nursingLab.normalRangesTitle}</p>
+                <p className="mt-1 text-xs text-muted">{dict.nursingLab.normalRangesHint}</p>
+                <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {skill.normalRanges.map((range, i) => (
+                    <div key={i}>
+                      <dt className="text-xs text-muted">{locale === "ar" ? range.labelAr : range.labelEn}</dt>
+                      <dd className="font-medium">{locale === "ar" ? range.valueAr : range.valueEn}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+
             <div>
               <p className="text-xs font-semibold text-muted">{dict.nursingLab.requiredEquipmentLabel}</p>
               <ul className="mt-1 list-inside list-disc space-y-1 text-sm">
