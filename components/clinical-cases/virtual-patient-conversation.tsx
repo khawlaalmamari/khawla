@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import type { AttemptView } from "@/lib/clinical-cases/queries";
@@ -20,6 +21,22 @@ import { getDecisionPointSummaries } from "@/lib/clinical-cases/decision-points"
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+// VR-2 — the 3D clinical room is isolated behind a dynamic, ssr:false
+// import (same pattern as the existing 3D Anatomy viewer): its three.js
+// bundle only loads once this component actually mounts, and never runs
+// on the server.
+const ClinicalRoomScene = dynamic(
+  () => import("./clinical-room-scene").then((mod) => mod.ClinicalRoomScene),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[280px] w-full items-center justify-center rounded-xl border border-border bg-surface sm:h-[380px]">
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+      </div>
+    ),
+  },
+);
 
 type EmotionalState = "CALM" | "ANXIOUS" | "UNCOMFORTABLE";
 
@@ -230,6 +247,18 @@ export function VirtualPatientConversation({
   const debriefHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const patient = attempt.visibleData.patientProfile;
+  // VR-2 — whether the patient avatar should skip its walk-in animation
+  // because this attempt already has interview turns beyond the seeded
+  // opening line (e.g. a reload mid-interview). Derived from the attempt's
+  // initial server-rendered messages, not the live `messages` state below,
+  // so sending a message doesn't retrigger the 3D scene.
+  const skipEntrance = attempt.messages.some((m) => m.role === "STUDENT");
+
+  function focusConversationInput() {
+    const input = document.getElementById("patient-question-input");
+    input?.scrollIntoView({ behavior: "smooth", block: "center" });
+    (input as HTMLInputElement | null)?.focus();
+  }
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
@@ -462,6 +491,19 @@ export function VirtualPatientConversation({
 
   return (
     <div className="space-y-6">
+      {/* VR-2 — Clinical Room: a purely presentational 3D framing in front
+          of the existing conversation below; it holds no interview state
+          of its own. */}
+      <Card>
+        <ClinicalRoomScene
+          dict={dict}
+          patientName={locale === "ar" ? patient.name.ar : patient.name.en}
+          settingText={locale === "ar" ? patient.setting.ar : patient.setting.en}
+          skipEntrance={skipEntrance}
+          onStartConversation={focusConversationInput}
+        />
+      </Card>
+
       {/* Virtual Patient */}
       <Card>
         <div className="flex items-center justify-between gap-3">

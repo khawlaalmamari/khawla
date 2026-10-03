@@ -116,6 +116,51 @@ test.describe("Clinical case conversation — English", () => {
   });
 });
 
+test.describe("VR-2 — 3D clinical room", () => {
+  let user: Awaited<ReturnType<typeof createTestUser>>;
+
+  test.beforeEach(async () => {
+    user = await createTestUser();
+  });
+
+  test.afterEach(async () => {
+    await deleteTestUser(user.userId);
+  });
+
+  test("clinical room loads alongside the existing VR-1 conversation, and the existing flow still works", async ({
+    page,
+  }) => {
+    await loginAndStartAttempt(page, user.email, user.password, "en");
+
+    // The 3D room mounts (dynamic, ssr:false) and renders its canvas.
+    const roomCanvasHost = page.getByLabel(
+      "Interactive 3D clinical room — drag to look around, and use the mouse wheel or touch to zoom in and out",
+    );
+    await expect(roomCanvasHost).toBeVisible();
+    await expect(roomCanvasHost.locator("canvas")).toBeVisible();
+
+    // "Start Conversation" connects the room to the existing VR-1 input —
+    // no second conversation surface, no duplicated state.
+    await page.getByRole("button", { name: "Start Conversation" }).click();
+    await expect(page.locator("#patient-question-input")).toBeFocused();
+
+    // The existing VR-1 engine still works unmodified with the room present.
+    const log = page.getByRole("log");
+    await expect(log.getByText(/catch my breath/i)).toBeVisible();
+    await page.locator("#patient-question-input").fill("When did the shortness of breath start?");
+    await page.getByRole("button", { name: "Send" }).click();
+    await expect(log.getByText(/30 minutes ago/i)).toBeVisible();
+  });
+
+  test("clinical room renders in Arabic/RTL", async ({ page }) => {
+    await loginAndStartAttempt(page, user.email, user.password, "ar");
+
+    await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    await expect(page.getByText("الغرفة السريرية")).toBeVisible();
+    await expect(page.getByRole("button", { name: "ابدئي المحادثة" })).toBeVisible();
+  });
+});
+
 test.describe("Clinical case conversation — Arabic / RTL", () => {
   let user: Awaited<ReturnType<typeof createTestUser>>;
 
