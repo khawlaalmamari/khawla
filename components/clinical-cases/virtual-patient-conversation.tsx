@@ -199,6 +199,7 @@ export function VirtualPatientConversation({
   const [status, setStatus] = useState(attempt.status);
   const [summary, setSummary] = useState<InterviewSummary | null>(null);
   const [ending, setEnding] = useState(false);
+  const [confirmingEnd, setConfirmingEnd] = useState(false);
   const [assessmentLoading, setAssessmentLoading] = useState<AssessmentType | null>(null);
   const [decisionSubmitting, setDecisionSubmitting] = useState<string | null>(null);
   const [reasoning, setReasoning] = useState<ReasoningFields>(attempt.reasoning ?? EMPTY_REASONING);
@@ -282,7 +283,11 @@ export function VirtualPatientConversation({
       });
       if (!res.ok) return;
       const data = await res.json();
-      setMessages((m) => [...m, data.studentMessage, data.resultMessage]);
+      setMessages((m) =>
+        data.patientReaction
+          ? [...m, data.patientReaction, data.studentMessage, data.resultMessage]
+          : [...m, data.studentMessage, data.resultMessage],
+      );
     } finally {
       setAssessmentLoading(null);
     }
@@ -389,6 +394,7 @@ export function VirtualPatientConversation({
       setSummary(data.summary ?? null);
     } finally {
       setEnding(false);
+      setConfirmingEnd(false);
     }
   }
 
@@ -878,11 +884,25 @@ export function VirtualPatientConversation({
 
       {/* End Interview / Summary */}
       {status !== "COMPLETED" ? (
-        <div className="flex justify-center">
-          <Button variant="secondary" onClick={endInterview} disabled={ending}>
-            {dict.clinicalCases.endInterviewButton}
-          </Button>
-        </div>
+        confirmingEnd ? (
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-sm text-muted">{dict.clinicalCases.endInterviewConfirmPrompt}</p>
+            <div className="flex justify-center gap-3">
+              <Button variant="outline" onClick={() => setConfirmingEnd(false)} disabled={ending}>
+                {dict.common.cancel}
+              </Button>
+              <Button variant="secondary" onClick={endInterview} disabled={ending}>
+                {dict.clinicalCases.endInterviewButton}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <Button variant="secondary" onClick={() => setConfirmingEnd(true)} disabled={ending}>
+              {dict.clinicalCases.endInterviewButton}
+            </Button>
+          </div>
+        )
       ) : (
         <Card>
           <h2 className="text-lg font-bold">{dict.clinicalCases.interviewSummaryTitle}</h2>

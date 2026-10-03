@@ -14,6 +14,17 @@ const NOT_SURE: Bilingual = {
   ar: "لست متأكدًا من ذلك.",
 };
 
+// Phase VR-1 — one in-character line the patient speaks once, only if the
+// student requests an assessment before asking anything at all (Step
+// "jumping straight to examining" from the brief). Not an authored case
+// fact, so it lives here as fixed patient-voice content rather than in
+// hiddenData — same spirit as NOT_SURE above. Non-punitive: never blocks
+// the assessment, just one extra conversational turn.
+export const PATIENT_ASKS_ABOUT_EXAM_FIRST: Bilingual = {
+  en: "Could you explain what you're going to check first?",
+  ar: "هل يمكنك أن تشرحي لي أولاً ما الذي ستتحققين منه؟",
+};
+
 // Simple, deterministic keyword matching per category (English + Arabic).
 // Not a general-purpose NLP system (Step 6) — just enough to run a
 // structured clinical interview against the sample case. Checked in this
@@ -113,17 +124,50 @@ export type EmotionalState = "CALM" | "ANXIOUS" | "UNCOMFORTABLE";
 
 // Lightweight, deterministic nudge (Step 7) — categories that touch on
 // how bad/threatening things are read as mildly distressing to ask about;
-// everything else leaves the current state alone. Intentionally simple:
-// no decay/recovery logic, no personality modeling.
+// everything else leaves the current state alone.
 const DISTRESSING_CATEGORIES: ReadonlySet<QuestionCategory> = new Set([
   "SEVERITY",
   "AGGRAVATING_FACTORS",
 ]);
 
+// Phase VR-1 — same substring-matching style as KEYWORDS below, not a new
+// subsystem: a short list of empathetic/professional-framing phrases that
+// let the patient recover toward CALM, so emotional state isn't purely
+// one-directional. Deliberately keyword-based (not AI-driven) so this stays
+// "educationally controlled" — the AI persona layer only ever reads
+// whatever state this function already decided, never sets it itself.
+const REASSURING_PHRASES = [
+  "i understand",
+  "i'll explain",
+  "i will explain",
+  "take your time",
+  "no rush",
+  "you're safe",
+  "you are safe",
+  "i'm here to help",
+  "i am here to help",
+  "أتفهم",
+  "خذي وقتك",
+  "خذ وقتك",
+  "لا داعي للقلق",
+  "أنا هنا لمساعدتك",
+  "سأشرح",
+];
+
+function soundsReassuring(studentText: string | undefined): boolean {
+  if (!studentText) return false;
+  const lower = studentText.toLowerCase();
+  return REASSURING_PHRASES.some((phrase) => lower.includes(phrase));
+}
+
 export function nextEmotionalState(
   current: EmotionalState,
   category: QuestionCategory | null,
+  studentText?: string,
 ): EmotionalState {
+  if (current !== "CALM" && soundsReassuring(studentText)) {
+    return "CALM";
+  }
   if (category && DISTRESSING_CATEGORIES.has(category) && current === "CALM") {
     return "ANXIOUS";
   }

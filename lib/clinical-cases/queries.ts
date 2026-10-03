@@ -14,6 +14,7 @@ import type {
 import { ASSESSMENT_TYPES, QUESTION_CATEGORIES } from "./types";
 import {
   ASSESSMENT_ACTION_LABELS,
+  PATIENT_ASKS_ABOUT_EXAM_FIRST,
   buildAssessmentResult,
   getAvailableAssessments,
   getDecisionExplanation,
@@ -289,8 +290,16 @@ function applyPatientVariant(visibleData: VisibleCaseData, variantIndex: number 
  * nameAgeVariants in types.ts. Returns null if the case doesn't exist or
  * isn't published — never trusts a caller-provided case id, only the slug
  * looked up server-side.
+ *
+ * Phase VR-1 — also seeds the patient's opening line (the case's own
+ * chiefComplaint, already authored in first-person patient voice) as the
+ * very first conversation message, so the encounter starts with the
+ * patient speaking rather than an empty log. No new clinical content: it
+ * reuses the exact existing visibleData field. category is left null —
+ * the existing isAssessmentType/isDecisionType checks already treat null
+ * as a plain conversation turn, so this needs no new message shape.
  */
-export async function startCaseAttempt(userId: string, slug: string) {
+export async function startCaseAttempt(userId: string, slug: string, locale: "ar" | "en") {
   const found = await prisma.clinicalCase.findUnique({ where: { slug } });
   if (!found || !found.isPublished) return null;
 
@@ -298,13 +307,25 @@ export async function startCaseAttempt(userId: string, slug: string) {
   const variants = visibleData.patientProfile.nameAgeVariants ?? [];
   const patientVariantIndex = variants.length > 0 ? Math.floor(Math.random() * (variants.length + 1)) : null;
 
-  return prisma.clinicalCaseAttempt.create({
-    data: {
-      userId,
-      caseId: found.id,
-      emotionalState: visibleData.patientProfile.initialEmotionalState,
-      patientVariantIndex,
-    },
+  return prisma.$transaction(async (tx) => {
+    const attempt = await tx.clinicalCaseAttempt.create({
+      data: {
+        userId,
+        caseId: found.id,
+        emotionalState: visibleData.patientProfile.initialEmotionalState,
+        patientVariantIndex,
+      },
+    });
+    await tx.clinicalCaseConversationMessage.create({
+      data: {
+        attemptId: attempt.id,
+        role: "PATIENT",
+        message: visibleData.chiefComplaint[locale],
+        category: null,
+        sequence: 1,
+      },
+    });
+    return attempt;
   });
 }
 
@@ -404,7 +425,7 @@ export async function addConversationTurn(
     locale,
     attempt.emotionalState,
   );
-  const newEmotionalState = nextEmotionalState(attempt.emotionalState, category);
+  const newEmotionalState = nextEmotionalState(attempt.emotionalState, category, studentText);
 
   const priorCount = await prisma.clinicalCaseConversationMessage.count({ where: { attemptId } });
 
@@ -449,7 +470,11 @@ export async function requestAssessment(
 ): Promise<
   | { error: "notFound" }
   | { error: "notSupported" }
-  | { studentMessage: ConversationMessageDTO; resultMessage: ConversationMessageDTO }
+  | {
+      studentMessage: ConversationMessageDTO;
+      resultMessage: ConversationMessageDTO;
+      patientReaction?: ConversationMessageDTO;
+    }
 > {
   const attempt = await prisma.clinicalCaseAttempt.findFirst({
     where: { id: attemptId, userId, status: "IN_PROGRESS" },
@@ -472,18 +497,58 @@ export async function requestAssessment(
   const requestText = ASSESSMENT_ACTION_LABELS[type][locale];
   const priorCount = await prisma.clinicalCaseConversationMessage.count({ where: { attemptId } });
 
-  const [studentMessage, resultMessage] = await prisma.$transaction([
+  // Phase VR-1 — if the student hasn't asked the patient anything yet (the
+  // seeded opening PATIENT line has no STUDENT counterpart, so this is 0
+  // for a genuinely untouched interview) and jumps straight to an
+  // assessment, the patient reacts once in character before the usual
+  // request/result pair — see PATIENT_ASKS_ABOUT_EXAM_FIRST.
+  const priorStudentCount = await prisma.clinicalCaseConversationMessage.count({
+    where: { attemptId, role: "STUDENT" },
+  });
+  const skippedInterview = priorStudentCount === 0;
+  const sequenceOffset = skippedInterview ? 1 : 0;
+
+  const openingReaction = skippedInterview
+    ? [
+        prisma.clinicalCaseConversationMessage.create({
+          data: {
+            attemptId,
+            role: "PATIENT" as const,
+            message: PATIENT_ASKS_ABOUT_EXAM_FIRST[locale],
+            category: null,
+            sequence: priorCount + 1,
+          },
+        }),
+      ]
+    : [];
+
+  const results = await prisma.$transaction([
+    ...openingReaction,
     prisma.clinicalCaseConversationMessage.create({
-      data: { attemptId, role: "STUDENT", message: requestText, category: type, sequence: priorCount + 1 },
+      data: {
+        attemptId,
+        role: "STUDENT",
+        message: requestText,
+        category: type,
+        sequence: priorCount + 1 + sequenceOffset,
+      },
     }),
     prisma.clinicalCaseConversationMessage.create({
-      data: { attemptId, role: "SYSTEM", message: resultText, category: type, sequence: priorCount + 2 },
+      data: {
+        attemptId,
+        role: "SYSTEM",
+        message: resultText,
+        category: type,
+        sequence: priorCount + 2 + sequenceOffset,
+      },
     }),
   ]);
+  const [studentMessage, resultMessage] = results.slice(-2);
 
   return {
     studentMessage: toMessageDTO(studentMessage),
     resultMessage: toMessageDTO(resultMessage),
+    ...(skippedInterview ? { patientReaction: toMessageDTO(results[0]) } : {}),
   };
 }
 
